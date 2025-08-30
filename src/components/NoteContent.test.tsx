@@ -243,11 +243,11 @@ describe('NoteContent', () => {
     // Check that the images have the correct attributes
     expect(images[0]).toHaveAttribute('src', 'https://example.com/image.jpg');
     expect(images[0]).toHaveAttribute('alt', 'Shared image');
-    expect(images[0]).toHaveClass('rounded-lg');
+    expect(images[0]).toHaveClass('object-cover');
 
     expect(images[1]).toHaveAttribute('src', 'https://picsum.photos/200/300.png');
     expect(images[1]).toHaveAttribute('alt', 'Shared image');
-    expect(images[1]).toHaveClass('rounded-lg');
+    expect(images[1]).toHaveClass('object-cover');
 
     // Should not have any links for the image URLs
     const links = screen.queryAllByRole('link');

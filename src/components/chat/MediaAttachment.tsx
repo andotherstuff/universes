@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { X, Download, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { ChatImage } from '@/components/ChatImage';
 import { cn } from '@/lib/utils';
 
 interface MediaAttachmentProps {
@@ -12,6 +13,7 @@ interface MediaAttachmentProps {
   className?: string;
   onRemove?: () => void;
   showRemove?: boolean;
+  onImageClick?: (url: string) => void;
 }
 
 export function MediaAttachment({
@@ -21,7 +23,8 @@ export function MediaAttachment({
   name,
   className,
   onRemove,
-  showRemove = false
+  showRemove = false,
+  onImageClick
 }: MediaAttachmentProps) {
   const [imageError, setImageError] = useState(false);
 
@@ -49,12 +52,12 @@ export function MediaAttachment({
   if (mediaType === 'image' && !imageError) {
     return (
       <div className={cn("relative inline-block max-w-sm", className)}>
-        <img
+        <ChatImage
           src={url}
           alt={fileName}
-          className="rounded-lg max-h-64 w-auto object-cover"
+          className="max-h-64 w-auto"
           onError={() => setImageError(true)}
-          loading="lazy"
+          onClick={() => onImageClick?.(url)}
         />
         {showRemove && onRemove && (
           <Button
