@@ -234,11 +234,13 @@ export function CommunityPanel({ communityId, selectedChannel, selectedSpace, on
       <ScrollArea className="flex-1 min-h-0">
         <div className="p-2 space-y-4 w-full">
           {/* Spaces Navigator - Marketplace and Resources */}
+          <div className="hidden">
           <SpacesNavigator
             communityId={communityId}
             selectedSpace={selectedSpace || null}
             onSelectSpace={(spaceId) => onSelectSpace?.(spaceId)}
           />
+          </div>
 
           {/* Channel Organizer */}
           <ChannelOrganizer
