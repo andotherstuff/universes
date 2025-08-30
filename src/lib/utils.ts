@@ -110,3 +110,68 @@ export function isNaddr(value: string): boolean {
     return false;
   }
 }
+
+/**
+ * Extract channel name from channel ID (handles both "name" and "communityId:name" formats)
+ */
+export function extractChannelName(channelId: string): string {
+  return channelId.includes(':') ? channelId.split(':').pop() || channelId : channelId;
+}
+
+/**
+ * Safely encode naddr for URL usage
+ */
+export function encodeNaddrForUrl(naddr: string): string {
+  try {
+    return encodeURIComponent(naddr);
+  } catch (error) {
+    console.error('Failed to encode naddr for URL:', error);
+    throw new Error('Failed to encode community ID');
+  }
+}
+
+/**
+ * Safely decode URL-encoded naddr
+ */
+export function decodeNaddrFromUrl(encodedNaddr: string): string {
+  try {
+    return encodedNaddr.includes('%') ? decodeURIComponent(encodedNaddr) : encodedNaddr;
+  } catch (error) {
+    console.error('Failed to decode naddr from URL:', error);
+    throw new Error('Failed to decode community ID');
+  }
+}
+
+/**
+ * Generate space URL path with naddr encoding
+ * @returns URL path (e.g., "/space/encoded-naddr/channel-name")
+ */
+export function buildSpacePath(communityId: string, channelId?: string | null): string {
+  const channelName = channelId ? extractChannelName(channelId) : undefined;
+
+  try {
+    const naddr = communityIdToNaddr(communityId);
+    const encodedNaddr = encodeNaddrForUrl(naddr);
+    return channelName ? `/space/${encodedNaddr}/${channelName}` : `/space/${encodedNaddr}`;
+  } catch (error) {
+    console.error('Failed to encode community ID, using fallback:', error);
+    // Fallback to unencoded format
+    return channelName ? `/space/${communityId}/${channelName}` : `/space/${communityId}`;
+  }
+}
+
+/**
+ * Generate full space URL with naddr encoding
+ */
+export function generateSpaceUrl(communityId: string, channelId?: string | null): string {
+  return `${window.location.origin}${buildSpacePath(communityId, channelId)}`;
+}
+
+/**
+ * Update browser URL with space navigation
+ */
+export function updateSpaceUrl(communityId: string, channelId?: string | null): void {
+  const url = new URL(window.location.href);
+  url.pathname = buildSpacePath(communityId, channelId);
+  window.history.replaceState({}, '', url.toString());
+}

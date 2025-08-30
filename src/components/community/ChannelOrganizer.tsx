@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { cn } from '@/lib/utils';
+import { cn, generateSpaceUrl } from '@/lib/utils';
 import {
   Hash,
   Volume2,
@@ -21,6 +21,7 @@ import {
   DropdownMenuTrigger,
   DropdownMenuLabel
 } from "@/components/ui/dropdown-menu";
+import { useToast } from "@/hooks/useToast";
 import {
   ContextMenu,
   ContextMenuContent,
@@ -54,6 +55,7 @@ export function ChannelOrganizer({
   canModerate,
   onChannelCreated,
 }: ChannelOrganizerProps) {
+  const { toast } = useToast();
   const { data: channels, isLoading: isLoadingChannels } = useChannels(communityId);
   const { data: folders, isLoading: isLoadingFolders } = useChannelFolders(communityId);
 
@@ -99,9 +101,18 @@ export function ChannelOrganizer({
   };
 
   const copyChannelLink = (channel: Channel) => {
-    // Create a link to the channel
-    const channelLink = `${window.location.origin}/communities/${communityId}/channels/${channel.id}`;
-    navigator.clipboard.writeText(channelLink);
+    // Create a link to the channel using naddr format
+    try {
+      const channelLink = generateSpaceUrl(communityId, channel.id);
+      navigator.clipboard.writeText(channelLink);
+    } catch {
+      // Show error to user
+      toast({
+        title: "Error",
+        description: "Failed to generate channel link. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   // Show loading skeleton only if we have no data AND we're actually loading (not background fetching)
@@ -483,9 +494,9 @@ function ChannelItemWithPermissionCheck(props: {
   }
 
   return (
-    <ChannelItem 
-      {...props} 
-      hasAccess={canAccess} 
+    <ChannelItem
+      {...props}
+      hasAccess={canAccess}
       isLoadingPermissions={isLoadingPermissions}
     />
   );

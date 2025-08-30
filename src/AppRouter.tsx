@@ -1,5 +1,6 @@
 import { BrowserRouter, Route, Routes, useParams } from "react-router-dom";
 import { ScrollToTop } from "./components/ScrollToTop";
+import { decodeNaddrFromUrl } from "./lib/utils";
 
 import Index from "./pages/Index";
 import Search from "./pages/Search";
@@ -19,17 +20,26 @@ function DMWrapper() {
   return <Index dmTargetPubkey={npub} />;
 }
 
-// Wrapper component to extract community-id parameter and pass it to Index
-// Handles both "kind:pubkey:d-tag" format and naddr format
+// Wrapper component to extract community-id and channel parameters and pass them to Index
+// Handles both "kind:pubkey:d-tag" format and naddr format (URL-encoded)
 function SpacesWrapper() {
-  const { communityId } = useParams<{ communityId?: string }>();
+  const { communityId, channelId } = useParams<{ communityId?: string; channelId?: string }>();
 
   if (!communityId) {
     return <Index />;
   }
 
-  // Pass the communityId as-is to Index - it will handle both formats
-  return <Index spaceCommunityId={communityId} />;
+  // Decode URL-encoded naddr if needed
+  let decodedCommunityId = communityId;
+  try {
+    decodedCommunityId = decodeNaddrFromUrl(communityId);
+  } catch {
+    // Use original ID if decoding fails
+    decodedCommunityId = communityId;
+  }
+
+  // Pass the decoded communityId and channelId to Index
+  return <Index spaceCommunityId={decodedCommunityId} spaceChannelId={channelId} />;
 }
 
 export function AppRouter() {
@@ -56,6 +66,7 @@ export function AppRouter() {
 
         {/* Space Routes - show /space/community-id when joining communities */}
         <Route path="/space/:communityId" element={<SpacesWrapper />} />
+        <Route path="/space/:communityId/:channelId" element={<SpacesWrapper />} />
 
         {/* NIP-19 identifier routes - handle at root level */}
         <Route path="/:nip19" element={<NIP19Page />} />

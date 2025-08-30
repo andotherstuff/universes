@@ -13,6 +13,7 @@ import { useNavigate } from "react-router-dom";
 import { TypingIndicator } from "@/components/chat/TypingIndicator";
 import { VoiceChannel } from "@/components/voice/VoiceChannel";
 import { useChannels } from "@/hooks/useChannels";
+import { generateSpaceUrl } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/useIsMobile";
 import { useCanModerate } from "@/hooks/useCommunityRoles";
 import { useUserRole } from "@/hooks/useCommunityRoles";
@@ -83,10 +84,14 @@ function CommunityChatHeader({
   const isVoiceChannel = channel?.type === "voice";
 
   const copyChannelLink = () => {
-    const channelLink =
-      `${window.location.origin}/communities/${communityId}/channels/${channelId}`;
-    navigator.clipboard.writeText(channelLink);
-    toast.success("Channel link copied to clipboard!");
+    // Use naddr format for community ID
+    try {
+      const channelLink = generateSpaceUrl(communityId, channelId);
+      navigator.clipboard.writeText(channelLink);
+      toast.success("Channel link copied to clipboard!");
+    } catch {
+      toast.error("Failed to generate channel link. Please try again.");
+    }
   };
 
   if (isMobile) {

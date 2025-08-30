@@ -4,14 +4,15 @@ import { DiscordLayout } from "@/components/layout/DiscordLayout";
 import { MessageCircle, ShoppingCart, FolderOpen } from "lucide-react";
 import { useEffect } from "react";
 import { nip19 } from "nostr-tools";
-import { communityIdToNaddr, naddrToCommunityId } from "@/lib/utils";
+import { naddrToCommunityId, updateSpaceUrl } from "@/lib/utils";
 
 interface IndexProps {
   dmTargetPubkey?: string;
   spaceCommunityId?: string;
+  spaceChannelId?: string;
 }
 
-const Index = ({ dmTargetPubkey, spaceCommunityId }: IndexProps) => {
+const Index = ({ dmTargetPubkey, spaceCommunityId, spaceChannelId }: IndexProps) => {
   const { user } = useCurrentUser();
 
 
@@ -29,35 +30,10 @@ const Index = ({ dmTargetPubkey, spaceCommunityId }: IndexProps) => {
   // If spaceCommunityId is provided, ensure user is logged in and handle URL updates
   useEffect(() => {
     if (spaceCommunityId && user) {
-      // Check if the communityId is already in naddr format
-      if (spaceCommunityId.startsWith('naddr1')) {
-        // Already in naddr format, check if URL needs to be updated
-        const currentPath = window.location.pathname;
-        const expectedPath = `/space/${spaceCommunityId}`;
-
-        // Only update URL if it's not already correct (prevents unnecessary redirects)
-        if (currentPath !== expectedPath) {
-          const url = new URL(window.location.href);
-          url.pathname = expectedPath;
-          window.history.replaceState({}, '', url.toString());
-        }
-      } else {
-        // Convert community ID to naddr format for the URL
-        try {
-          const naddr = communityIdToNaddr(spaceCommunityId);
-          const url = new URL(window.location.href);
-          url.pathname = `/space/${naddr}`;
-          window.history.replaceState({}, '', url.toString());
-        } catch {
-          console.error('Failed to encode community ID as naddr');
-          // Fallback to original format
-          const url = new URL(window.location.href);
-          url.pathname = `/space/${spaceCommunityId}`;
-          window.history.replaceState({}, '', url.toString());
-        }
-      }
+      // Update URL with proper naddr encoding
+      updateSpaceUrl(spaceCommunityId, spaceChannelId);
     }
-  }, [spaceCommunityId, user]);
+  }, [spaceCommunityId, spaceChannelId, user]);
 
   if (!user) {
     return (
@@ -76,8 +52,8 @@ const Index = ({ dmTargetPubkey, spaceCommunityId }: IndexProps) => {
           <div className="container mx-auto px-4 pt-16 pb-24">
             {/* Welcome to Universes Hero */}
             <div className="text-center max-w-4xl mx-auto mb-16">
-              <img 
-                src="/universes-logo.png" 
+              <img
+                src="/universes-logo.png"
                 alt="Universes Logo"
                 className="w-32 h-32 mx-auto mb-8"
                 style={{ filter: 'drop-shadow(0 0 30px rgba(255, 255, 255, 0.6))' }}
@@ -85,7 +61,7 @@ const Index = ({ dmTargetPubkey, spaceCommunityId }: IndexProps) => {
               <h1 className="text-5xl md:text-7xl font-bold text-white mb-4 leading-tight">
                 Welcome to Universes
               </h1>
-              
+
               <p className="text-2xl md:text-3xl text-gray-300 mb-12 font-light">
                 A space for all your spaces
               </p>
@@ -109,7 +85,7 @@ const Index = ({ dmTargetPubkey, spaceCommunityId }: IndexProps) => {
 
             {/* Feature Sections */}
             <div className="max-w-7xl mx-auto space-y-32">
-              
+
               {/* Community Feature */}
               <div className="grid lg:grid-cols-2 gap-12 items-center">
                 <div className="order-2 lg:order-1">
@@ -254,7 +230,7 @@ const Index = ({ dmTargetPubkey, spaceCommunityId }: IndexProps) => {
               <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
                 <LoginArea className="w-full max-w-xs" />
               </div>
-              
+
               {/* Footer */}
               <div className="mt-16 pt-8 border-t border-slate-700/50">
                 <div className="flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-8 text-sm text-gray-400">
@@ -331,10 +307,10 @@ const Index = ({ dmTargetPubkey, spaceCommunityId }: IndexProps) => {
       }
     }
 
-    return <DiscordLayout initialDMTargetPubkey={targetHexPubkey} initialSpaceCommunityId={decodedSpaceCommunityId} />;
+    return <DiscordLayout initialDMTargetPubkey={targetHexPubkey} initialSpaceCommunityId={decodedSpaceCommunityId} initialSpaceChannelId={spaceChannelId} />;
   }
 
-  return <DiscordLayout initialSpaceCommunityId={decodedSpaceCommunityId} />;
+  return <DiscordLayout initialSpaceCommunityId={decodedSpaceCommunityId} initialSpaceChannelId={spaceChannelId} />;
 };
 
 export default Index;

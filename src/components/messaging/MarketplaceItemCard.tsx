@@ -8,6 +8,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useAuthor } from '@/hooks/useAuthor';
 import { genUserName } from '@/lib/genUserName';
 import { useToast } from '@/hooks/useToast';
+import { encodeNaddrForUrl } from '@/lib/utils';
 import type { NostrEvent } from '@/types/nostr';
 
 interface MarketplaceItemData {
@@ -99,11 +100,12 @@ export function MarketplaceItemCard({ item, isInDM = true, className }: Marketpl
     });
 
     // Open in new tab or navigate based on environment
+    const encodedNaddr = encodeNaddrForUrl(naddr);
     if (window.open) {
-      window.open(`/${naddr}`, '_blank');
+      window.open(`/space/${encodedNaddr}`, '_blank');
     } else {
       // Fallback: copy to clipboard
-      navigator.clipboard.writeText(`${window.location.origin}/${naddr}`);
+      navigator.clipboard.writeText(`${window.location.origin}/space/${encodedNaddr}`);
       toast({
         title: "Link Copied!",
         description: "Marketplace listing link copied to clipboard",

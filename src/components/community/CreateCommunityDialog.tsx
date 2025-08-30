@@ -13,7 +13,7 @@ import { useToast } from "@/hooks/useToast";
 import { useUploadFile } from "@/hooks/useUploadFile";
 import { useQueryClient, useMutation } from "@tanstack/react-query";
 import { Upload, X, Users, Sparkles, MessageSquare, Hash, Settings, Share, Wand2, Plus, Shield } from "lucide-react";
-import { cn, communityIdToNaddr, generateCommunityIdentifier, generateChannelIdentifier } from "@/lib/utils";
+import { cn, communityIdToNaddr, generateCommunityIdentifier, generateChannelIdentifier, encodeNaddrForUrl } from "@/lib/utils";
 import type { Community } from "@/hooks/useCommunities";
 import { QuickSetupStep } from "./QuickSetupStep";
 
@@ -661,7 +661,8 @@ export function CreateCommunityDialog({ open, onOpenChange, onCommunityCreated }
                         setTimeout(() => {
                           try {
                             const naddr = communityIdToNaddr(createdCommunityId);
-                            navigate(`/space/${naddr}`);
+                            const encodedNaddr = encodeNaddrForUrl(naddr);
+                            navigate(`/space/${encodedNaddr}`);
                           } catch (error) {
                             console.error('Failed to encode community ID:', error);
                             // Fallback to unencoded format if encoding fails
@@ -692,7 +693,8 @@ export function CreateCommunityDialog({ open, onOpenChange, onCommunityCreated }
                         setTimeout(() => {
                           try {
                             const naddr = communityIdToNaddr(createdCommunityId);
-                            navigate(`/space/${naddr}?share=true`);
+                            const encodedNaddr = encodeNaddrForUrl(naddr);
+                            navigate(`/space/${encodedNaddr}?share=true`);
                           } catch (error) {
                             console.error('Failed to encode community ID:', error);
                             // Fallback to unencoded format if encoding fails

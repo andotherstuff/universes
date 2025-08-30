@@ -14,7 +14,7 @@ import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { useAuthor } from "@/hooks/useAuthor";
 import { genUserName } from "@/lib/genUserName";
 import { useToast } from "@/hooks/useToast";
-import { generateCommunityNaddr } from "@/lib/utils";
+import { generateCommunityNaddr, encodeNaddrForUrl } from "@/lib/utils";
 import type { Community } from "@/hooks/useCommunities";
 import type { MembershipStatus } from "@/hooks/useUserMembership";
 import { useCommunityMembers } from "@/hooks/useCommunityMembers";
@@ -130,13 +130,14 @@ function CommunityCard({ community, membershipStatus, onSelect: _onSelect }: Com
   const handleCardClick = () => {
     // Navigate to the main app with the community selected for preview
     const naddr = generateCommunityNaddr(community.event);
+    const encodedNaddr = encodeNaddrForUrl(naddr);
 
     // If user is already a member (approved, owner, or moderator), navigate directly
     if (membershipStatus === 'approved' || membershipStatus === 'owner' || membershipStatus === 'moderator') {
-      navigate(`/${naddr}`);
+      navigate(`/space/${encodedNaddr}`);
     } else if (membershipStatus === 'pending') {
       // For pending requests, navigate to show the community but inform user
-      navigate(`/${naddr}`);
+      navigate(`/space/${encodedNaddr}`);
       setTimeout(() => {
         toast({
           title: 'Request Pending',
@@ -146,7 +147,7 @@ function CommunityCard({ community, membershipStatus, onSelect: _onSelect }: Com
       }, 500);
     } else {
       // For non-members (not-member, declined, banned), navigate to show preview and trigger join flow
-      navigate(`/${naddr}`);
+      navigate(`/space/${encodedNaddr}`);
     }
   };
 

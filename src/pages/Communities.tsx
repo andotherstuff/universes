@@ -13,7 +13,7 @@ import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { useToast } from "@/hooks/useToast";
 import { LoginArea } from "@/components/auth/LoginArea";
 import { CommunityShareDialog } from "@/components/community/CommunityShareDialog";
-import { generateCommunityNaddr } from "@/lib/utils";
+import { generateCommunityNaddr, encodeNaddrForUrl } from "@/lib/utils";
 
 export function Communities() {
   const navigate = useNavigate();
@@ -171,7 +171,8 @@ export function Communities() {
                             className="text-xs sm:text-sm whitespace-nowrap shrink-0"
                             onClick={() => {
                               const naddr = generateCommunityNaddr(community.event);
-                              navigate(`/${naddr}`);
+                              const encodedNaddr = encodeNaddrForUrl(naddr);
+                              navigate(`/space/${encodedNaddr}`);
                             }}
                           >
                             <ExternalLink className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
