@@ -22,10 +22,11 @@ interface CreateCommunityDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onCommunityCreated?: (communityId: string) => void;
+  initialStep?: 'welcome' | 'details' | 'quicksetup' | 'create' | 'success';
 }
 
-export function CreateCommunityDialog({ open, onOpenChange, onCommunityCreated }: CreateCommunityDialogProps) {
-  const [step, setStep] = useState<'welcome' | 'details' | 'quicksetup' | 'create' | 'success'>('welcome');
+export function CreateCommunityDialog({ open, onOpenChange, onCommunityCreated, initialStep = 'welcome' }: CreateCommunityDialogProps) {
+  const [step, setStep] = useState<'welcome' | 'details' | 'quicksetup' | 'create' | 'success'>(initialStep);
   const [formData, setFormData] = useState({
     name: "",
     description: "",
@@ -34,9 +35,7 @@ export function CreateCommunityDialog({ open, onOpenChange, onCommunityCreated }
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string>("");
   const [createdCommunityId, setCreatedCommunityId] = useState<string>("");
-  const [selectedModerators, setSelectedModerators] = useState<string[]>([]);
-  const [requireApproval, setRequireApproval] = useState<boolean>(false);
-  const [preApprovedUsers, setPreApprovedUsers] = useState<string[]>([]);
+  const [requireApproval] = useState<boolean>(true);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const { user } = useCurrentUser();
@@ -49,19 +48,16 @@ export function CreateCommunityDialog({ open, onOpenChange, onCommunityCreated }
   // Reset state when dialog opens
   useEffect(() => {
     if (open) {
-      setStep('welcome');
+      setStep(initialStep);
       setFormData({ name: "", description: "", image: "" });
       setImageFile(null);
       setImagePreview("");
       setCreatedCommunityId("");
-      setSelectedModerators([]);
-      setRequireApproval(false);
-      setPreApprovedUsers([]);
       if (fileInputRef.current) {
         fileInputRef.current.value = "";
       }
     }
-  }, [open]);
+  }, [open, initialStep]);
 
   // Handle image file selection
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -144,10 +140,6 @@ export function CreateCommunityDialog({ open, onOpenChange, onCommunityCreated }
       // Add creator as moderator
       communityTags.push(["p", user!.pubkey, "", "moderator"]);
 
-      // Add selected moderators
-      selectedModerators.forEach(moderatorPubkey => {
-        communityTags.push(["p", moderatorPubkey, "", "moderator"]);
-      });
 
       const communityEvent = await createEvent({
         kind: 34550,
@@ -182,24 +174,6 @@ export function CreateCommunityDialog({ open, onOpenChange, onCommunityCreated }
         tags: settingsTags,
       });
 
-      // Create approved members list if approval is required
-      if (requireApproval && preApprovedUsers.length > 0) {
-        const approvedMembersTags = [
-          ["d", `34550:${user!.pubkey}:${communityIdentifier}`],
-          ["t", "approved-members"],
-        ];
-
-        // Add pre-approved users
-        preApprovedUsers.forEach(userPubkey => {
-          approvedMembersTags.push(["p", userPubkey]);
-        });
-
-        await createEvent({
-          kind: 34551,
-          content: "",
-          tags: approvedMembersTags,
-        });
-      }
 
       // Create default general channel
       const channelDisplayName = 'general';
@@ -558,14 +532,10 @@ export function CreateCommunityDialog({ open, onOpenChange, onCommunityCreated }
           {/* Quick Setup Step */}
           {step === 'quicksetup' && (
             <QuickSetupStep
-              selectedModerators={selectedModerators}
-              onModeratorsChange={setSelectedModerators}
-              requireApproval={requireApproval}
-              onRequireApprovalChange={setRequireApproval}
-              preApprovedUsers={preApprovedUsers}
-              onPreApprovedUsersChange={setPreApprovedUsers}
               onCreateCommunity={() => handleSubmit(new Event('submit') as unknown as React.FormEvent)}
               onPrevious={() => setStep('details')}
+              formData={formData}
+              userPubkey={user?.pubkey || ''}
             />
           )}
 

@@ -11,7 +11,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Switch } from "@/components/ui/switch";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -28,7 +27,6 @@ import { useUploadFile } from "@/hooks/useUploadFile";
 import { useNostrPublish } from "@/hooks/useNostrPublish";
 import { useToast } from "@/hooks/useToast";
 import { useManageMembers } from "@/hooks/useManageMembers";
-import { useCommunitySettings, useUpdateCommunitySettings } from "@/hooks/useCommunitySettings";
 import { genUserName } from "@/lib/genUserName";
 
 import { nip19 } from 'nostr-tools';
@@ -54,9 +52,6 @@ export function CommunitySettings({ communityId, open, onOpenChange }: Community
   const [imagePreview, setImagePreview] = useState<string>("");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Community settings
-  const { data: communitySettings } = useCommunitySettings(communityId);
-  const { mutateAsync: updateSettings } = useUpdateCommunitySettings(communityId);
 
   const { mutateAsync: uploadFile, isPending: isUploading } = useUploadFile();
   const { mutateAsync: createEvent } = useNostrPublish();
@@ -133,23 +128,6 @@ export function CommunitySettings({ communityId, open, onOpenChange }: Community
     }
   };
 
-  // Handle require approval toggle
-  const handleRequireApprovalChange = async (checked: boolean) => {
-    try {
-      await updateSettings({ requireApproval: checked });
-      toast({
-        title: "Success",
-        description: `Approval requirement ${checked ? 'enabled' : 'disabled'} successfully!`,
-      });
-    } catch (error) {
-      console.error("Failed to update approval setting:", error);
-      toast({
-        title: "Error",
-        description: "Failed to update approval setting",
-        variant: "destructive",
-      });
-    }
-  };
 
   // Handle join request approval
   const handleApproveRequest = async (requesterPubkey: string) => {
@@ -484,17 +462,18 @@ export function CommunitySettings({ communityId, open, onOpenChange }: Community
                   {/* Approval Setting */}
                   <div className="flex items-center justify-between p-4 bg-muted/50 rounded-lg border">
                     <div className="space-y-1">
-                      <Label htmlFor="require-approval">Require approval to join</Label>
+                      <div className="flex items-center gap-2">
+                        <Shield className="w-4 h-4 text-green-600" />
+                        <Label>Invite-Only Community</Label>
+                      </div>
                       <p className="text-sm text-muted-foreground">
-                        When enabled, new members need approval to join
+                        All new members require approval to join
                       </p>
                     </div>
-                    <Switch
-                      id="require-approval"
-                      checked={communitySettings?.requireApproval ?? true}
-                      onCheckedChange={handleRequireApprovalChange}
-                      disabled={!isAdmin}
-                    />
+                    <div className="flex items-center gap-2">
+                      <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                      <span className="text-sm text-green-600 font-medium">Enabled</span>
+                    </div>
                   </div>
 
                   {/* Save Button */}

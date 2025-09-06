@@ -1,418 +1,270 @@
-import { useState } from 'react';
-import { Search, UserPlus, X, Shield, Users, Hash, Settings, Check, CheckCircle } from 'lucide-react';
+import { useState, useEffect, useMemo } from 'react';
+import { Shield, Users, Hash, Settings, Check, Copy, QrCode, CheckCircle, Download } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Badge } from '@/components/ui/badge';
-import { Card } from '@/components/ui/card';
-
-import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
-
-import { useUserSearch } from '@/hooks/useUserSearch';
-import { useAuthor } from '@/hooks/useAuthor';
-import { useFriends } from '@/hooks/useFriends';
-import { genUserName } from '@/lib/genUserName';
+import { useToast } from '@/hooks/useToast';
+import { generateCommunityIdentifier } from '@/lib/utils';
+import { nip19 } from 'nostr-tools';
+import QRCode from 'qrcode';
 
 interface QuickSetupStepProps {
-  selectedModerators: string[];
-  onModeratorsChange: (moderators: string[]) => void;
-  requireApproval: boolean;
-  onRequireApprovalChange: (require: boolean) => void;
-  preApprovedUsers: string[];
-  onPreApprovedUsersChange: (users: string[]) => void;
   onCreateCommunity: () => void;
   onPrevious: () => void;
+  formData: {
+    name: string;
+    description: string;
+    image: string;
+  };
+  userPubkey: string;
 }
 
 export function QuickSetupStep({
-  selectedModerators,
-  onModeratorsChange,
-  requireApproval,
-  onRequireApprovalChange,
-  preApprovedUsers,
-  onPreApprovedUsersChange,
   onCreateCommunity,
-  onPrevious
+  onPrevious,
+  formData,
+  userPubkey
 }: QuickSetupStepProps) {
-  const [moderatorSearchQuery, setModeratorSearchQuery] = useState('');
-  const [preApprovedSearchQuery, setPreApprovedSearchQuery] = useState('');
-  const { data: friends } = useFriends();
+  const [copiedField, setCopiedField] = useState<string | null>(null);
+  const [moderatorQrCodeDataUrl, setModeratorQrCodeDataUrl] = useState<string>('');
+  const [memberQrCodeDataUrl, setMemberQrCodeDataUrl] = useState<string>('');
+  const [isGeneratingModeratorQR, setIsGeneratingModeratorQR] = useState(false);
+  const [isGeneratingMemberQR, setIsGeneratingMemberQR] = useState(false);
+  const { toast } = useToast();
 
-  const isUserFriend = (pubkey: string) => {
-    return friends?.some(friend => friend.pubkey === pubkey) || false;
-  };
 
-  const { data: moderatorSearchResults, isLoading: isSearchingModerators } = useUserSearch(moderatorSearchQuery);
-  const { data: preApprovedSearchResults, isLoading: isSearchingPreApproved } = useUserSearch(preApprovedSearchQuery);
+  // Generate preview sharing links (memoized to prevent infinite re-renders)
+  const { moderatorJoinUrl, memberJoinUrl } = useMemo(() => {
+    if (!formData.name.trim() || !userPubkey) return { moderatorJoinUrl: '', memberJoinUrl: '' };
 
-  const addModerator = (pubkey: string) => {
-    if (!selectedModerators.includes(pubkey)) {
-      onModeratorsChange([...selectedModerators, pubkey]);
+    try {
+      const communityIdentifier = generateCommunityIdentifier(formData.name);
+      
+      // Generate naddr
+      const naddr = nip19.naddrEncode({
+        kind: 34550,
+        pubkey: userPubkey,
+        identifier: communityIdentifier,
+      });
+
+      // Generate URLs with role-specific parameters
+      const baseUrl = window.location.origin;
+      const moderatorJoinUrl = `${baseUrl}/join/${encodeURIComponent(naddr)}?role=moderator`;
+      const memberJoinUrl = `${baseUrl}/join/${encodeURIComponent(naddr)}?role=member`;
+
+      return { moderatorJoinUrl, memberJoinUrl };
+    } catch (error) {
+      console.error('Failed to generate preview links:', error);
+      return { moderatorJoinUrl: '', memberJoinUrl: '' };
+    }
+  }, [formData.name, userPubkey]);
+
+  // Generate moderator QR code
+  useEffect(() => {
+    if (!moderatorJoinUrl) return;
+
+    const generateModeratorQRCode = async () => {
+      try {
+        setIsGeneratingModeratorQR(true);
+        const qrDataUrl = await QRCode.toDataURL(moderatorJoinUrl, {
+          width: 200,
+          margin: 2,
+          color: {
+            dark: '#000000',
+            light: '#FFFFFF',
+          },
+        });
+        setModeratorQrCodeDataUrl(qrDataUrl);
+      } catch (error) {
+        console.error('Failed to generate moderator QR code:', error);
+        toast({
+          title: 'Error',
+          description: 'Failed to generate moderator QR code',
+          variant: 'destructive',
+        });
+      } finally {
+        setIsGeneratingModeratorQR(false);
+      }
+    };
+
+    generateModeratorQRCode();
+  }, [moderatorJoinUrl, toast]);
+
+  // Generate member QR code
+  useEffect(() => {
+    if (!memberJoinUrl) return;
+
+    const generateMemberQRCode = async () => {
+      try {
+        setIsGeneratingMemberQR(true);
+        const qrDataUrl = await QRCode.toDataURL(memberJoinUrl, {
+          width: 200,
+          margin: 2,
+          color: {
+            dark: '#000000',
+            light: '#FFFFFF',
+          },
+        });
+        setMemberQrCodeDataUrl(qrDataUrl);
+      } catch (error) {
+        console.error('Failed to generate member QR code:', error);
+        toast({
+          title: 'Error',
+          description: 'Failed to generate member QR code',
+          variant: 'destructive',
+        });
+      } finally {
+        setIsGeneratingMemberQR(false);
+      }
+    };
+
+    generateMemberQRCode();
+  }, [memberJoinUrl, toast]);
+
+  const copyToClipboard = async (text: string, field: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopiedField(field);
+      toast({
+        title: 'Copied to clipboard',
+        description: 'The link has been copied to your clipboard.',
+      });
+      setTimeout(() => setCopiedField(null), 2000);
+    } catch {
+      toast({
+        title: 'Failed to copy',
+        description: 'Could not copy to clipboard. Please copy manually.',
+        variant: 'destructive',
+      });
     }
   };
 
-  const removeModerator = (pubkey: string) => {
-    onModeratorsChange(selectedModerators.filter(p => p !== pubkey));
-  };
+  const copyQRCodeAsImage = async (qrCodeDataUrl: string, field: string) => {
+    try {
+      // Check if clipboard API is available and supports images
+      if (!navigator.clipboard || !navigator.clipboard.write) {
+        throw new Error('Clipboard API not supported');
+      }
 
-  const addPreApprovedUser = (pubkey: string) => {
-    if (!preApprovedUsers.includes(pubkey)) {
-      onPreApprovedUsersChange([...preApprovedUsers, pubkey]);
+      // Convert data URL to blob
+      const response = await fetch(qrCodeDataUrl);
+      const blob = await response.blob();
+      
+      // Check if the browser supports ClipboardItem with images
+      if (!window.ClipboardItem) {
+        throw new Error('ClipboardItem not supported');
+      }
+
+      // Create a proper image blob with correct MIME type
+      const imageBlob = new Blob([blob], { type: 'image/png' });
+
+      // Copy blob to clipboard
+      await navigator.clipboard.write([
+        new ClipboardItem({
+          'image/png': imageBlob
+        })
+      ]);
+      
+      setCopiedField(field);
+      toast({
+        title: 'QR Code Copied!',
+        description: 'The QR code has been copied as an image to your clipboard.',
+      });
+      setTimeout(() => setCopiedField(null), 2000);
+    } catch (error) {
+      console.error('Failed to copy QR code:', error);
+      
+      // Try alternative approach: create a canvas and copy from there
+      try {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        const img = new Image();
+        
+        await new Promise((resolve, reject) => {
+          img.onload = () => {
+            canvas.width = img.width;
+            canvas.height = img.height;
+            ctx?.drawImage(img, 0, 0);
+            
+            canvas.toBlob(async (blob) => {
+              if (blob) {
+                try {
+                  await navigator.clipboard.write([
+                    new ClipboardItem({
+                      'image/png': blob
+                    })
+                  ]);
+                  resolve(true);
+                } catch (clipError) {
+                  reject(clipError);
+                }
+              } else {
+                reject(new Error('Failed to create blob from canvas'));
+              }
+            }, 'image/png');
+          };
+          img.onerror = reject;
+          img.src = qrCodeDataUrl;
+        });
+        
+        setCopiedField(field);
+        toast({
+          title: 'QR Code Copied!',
+          description: 'The QR code has been copied as an image to your clipboard.',
+        });
+        setTimeout(() => setCopiedField(null), 2000);
+      } catch (canvasError) {
+        console.error('Canvas approach also failed:', canvasError);
+        
+        // Final fallback: Copy the data URL as text
+        try {
+          await navigator.clipboard.writeText(qrCodeDataUrl);
+          setCopiedField(field);
+          toast({
+            title: 'QR Code URL Copied',
+            description: 'The QR code URL has been copied to your clipboard. You can paste it into an image editor.',
+          });
+          setTimeout(() => setCopiedField(null), 2000);
+        } catch (fallbackError) {
+          console.error('Fallback copy also failed:', fallbackError);
+          toast({
+            title: 'Copy Failed',
+            description: 'Your browser doesn\'t support copying images. Use the Download button instead.',
+            variant: 'destructive',
+          });
+        }
+      }
     }
   };
 
-  const removePreApprovedUser = (pubkey: string) => {
-    onPreApprovedUsersChange(preApprovedUsers.filter(p => p !== pubkey));
+  const downloadQRCode = (qrCodeDataUrl: string, filename: string) => {
+    try {
+      const link = document.createElement('a');
+      link.href = qrCodeDataUrl;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      toast({
+        title: 'QR Code Downloaded',
+        description: 'The QR code has been saved to your downloads folder.',
+      });
+    } catch (error) {
+      console.error('Failed to download QR code:', error);
+      toast({
+        title: 'Download Failed',
+        description: 'Could not download the QR code. Please try right-clicking and "Save image as".',
+        variant: 'destructive',
+      });
+    }
   };
 
-  const ModeratorCard = ({ pubkey }: { pubkey: string }) => {
-    const author = useAuthor(pubkey);
-    const metadata = author.data?.metadata;
-    const displayName = metadata?.name || genUserName(pubkey);
-    const profileImage = metadata?.picture;
-    const nip05 = metadata?.nip05;
-    const isFriend = isUserFriend(pubkey);
-
-    return (
-      <Card className="p-3">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-3">
-            <div className="relative">
-              <Avatar className="w-10 h-10">
-                <AvatarImage src={profileImage} />
-                <AvatarFallback className="bg-purple-600 text-white">
-                  {displayName.slice(0, 2).toUpperCase()}
-                </AvatarFallback>
-              </Avatar>
-              {isFriend && (
-                <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-blue-500 rounded-full flex items-center justify-center">
-                  <Users className="w-2 h-2 text-white" />
-                </div>
-              )}
-            </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <p className="font-medium text-sm">{displayName}</p>
-                {isFriend && (
-                  <Badge variant="outline" className="text-xs bg-blue-50 text-blue-700 border-blue-200">
-                    Following
-                  </Badge>
-                )}
-              </div>
-              <div className="flex items-center gap-2">
-                <p className="text-xs text-muted-foreground font-mono">{pubkey.slice(0, 16)}...</p>
-                {nip05 && (
-                  <Badge variant="outline" className="text-xs bg-green-50 text-green-700 border-green-200">
-                    ✓ {nip05}
-                  </Badge>
-                )}
-              </div>
-            </div>
-          </div>
-          <div className="flex items-center space-x-2">
-            <Badge variant="secondary" className="bg-purple-100 text-purple-800">
-              <Shield className="w-3 h-3 mr-1" />
-              Moderator
-            </Badge>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => removeModerator(pubkey)}
-              className="h-8 w-8 text-red-400 hover:text-red-300 hover:bg-red-500/20"
-            >
-              <X className="w-4 h-4" />
-            </Button>
-          </div>
-        </div>
-      </Card>
-    );
-  };
-
-  const PreApprovedUserCard = ({ pubkey }: { pubkey: string }) => {
-    const author = useAuthor(pubkey);
-    const metadata = author.data?.metadata;
-    const displayName = metadata?.name || genUserName(pubkey);
-    const profileImage = metadata?.picture;
-    const nip05 = metadata?.nip05;
-    const isFriend = isUserFriend(pubkey);
-
-    return (
-      <Card className="p-3">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-3">
-            <div className="relative">
-              <Avatar className="w-10 h-10">
-                <AvatarImage src={profileImage} />
-                <AvatarFallback className="bg-green-600 text-white">
-                  {displayName.slice(0, 2).toUpperCase()}
-                </AvatarFallback>
-              </Avatar>
-              {isFriend && (
-                <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-blue-500 rounded-full flex items-center justify-center">
-                  <Users className="w-2 h-2 text-white" />
-                </div>
-              )}
-            </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <p className="font-medium text-sm">{displayName}</p>
-                {isFriend && (
-                  <Badge variant="outline" className="text-xs bg-blue-50 text-blue-700 border-blue-200">
-                    Following
-                  </Badge>
-                )}
-              </div>
-              <div className="flex items-center gap-2">
-                <p className="text-xs text-muted-foreground font-mono">{pubkey.slice(0, 16)}...</p>
-                {nip05 && (
-                  <Badge variant="outline" className="text-xs bg-green-50 text-green-700 border-green-200">
-                    ✓ {nip05}
-                  </Badge>
-                )}
-              </div>
-            </div>
-          </div>
-          <div className="flex items-center space-x-2">
-            <Badge variant="secondary" className="bg-green-100 text-green-800">
-              <CheckCircle className="w-3 h-3 mr-1" />
-              Pre-approved
-            </Badge>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => removePreApprovedUser(pubkey)}
-              className="h-8 w-8 text-red-400 hover:text-red-300 hover:bg-red-500/20"
-            >
-              <X className="w-4 h-4" />
-            </Button>
-          </div>
-        </div>
-      </Card>
-    );
-  };
-
-  const SearchResultCard = ({ pubkey, type }: { pubkey: string; type: 'moderator' | 'preapproved' }) => {
-    const author = useAuthor(pubkey);
-    const metadata = author.data?.metadata;
-    const displayName = metadata?.name || genUserName(pubkey);
-    const profileImage = metadata?.picture;
-    const nip05 = metadata?.nip05;
-    const isFriend = isUserFriend(pubkey);
-
-    const isModeratorSelected = selectedModerators.includes(pubkey);
-    const isPreApprovedSelected = preApprovedUsers.includes(pubkey);
-
-    const isSelected = type === 'moderator' ? isModeratorSelected : isPreApprovedSelected;
-    const addAction = type === 'moderator' ? addModerator : addPreApprovedUser;
-    const removeAction = type === 'moderator' ? removeModerator : removePreApprovedUser;
-    const selectedColor = type === 'moderator' ? 'bg-purple-900/50 border-purple-500/30' : 'bg-green-900/50 border-green-500/30';
-    const buttonColor = type === 'moderator' ? 'bg-purple-600 hover:bg-purple-700' : 'bg-green-600 hover:bg-green-700';
-
-    return (
-      <Card className={`p-3 cursor-pointer transition-colors ${isSelected ? selectedColor : 'hover:bg-slate-800/50'}`}>
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-3">
-            <div className="relative">
-              <Avatar className="w-10 h-10">
-                <AvatarImage src={profileImage} />
-                <AvatarFallback className="bg-gray-600 text-white">
-                  {displayName.slice(0, 2).toUpperCase()}
-                </AvatarFallback>
-              </Avatar>
-              {isFriend && (
-                <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-blue-500 rounded-full flex items-center justify-center">
-                  <Users className="w-2 h-2 text-white" />
-                </div>
-              )}
-            </div>
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2">
-                <p className="font-medium text-sm truncate">{displayName}</p>
-                {isFriend && (
-                  <Badge variant="outline" className="text-xs bg-blue-50 text-blue-700 border-blue-200">
-                    Following
-                  </Badge>
-                )}
-              </div>
-              <div className="flex items-center gap-2">
-                <p className="text-xs text-muted-foreground font-mono truncate">{pubkey.slice(0, 16)}...</p>
-                {nip05 && (
-                  <Badge variant="outline" className="text-xs bg-blue-50 text-blue-700 border-blue-200 truncate max-w-[120px]">
-                    {nip05}
-                  </Badge>
-                )}
-              </div>
-            </div>
-          </div>
-          <Button
-            variant={isSelected ? "default" : "outline"}
-            size="sm"
-            onClick={() => isSelected ? removeAction(pubkey) : addAction(pubkey)}
-            className={isSelected ? buttonColor : "bg-slate-800/50 border-slate-700/50 text-purple-200 hover:bg-slate-700/50 hover:text-white"}
-          >
-            {isSelected ? (
-              <>
-                <Check className="w-4 h-4 mr-1" />
-                Selected
-              </>
-            ) : (
-              <>
-                <UserPlus className="w-4 h-4 mr-1" />
-                Add
-              </>
-            )}
-          </Button>
-        </div>
-      </Card>
-    );
-  };
 
   return (
     <div className="space-y-6">
-      {/* Top Section - Moderators */}
-      <div className='relative p-6 rounded-2xl bg-slate-800/40 backdrop-blur-sm border border-slate-700/50'>
-        <div className="space-y-4">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-purple-500/20 to-pink-500/20 rounded-full flex items-center justify-center shadow-lg border border-purple-500/30">
-              <Shield className="w-5 h-5 text-purple-400" />
-            </div>
-            <h3 className="text-2xl font-bold text-white">
-              MODERATORS
-            </h3>
-          </div>
 
-          <p className="text-purple-200">
-            Add trusted users to help manage your community. You're automatically a moderator.
-          </p>
-
-          {/* Selected Moderators */}
-          {selectedModerators.length > 0 && (
-            <div className="space-y-2">
-              <h4 className="font-medium text-sm text-purple-300">
-                Selected ({selectedModerators.length})
-              </h4>
-              <div className="space-y-2 max-h-40 overflow-y-auto">
-                {selectedModerators.map((pubkey) => (
-                  <ModeratorCard key={pubkey} pubkey={pubkey} />
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Search for Moderators */}
-          <div className="space-y-2">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-4 h-4" />
-              <Input
-                placeholder="Search by name, npub, or nip-05..."
-                value={moderatorSearchQuery}
-                onChange={(e) => setModeratorSearchQuery(e.target.value)}
-                className="pl-10 bg-slate-800/50 border-slate-700/50 text-white placeholder:text-slate-500 focus:border-purple-500 focus:ring-purple-500/20"
-              />
-            </div>
-
-            {/* Search Results */}
-            {moderatorSearchQuery && (
-              <div className="space-y-2 max-h-40 overflow-y-auto">
-                {isSearchingModerators ? (
-                  <div className="text-center py-4 text-purple-300">
-                    Searching users...
-                  </div>
-                ) : moderatorSearchResults && moderatorSearchResults.length > 0 ? (
-                  moderatorSearchResults.slice(0, 5).map((pubkey) => (
-                    <SearchResultCard key={`mod-${pubkey}`} pubkey={pubkey} type="moderator" />
-                  ))
-                ) : (
-                  <div className="text-center py-4 text-purple-300">
-                    No users found. Try a different search term.
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
-
-      {/* Middle Section - User Approval */}
-      <div className='relative p-6 rounded-2xl bg-slate-800/40 backdrop-blur-sm border border-slate-700/50'>
-        <div className="space-y-4">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-green-500/20 to-emerald-500/20 rounded-full flex items-center justify-center shadow-lg border border-green-500/30">
-              <CheckCircle className="w-5 h-5 text-green-400" />
-            </div>
-            <h3 className="text-2xl font-bold text-white">
-              MEMBER APPROVAL
-            </h3>
-          </div>
-          <div className="flex items-center space-x-2">
-            <Switch
-              id="approval"
-              checked={requireApproval}
-              onCheckedChange={onRequireApprovalChange}
-            />
-            <Label htmlFor="approval" className="text-sm font-medium text-purple-200">
-              Require approval for new members
-            </Label>
-          </div>
-
-          {requireApproval && (
-            <>
-              <p className="text-purple-200">
-                These users will be automatically approved when they request to join:
-              </p>
-
-              {/* Selected Pre-approved Users */}
-              {preApprovedUsers.length > 0 && (
-                <div className="space-y-2">
-                  <h4 className="font-medium text-sm text-green-300">
-                    Pre-approved ({preApprovedUsers.length})
-                  </h4>
-                  <div className="space-y-2 max-h-40 overflow-y-auto">
-                    {preApprovedUsers.map((pubkey) => (
-                      <PreApprovedUserCard key={pubkey} pubkey={pubkey} />
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Search for Pre-approved Users */}
-              <div className="space-y-2">
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-4 h-4" />
-                  <Input
-                    placeholder="Search by name, npub, or nip-05..."
-                    value={preApprovedSearchQuery}
-                    onChange={(e) => setPreApprovedSearchQuery(e.target.value)}
-                    className="pl-10 bg-slate-800/50 border-slate-700/50 text-white placeholder:text-slate-500 focus:border-purple-500 focus:ring-purple-500/20"
-                  />
-                </div>
-
-                {/* Search Results */}
-                {preApprovedSearchQuery && (
-                  <div className="space-y-2 max-h-40 overflow-y-auto">
-                    {isSearchingPreApproved ? (
-                      <div className="text-center py-4 text-purple-300">
-                        Searching users...
-                      </div>
-                    ) : preApprovedSearchResults && preApprovedSearchResults.length > 0 ? (
-                      preApprovedSearchResults.slice(0, 5).map((pubkey) => (
-                        <SearchResultCard key={`pre-${pubkey}`} pubkey={pubkey} type="preapproved" />
-                      ))
-                    ) : (
-                      <div className="text-center py-4 text-purple-300">
-                        No users found. Try a different search term.
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
-            </>
-          )}
-        </div>
-      </div>
-
-      {/* Bottom Section - What's Included */}
+      {/* What's Included */}
       <div className='relative p-6 rounded-2xl bg-slate-800/40 backdrop-blur-sm border border-slate-700/50'>
         <div className="space-y-4">
           <div className="flex items-center gap-3">
@@ -449,6 +301,207 @@ export function QuickSetupStep({
           </div>
         </div>
       </div>
+
+      {/* Moderator Invitations Section */}
+      {formData.name.trim() && (
+        <div className='relative p-6 rounded-2xl bg-slate-800/40 backdrop-blur-sm border border-slate-700/50'>
+          <div className="space-y-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-gradient-to-br from-purple-500/20 to-pink-500/20 rounded-full flex items-center justify-center shadow-lg border border-purple-500/30">
+                <Shield className="w-5 h-5 text-purple-400" />
+              </div>
+              <h3 className="text-2xl font-bold text-white">
+                INVITE MODERATORS
+              </h3>
+            </div>
+
+            <p className="text-purple-200">
+              Share this link with trusted users you want to make moderators. They'll be able to help manage your community.
+            </p>
+
+            <div className="space-y-4">
+              {/* Moderator Invite Link */}
+              <div className="space-y-2">
+                <Label className="text-sm font-medium text-purple-200">Moderator Invite Link</Label>
+                <div className="flex gap-2">
+                  <Input
+                    value={moderatorJoinUrl}
+                    readOnly
+                    className="font-mono text-sm bg-slate-800/50 border-slate-700/50 text-white"
+                  />
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={() => copyToClipboard(moderatorJoinUrl, 'moderator-invite')}
+                    className="bg-slate-800/50 border-slate-700/50 text-purple-200 hover:bg-slate-700/50 hover:text-white"
+                  >
+                    {copiedField === 'moderator-invite' ? (
+                      <Check className="w-4 h-4" />
+                    ) : (
+                      <Copy className="w-4 h-4" />
+                    )}
+                  </Button>
+                </div>
+                <p className="text-xs text-purple-300">
+                  Send this to users you want to make moderators
+                </p>
+              </div>
+
+              {/* Moderator QR Code */}
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <Label className="text-sm font-medium text-purple-200">QR Code</Label>
+                  {moderatorQrCodeDataUrl && (
+                    <div className="flex gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => copyQRCodeAsImage(moderatorQrCodeDataUrl, 'moderator-qr')}
+                        className="bg-slate-800/50 border-slate-700/50 text-purple-200 hover:bg-slate-700/50 hover:text-white"
+                      >
+                        {copiedField === 'moderator-qr' ? (
+                          <CheckCircle className="w-4 h-4" />
+                        ) : (
+                          <Copy className="w-4 h-4" />
+                        )}
+                        <span className="ml-1">
+                          {copiedField === 'moderator-qr' ? 'Copied!' : 'Copy'}
+                        </span>
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => downloadQRCode(moderatorQrCodeDataUrl, `moderator-qr-${formData.name.replace(/\s+/g, '-').toLowerCase()}.png`)}
+                        className="bg-slate-800/50 border-slate-700/50 text-purple-200 hover:bg-slate-700/50 hover:text-white"
+                      >
+                        <Download className="w-4 h-4" />
+                        <span className="ml-1">Download</span>
+                      </Button>
+                    </div>
+                  )}
+                </div>
+                <div className="flex items-center gap-4">
+                  <div className="w-32 h-32 bg-white rounded-lg p-2 flex items-center justify-center">
+                    {isGeneratingModeratorQR ? (
+                      <div className="w-8 h-8 border-2 border-purple-500 border-t-transparent rounded-full animate-spin"></div>
+                    ) : moderatorQrCodeDataUrl ? (
+                      <img src={moderatorQrCodeDataUrl} alt="Moderator QR Code" className="w-full h-full" />
+                    ) : (
+                      <QrCode className="w-8 h-8 text-gray-400" />
+                    )}
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-xs text-purple-300">
+                      Scan this QR code to get the moderator invite link on mobile devices
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Member Invitations Section */}
+      {formData.name.trim() && (
+        <div className='relative p-6 rounded-2xl bg-slate-800/40 backdrop-blur-sm border border-slate-700/50'>
+          <div className="space-y-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-gradient-to-br from-blue-500/20 to-cyan-500/20 rounded-full flex items-center justify-center shadow-lg border border-blue-500/30">
+                <Users className="w-5 h-5 text-blue-400" />
+              </div>
+              <h3 className="text-2xl font-bold text-white">
+                INVITE MEMBERS
+              </h3>
+            </div>
+
+            <p className="text-blue-200">
+              Share this link with people you want to join your community. They'll need approval to become members.
+            </p>
+
+            <div className="space-y-4">
+              {/* Member Join Link */}
+              <div className="space-y-2">
+                <Label className="text-sm font-medium text-blue-200">Member Join Link</Label>
+                <div className="flex gap-2">
+                  <Input
+                    value={memberJoinUrl}
+                    readOnly
+                    className="font-mono text-sm bg-slate-800/50 border-slate-700/50 text-white"
+                  />
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={() => copyToClipboard(memberJoinUrl, 'member-join')}
+                    className="bg-slate-800/50 border-slate-700/50 text-blue-200 hover:bg-slate-700/50 hover:text-white"
+                  >
+                    {copiedField === 'member-join' ? (
+                      <Check className="w-4 h-4" />
+                    ) : (
+                      <Copy className="w-4 h-4" />
+                    )}
+                  </Button>
+                </div>
+                <p className="text-xs text-blue-300">
+                  Share this link to let people request to join your space
+                </p>
+              </div>
+
+              {/* Member QR Code */}
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <Label className="text-sm font-medium text-blue-200">QR Code</Label>
+                  {memberQrCodeDataUrl && (
+                    <div className="flex gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => copyQRCodeAsImage(memberQrCodeDataUrl, 'member-qr')}
+                        className="bg-slate-800/50 border-slate-700/50 text-blue-200 hover:bg-slate-700/50 hover:text-white"
+                      >
+                        {copiedField === 'member-qr' ? (
+                          <CheckCircle className="w-4 h-4" />
+                        ) : (
+                          <Copy className="w-4 h-4" />
+                        )}
+                        <span className="ml-1">
+                          {copiedField === 'member-qr' ? 'Copied!' : 'Copy'}
+                        </span>
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => downloadQRCode(memberQrCodeDataUrl, `member-qr-${formData.name.replace(/\s+/g, '-').toLowerCase()}.png`)}
+                        className="bg-slate-800/50 border-slate-700/50 text-blue-200 hover:bg-slate-700/50 hover:text-white"
+                      >
+                        <Download className="w-4 h-4" />
+                        <span className="ml-1">Download</span>
+                      </Button>
+                    </div>
+                  )}
+                </div>
+                <div className="flex items-center gap-4">
+                  <div className="w-32 h-32 bg-white rounded-lg p-2 flex items-center justify-center">
+                    {isGeneratingMemberQR ? (
+                      <div className="w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+                    ) : memberQrCodeDataUrl ? (
+                      <img src={memberQrCodeDataUrl} alt="Member QR Code" className="w-full h-full" />
+                    ) : (
+                      <QrCode className="w-8 h-8 text-gray-400" />
+                    )}
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-xs text-blue-300">
+                      Scan this QR code to get the member join link on mobile devices
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
 
       {/* Navigation */}
       <div className="flex justify-between pt-4">

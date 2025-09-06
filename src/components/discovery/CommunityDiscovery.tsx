@@ -214,9 +214,21 @@ function CommunityCard({ community, membershipStatus, onSelect }: CommunityCardP
                 Pending
               </Badge>
             )}
-            <Badge variant="secondary" className="text-xs">
-              Public
-            </Badge>
+            {membershipStatus === 'approved' && (
+              <Badge variant="outline" className="text-xs text-green-400 border-green-400">
+                Member
+              </Badge>
+            )}
+            {membershipStatus === 'owner' && (
+              <Badge variant="outline" className="text-xs text-purple-400 border-purple-400">
+                Owner
+              </Badge>
+            )}
+            {membershipStatus === 'moderator' && (
+              <Badge variant="outline" className="text-xs text-blue-400 border-blue-400">
+                Moderator
+              </Badge>
+            )}
           </div>
         </div>
       </CardContent>

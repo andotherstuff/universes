@@ -56,6 +56,7 @@ export function CommunitySelectionDialog({
         open={showCreateDialog}
         onOpenChange={handleCreateDialogClose}
         onCommunityCreated={handleCommunityCreated}
+        initialStep="details"
       />
     );
   }
