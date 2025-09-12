@@ -30,7 +30,8 @@ export interface Notification {
 export function useNotifications() {
   const { nostr } = useNostr();
   const { user } = useCurrentUser();
-  const { messages: dmMessages } = useDataManager();
+  const { messaging } = useDataManager();
+  const { messages: dmMessages } = messaging;
 
   return useQuery({
     queryKey: ['notifications', user?.pubkey, dmMessages.size],

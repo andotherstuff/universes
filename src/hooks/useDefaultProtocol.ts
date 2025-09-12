@@ -11,7 +11,8 @@ import { useDefaultProtocolSetting } from './useDefaultProtocolSetting';
 export function useDefaultProtocol(conversationId?: string) {
   const [defaultProtocolSetting] = useDefaultProtocolSetting();
   const { settings } = useUserSettings();
-  const { conversations } = useDataManager();
+  const { messaging } = useDataManager();
+  const { conversations } = messaging;
   const isNIP17Enabled = settings.enableNIP17;
 
   return useMemo(() => {

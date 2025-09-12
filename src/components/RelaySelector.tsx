@@ -25,7 +25,8 @@ interface RelaySelectorProps {
 export function RelaySelector(props: RelaySelectorProps) {
   const { className } = props;
   const { config, updateConfig, presetRelays = [] } = useAppContext();
-  const { resetMessageDataAndCache } = useDataManager();
+  const { messaging } = useDataManager();
+  const { resetMessageDataAndCache } = messaging;
 
   const selectedRelay = config.relayUrl;
   const setSelectedRelay = (relay: string) => {

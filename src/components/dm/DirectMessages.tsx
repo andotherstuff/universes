@@ -40,13 +40,14 @@ export function DirectMessages({ targetPubkey, selectedConversation: propSelecte
   const { user } = useCurrentUser();
   const { toast } = useToast();
   // Use the DataManager for all conversation data
+  const { messaging } = useDataManager();
   const {
     conversations: newConversations,
     isLoading,
     loadingPhase,
     isDoingInitialLoad,
     subscriptions
-  } = useDataManager();
+  } = messaging;
 
   // Use controlled state if provided, otherwise use internal state
   const selectedConversation = propSelectedConversation !== undefined ? propSelectedConversation : internalSelectedConversation;

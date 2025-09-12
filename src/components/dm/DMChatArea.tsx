@@ -84,7 +84,8 @@ export function DMChatArea(
   { conversationId, onNavigateToDMs, onBack, onMessageSent }: DMChatAreaProps,
 ) {
   const { messages: conversationMessages } = useConversationMessages(conversationId);
-  const { sendMessage, isDoingInitialLoad, isLoading } = useDataManager();
+  const { messaging } = useDataManager();
+  const { sendMessage, isDoingInitialLoad, isLoading } = messaging;
 
   // Simple pagination from conversation messages
   const [displayLimit, setDisplayLimit] = useState<number>(MESSAGES_PER_PAGE);

@@ -61,7 +61,8 @@ export function MemberCard({
   const [mobileDialogOpen, setMobileDialogOpen] = useState(false);
 
   // DM functionality
-  const { sendMessage: sendDM } = useDataManager();
+  const { messaging } = useDataManager();
+  const { sendMessage: sendDM } = messaging;
   const [isSendingDM, setIsSendingDM] = useState(false);
 
   // Follow state and actions

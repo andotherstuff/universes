@@ -8,7 +8,8 @@ import { MESSAGE_PROTOCOL } from '@/lib/dmConstants';
  * Only re-runs when the specific conversation's protocol flags change.
  */
 export function useAutoProtocol(conversationId?: string) {
-  const { messages } = useDataManager();
+  const { messaging } = useDataManager();
+  const { messages } = messaging;
 
   // Extract just the protocol flags for this specific conversation
   const conversationData = conversationId ? messages.get(conversationId) : null;

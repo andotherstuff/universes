@@ -1,40 +1,43 @@
-import { Users, Crown, Shield, MessageCircle } from "lucide-react";
+import { Users, Crown, Shield, MessageCircle, Settings } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Skeleton } from "@/components/ui/skeleton";
 import { DirectMessages } from "@/components/dm/DirectMessages";
-import { useCommunities } from "@/hooks/useCommunities";
-import { useCommunityById } from "@/hooks/useCommunityById";
 import { CommunitySettings } from "@/components/community/CommunitySettings";
 import { ChannelSettingsDialog } from "@/components/community/ChannelSettingsDialog";
 import { FolderManagementDialog } from "@/components/community/FolderManagementDialog";
-import { ChannelOrganizer } from "@/components/community/ChannelOrganizer";
+import { CommunityChannelList } from "@/components/community/CommunityChannelList";
 import { useChannels, type Channel } from "@/hooks/useChannels";
 import { useCanModerate } from "@/hooks/useCommunityRoles";
-import { useUserCommunities } from "@/hooks/useUserCommunities";
+import { useDataManager } from "@/components/DataManagerProvider";
 import { useIsMobile } from "@/hooks/useIsMobile";
 import { useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { SpacesNavigator } from "@/components/spaces/SpacesNavigator";
+import { Button } from "@/components/ui/button";
+import { CommunitySectionNav } from "@/components/spaces/CommunitySectionNav";
+import { useNavigate } from "react-router-dom";
 
 interface CommunityPanelProps {
   communityId: string | null;
   selectedChannel: string | null;
   selectedSpace?: string | null;
-  onSelectChannel: (channelId: string | null) => void;
+  onSelectChannel?: (channelId: string | null) => void;
   onSelectSpace?: (spaceId: string | null) => void;
   onSelectCommunity?: (communityId: string | null) => void;
   dmTargetPubkey?: string | null;
   onDmTargetHandled?: () => void;
   onNavigateToDMs?: (targetPubkey: string) => void;
+  managementMode?: boolean;
 }
 
-export function CommunityPanel({ communityId, selectedChannel, selectedSpace, onSelectChannel, onSelectSpace, onSelectCommunity, dmTargetPubkey, onDmTargetHandled, onNavigateToDMs }: CommunityPanelProps) {
-  const { data: communities } = useCommunities();
-  const { data: specificCommunity, isLoading: isLoadingSpecificCommunity } = useCommunityById(communityId);
-  const { data: userCommunities, isLoading: isLoadingUserCommunities } = useUserCommunities();
+export function CommunityPanel({ communityId, selectedChannel, selectedSpace, onSelectChannel, onSelectSpace, onSelectCommunity, dmTargetPubkey, onDmTargetHandled, onNavigateToDMs, managementMode = false }: CommunityPanelProps) {
+  const { communities } = useDataManager();
+
+  // Convert DataManager communities to array for compatibility with existing code
+  const userCommunities = Array.from(communities.communities.values());
   const { refetch: refetchChannels } = useChannels(communityId);
   const { canModerate } = useCanModerate(communityId || '');
   const isMobile = useIsMobile();
+  const navigate = useNavigate();
   const [showSettings, setShowSettings] = useState(false);
   const [showFolderManagement, setShowFolderManagement] = useState(false);
   const [selectedChannelForSettings, setSelectedChannelForSettings] = useState<Channel | null>(null);
@@ -43,9 +46,8 @@ export function CommunityPanel({ communityId, selectedChannel, selectedSpace, on
     refetchChannels();
   };
 
-  // Try to find the community in the general communities list first,
-  // then fall back to the specific community query for direct navigation
-  const community = communities?.find(c => c.id === communityId) || specificCommunity;
+  // Use DataManager as the primary source for community data
+  const community = communities.communities.get(communityId || '');
 
   if (!communityId) {
     // On mobile, show communities list instead of Direct Messages
@@ -57,13 +59,13 @@ export function CommunityPanel({ communityId, selectedChannel, selectedSpace, on
               Your Communities
             </h2>
             <p className="text-sm text-gray-400">
-              {userCommunities?.length || 0} communities
+              {userCommunities.length} communities
             </p>
           </div>
 
           <ScrollArea className="flex-1 mobile-communities-container min-h-0">
             <div className="p-4 space-y-3 mobile-communities-container">
-              {isLoadingUserCommunities ? (
+              {communities.isLoading ? (
                 // Loading skeleton
                 Array.from({ length: 3 }).map((_, i) => (
                   <div key={i} className="w-full flex flex-col items-center p-3 rounded-lg bg-gray-700/50 overflow-hidden">
@@ -74,7 +76,7 @@ export function CommunityPanel({ communityId, selectedChannel, selectedSpace, on
                     </div>
                   </div>
                 ))
-              ) : userCommunities && userCommunities.length > 0 ? (
+              ) : userCommunities.length > 0 ? (
                 userCommunities.map((community) => (
                   <button
                     key={community.id}
@@ -83,16 +85,16 @@ export function CommunityPanel({ communityId, selectedChannel, selectedSpace, on
                   >
                     {/* Icon/Avatar at the top */}
                     <div className="w-full flex justify-center mb-3">
-                      {community.image ? (
+                      {community.info.image ? (
                         <Avatar className="w-12 h-12 shrink-0">
-                          <AvatarImage src={community.image} alt={community.name} />
+                          <AvatarImage src={community.info.image} alt={community.info.name} />
                           <AvatarFallback className="bg-primary text-primary-foreground">
-                            {community.name.slice(0, 2).toUpperCase()}
+                            {community.info.name.slice(0, 2).toUpperCase()}
                           </AvatarFallback>
                         </Avatar>
                       ) : (
                         <div className="w-12 h-12 shrink-0 bg-primary rounded-lg flex items-center justify-center text-primary-foreground font-semibold text-sm">
-                          {community.name.slice(0, 2).toUpperCase()}
+                          {community.info.name.slice(0, 2).toUpperCase()}
                         </div>
                       )}
                     </div>
@@ -101,7 +103,7 @@ export function CommunityPanel({ communityId, selectedChannel, selectedSpace, on
                     <div className="w-full text-center">
                       <div className="flex items-center justify-center mb-1">
                         <h3 className="font-medium text-white text-sm">
-                          {community.name}
+                          {community.info.name}
                         </h3>
                         {(community.membershipStatus === 'owner' || community.membershipStatus === 'moderator') && (
                           <div className="ml-2 shrink-0">
@@ -115,7 +117,7 @@ export function CommunityPanel({ communityId, selectedChannel, selectedSpace, on
                         )}
                       </div>
                       <p className="text-xs text-gray-400 break-words">
-                        {community.description || `${community.moderators.length + 1} members`}
+                        {community.info.description || `${community.info.moderators.length + 1} members`}
                       </p>
                     </div>
                   </button>
@@ -165,7 +167,7 @@ export function CommunityPanel({ communityId, selectedChannel, selectedSpace, on
     );
   }
 
-  if (!community && (isLoadingSpecificCommunity || !communityId)) {
+  if (!community && !communityId) {
     return (
       <div className="flex flex-col h-full min-h-0">
         <div className="p-4 border-b border-gray-600">
@@ -209,48 +211,63 @@ export function CommunityPanel({ communityId, selectedChannel, selectedSpace, on
           </div>
         ) : (
           <div className="flex items-center space-x-2 w-full">
-            {community.image ? (
+            {community.info.image ? (
               <Avatar className="w-8 h-8 flex-shrink-0">
-                <AvatarImage src={community.image} alt={community.name} />
+                <AvatarImage src={community.info.image} alt={community.info.name} />
                 <AvatarFallback className="text-sm font-semibold">
-                  {community.name.slice(0, 2).toUpperCase()}
+                  {community.info.name.slice(0, 2).toUpperCase()}
                 </AvatarFallback>
               </Avatar>
             ) : (
               <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center text-primary-foreground font-semibold text-sm flex-shrink-0">
-                {community.name.slice(0, 2).toUpperCase()}
+                {community.info.name.slice(0, 2).toUpperCase()}
               </div>
             )}
 
             <div className="min-w-0 flex-1">
               <h1 className="text-base font-semibold text-gray-900 dark:text-white truncate">
-                {community.name}
+                {community.info.name}
               </h1>
             </div>
+
+            {/* Management Button for Owners/Moderators */}
+            {canModerate && (
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => navigate(`/space/${encodeURIComponent(communityId)}/manage`)}
+                className="w-8 h-8 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 flex-shrink-0"
+                title="Manage Community"
+              >
+                <Settings className="w-4 h-4" />
+              </Button>
+            )}
           </div>
         )}
       </div>
 
       <ScrollArea className="flex-1 min-h-0">
         <div className="p-2 space-y-4 w-full">
-          {/* Spaces Navigator - Marketplace and Resources */}
+          {/* Community Section Navigator - Marketplace and Resources */}
           <div className="hidden">
-          <SpacesNavigator
-            communityId={communityId}
-            selectedSpace={selectedSpace || null}
-            onSelectSpace={(spaceId) => onSelectSpace?.(spaceId)}
-          />
+            <CommunitySectionNav
+              communityId={communityId}
+              selectedSpace={selectedSpace || null}
+              onSelectSpace={(spaceId) => onSelectSpace?.(spaceId)}
+            />
           </div>
 
-          {/* Channel Organizer */}
-          <ChannelOrganizer
-            communityId={communityId}
-            selectedChannel={selectedChannel}
-            onSelectChannel={(channelId) => onSelectChannel(channelId)}
-            onChannelSettings={setSelectedChannelForSettings}
-            canModerate={canModerate}
-            onChannelCreated={handleChannelCreated}
-          />
+          {/* Community Channel List - Hide in management mode */}
+          {!managementMode && (
+            <CommunityChannelList
+              communityId={communityId}
+              selectedChannel={selectedChannel}
+              onSelectChannel={(channelId) => onSelectChannel?.(channelId)}
+              onChannelSettings={setSelectedChannelForSettings}
+              canModerate={canModerate}
+              onChannelCreated={handleChannelCreated}
+            />
+          )}
         </div>
       </ScrollArea>
 

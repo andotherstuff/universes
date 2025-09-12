@@ -78,17 +78,17 @@ function AppContent() {
 
   return (
     <SettingsProvider>
-        <MessageSystemProvider>
-          <TooltipProvider>
-            <QueryOptimizer />
-            <Toaster />
-            <Sonner />
-            <Suspense>
-              <AppRouter />
-            </Suspense>
-            <SettingsDialog />
-          </TooltipProvider>
-        </MessageSystemProvider>
+      <MessageSystemProvider>
+        <TooltipProvider>
+          <QueryOptimizer />
+          <Toaster />
+          <Sonner />
+          <Suspense>
+            <AppRouter />
+          </Suspense>
+          <SettingsDialog />
+        </TooltipProvider>
+      </MessageSystemProvider>
     </SettingsProvider>
   );
 }

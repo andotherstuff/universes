@@ -38,7 +38,7 @@ import { useChannelFolders, type ChannelFolder } from "@/hooks/useChannelFolders
 import { useChannelPermissions, useCanAccessChannel } from "@/hooks/useChannelPermissions";
 import { useVoiceChannel } from "@/hooks/useVoiceChannel";
 
-interface ChannelOrganizerProps {
+interface CommunityChannelListProps {
   communityId: string;
   selectedChannel: string | null;
   onSelectChannel: (channelId: string) => void;
@@ -47,14 +47,14 @@ interface ChannelOrganizerProps {
   onChannelCreated: () => void;
 }
 
-export function ChannelOrganizer({
+export function CommunityChannelList({
   communityId,
   selectedChannel,
   onSelectChannel,
   onChannelSettings,
   canModerate,
   onChannelCreated,
-}: ChannelOrganizerProps) {
+}: CommunityChannelListProps) {
   const { toast } = useToast();
   const { data: channels, isLoading: isLoadingChannels } = useChannels(communityId);
   const { data: folders, isLoading: isLoadingFolders } = useChannelFolders(communityId);
@@ -117,7 +117,7 @@ export function ChannelOrganizer({
 
   // Show loading skeleton only if we have no data AND we're actually loading (not background fetching)
   if (shouldShowLoading) {
-    return <ChannelOrganizerSkeleton />;
+    return <CommunityChannelListSkeleton />;
   }
 
   return (
@@ -203,8 +203,8 @@ export function ChannelOrganizer({
   );
 }
 
-// Loading skeleton for ChannelOrganizer
-function ChannelOrganizerSkeleton() {
+// Loading skeleton for CommunityChannelList
+function CommunityChannelListSkeleton() {
   return (
     <div className="space-y-1">
       {/* Folders skeleton */}
@@ -571,16 +571,16 @@ function ChannelItem({
     <div className={`${inFolder ? 'ml-1' : 'ml-4'}`}>
       <ContextMenu>
         <ContextMenuTrigger>
-                      <div
-              className={cn(
-                "group flex items-center h-8 px-2 rounded-sm transition-colors duration-150 relative overflow-hidden",
-                {
-                  "bg-accent/80 dark:bg-accent/50": isSelected,
-                  "hover:bg-accent": !isSelected
-                }
-              )}
-              onMouseDown={() => communityId && onChannelPreload?.(communityId, channel.id)}
-            >
+          <div
+            className={cn(
+              "group flex items-center h-8 px-2 rounded-sm transition-colors duration-150 relative overflow-hidden",
+              {
+                "bg-accent/80 dark:bg-accent/50": isSelected,
+                "hover:bg-accent": !isSelected
+              }
+            )}
+            onMouseDown={() => communityId && onChannelPreload?.(communityId, channel.id)}
+          >
             {/* Selected indicator */}
             {isSelected && (
               <div className="absolute left-0 top-1/2 transform -translate-y-1/2 w-1 h-5 bg-nostr-purple rounded-r-full"></div>

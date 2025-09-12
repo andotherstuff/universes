@@ -1,72 +1,87 @@
-import { BrowserRouter, Route, Routes, useParams } from "react-router-dom";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { ScrollToTop } from "./components/ScrollToTop";
-import { decodeNaddrFromUrl } from "./lib/utils";
+import { useCurrentUser } from "./hooks/useCurrentUser";
 
-import Index from "./pages/Index";
+import { useParams } from "react-router-dom";
+import LandingPage from "./pages/LandingPage";
+import { DMLayout } from "./components/layout/DMLayout";
+import { CommunityPage } from "./pages/CommunityPage";
+import { CommunityListPage } from "./pages/CommunityListPage";
+import { CommunityManagementPage } from "./pages/CommunityManagementPage";
+import { CommunityMarketplacePage } from "./pages/CommunityMarketplacePage";
+import { CommunityResourcesPage } from "./pages/CommunityResourcesPage";
+import { JoinPage } from "./pages/JoinPage";
 import Search from "./pages/Search";
 import Profile from "./pages/Profile";
 import EditProfile from "./pages/EditProfile";
 import { Communities } from "./pages/Communities";
-import { CommunityManagement } from "./pages/CommunityManagement";
 import { EmojiReactionsDemo } from "./pages/EmojiReactionsDemo";
 import { VoiceDemo } from "./pages/VoiceDemo";
+import { CommunitiesDebug } from "./pages/CommunitiesDebug";
 import { NIP19Page } from "./pages/NIP19Page";
 import NotFound from "./pages/NotFound";
 
 
-// Wrapper component to extract npub parameter and pass it to Index
-function DMWrapper() {
+// Simple root redirecter - shows landing page or redirects to /space
+function RootRedirecter() {
+  const { user } = useCurrentUser();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (user) {
+      // Logged in - redirect to space
+      navigate('/space', { replace: true });
+    }
+  }, [user, navigate]);
+
+  // Show landing page for logged-out users
+  if (!user) {
+    return <LandingPage />;
+  }
+
+  // Show brief loading while redirecting
+  return null;
+}
+
+// Wrapper for DMLayout with URL params
+function DMWithParams() {
   const { npub } = useParams<{ npub?: string }>();
-  return <Index dmTargetPubkey={npub} />;
+  return <DMLayout targetPubkey={npub} />;
 }
 
-// Wrapper component to extract community-id and channel parameters and pass them to Index
-// Handles both "kind:pubkey:d-tag" format and naddr format (URL-encoded)
-function SpacesWrapper() {
-  const { communityId, channelId } = useParams<{ communityId?: string; channelId?: string }>();
-
-  if (!communityId) {
-    return <Index />;
-  }
-
-  // Decode URL-encoded naddr if needed
-  let decodedCommunityId = communityId;
-  try {
-    decodedCommunityId = decodeNaddrFromUrl(communityId);
-  } catch {
-    // Use original ID if decoding fails
-    decodedCommunityId = communityId;
-  }
-
-  // Pass the decoded communityId and channelId to Index
-  return <Index spaceCommunityId={decodedCommunityId} spaceChannelId={channelId} />;
-}
+// Remove old wrapper components - now handled in AppWithSidebar
 
 export function AppRouter() {
   return (
     <BrowserRouter>
       <ScrollToTop />
       <Routes>
-        <Route path="/" element={<Index />} />
+        <Route path="/" element={<RootRedirecter />} />
         <Route path="/search" element={<Search />} />
         <Route path="/communities" element={<Communities />} />
-        <Route
-          path="/communities/:communityId/manage"
-          element={<CommunityManagement />}
-        />
-        <Route path="/join/:naddr" element={<Index />} />
         <Route path="/profile/:npub" element={<Profile />} />
         <Route path="/profile/:npub/edit" element={<EditProfile />} />
         <Route path="/emoji-demo" element={<EmojiReactionsDemo />} />
         <Route path="/voice-demo" element={<VoiceDemo />} />
+        <Route path="/communities-debug" element={<CommunitiesDebug />} />
 
-        {/* DM Routes - always at /dm */}
-        <Route path="/dm" element={<Index dmTargetPubkey={undefined} />} />
-        <Route path="/dm/:npub" element={<DMWrapper />} />
-
-        {/* Space Routes - show /space/community-id when joining communities */}
-        <Route path="/space/:communityId" element={<SpacesWrapper />} />
-        <Route path="/space/:communityId/:channelId" element={<SpacesWrapper />} />
+        {/* App routes - each page handles its own layout */}
+        <Route path="/dm" element={<DMLayout />} />
+        <Route path="/dm/:npub" element={<DMWithParams />} />
+        <Route path="/space" element={<CommunityListPage />} />
+        <Route path="/space/:communityId" element={<CommunityPage />} />
+        <Route path="/space/:communityId/:channelId" element={<CommunityPage />} />
+        {/* TODO: Enable when marketplace/resources are ready */}
+        {process.env.NODE_ENV === 'never' && (
+          <>
+            <Route path="/space/:communityId/marketplace" element={<CommunityMarketplacePage />} />
+            <Route path="/space/:communityId/resources" element={<CommunityResourcesPage />} />
+          </>
+        )}
+        <Route path="/space/:communityId/manage" element={<CommunityManagementPage />} />
+        <Route path="/join/:naddr" element={<JoinPage />} />
 
         {/* NIP-19 identifier routes - handle at root level */}
         <Route path="/:nip19" element={<NIP19Page />} />

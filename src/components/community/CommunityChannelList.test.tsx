@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render } from '@testing-library/react';
 import { TestApp } from '@/test/TestApp';
-import { ChannelOrganizer } from './ChannelOrganizer';
+import { CommunityChannelList } from './CommunityChannelList';
 
 // Import the mocked hooks
 import { useChannels as _useChannels } from '@/hooks/useChannels';
@@ -58,17 +58,17 @@ vi.mock('@/hooks/useChannelPermissions', () => ({
   })),
 }));
 
-describe('ChannelOrganizer', () => {
+describe('CommunityChannelList', () => {
   it('shows loading skeleton when data is loading', () => {
     render(
       <TestApp>
-        <ChannelOrganizer
+        <CommunityChannelList
           communityId="test-community"
           selectedChannel={null}
-          onSelectChannel={() => {}}
-          onChannelSettings={() => {}}
+          onSelectChannel={() => { }}
+          onChannelSettings={() => { }}
           canModerate={false}
-          onChannelCreated={() => {}}
+          onChannelCreated={() => { }}
         />
       </TestApp>
     );
@@ -138,13 +138,13 @@ describe('ChannelOrganizer', () => {
 
     render(
       <TestApp>
-        <ChannelOrganizer
+        <CommunityChannelList
           communityId="test-community"
           selectedChannel={null}
-          onSelectChannel={() => {}}
-          onChannelSettings={() => {}}
+          onSelectChannel={() => { }}
+          onChannelSettings={() => { }}
           canModerate={false}
-          onChannelCreated={() => {}}
+          onChannelCreated={() => { }}
         />
       </TestApp>
     );
@@ -211,13 +211,13 @@ describe('ChannelOrganizer', () => {
 
     render(
       <TestApp>
-        <ChannelOrganizer
+        <CommunityChannelList
           communityId="test-community"
           selectedChannel={null}
-          onSelectChannel={() => {}}
-          onChannelSettings={() => {}}
+          onSelectChannel={() => { }}
+          onChannelSettings={() => { }}
           canModerate={false}
-          onChannelCreated={() => {}}
+          onChannelCreated={() => { }}
         />
       </TestApp>
     );

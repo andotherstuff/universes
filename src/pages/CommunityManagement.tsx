@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useParams, Navigate } from 'react-router-dom';
+import { useParams, Navigate, useNavigate } from 'react-router-dom';
 import { Shield, Crown, Settings, BarChart3, Users, AlertTriangle, Share2 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -21,6 +21,7 @@ import { CommunityShareDialog } from '@/components/community/CommunityShareDialo
 export function CommunityManagement() {
   const { communityId } = useParams<{ communityId: string }>();
   const [activeTab, setActiveTab] = useState('dashboard');
+  const navigate = useNavigate();
 
   const { user } = useCurrentUser();
   const { data: communities, isLoading: isLoadingCommunities } = useCommunities();
@@ -144,7 +145,7 @@ export function CommunityManagement() {
                     Share
                   </Button>
                 </CommunityShareDialog>
-                <Button variant="outline" onClick={() => window.history.back()}>
+                <Button variant="outline" onClick={() => navigate(`/space/${encodeURIComponent(communityId)}`)}>
                   Back to Community
                 </Button>
               </div>

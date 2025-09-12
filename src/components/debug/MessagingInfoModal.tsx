@@ -15,9 +15,9 @@ interface MessagingInfoModalProps {
 }
 
 export function MessagingInfoModal({ open, onOpenChange }: MessagingInfoModalProps) {
-	const dataManager = useDataManager();
-	const debugInfo = dataManager.getDebugInfo();
-	const { subscriptions } = dataManager;
+	const { messaging } = useDataManager();
+	const debugInfo = messaging.getDebugInfo();
+	const { subscriptions } = messaging;
 
 	return (
 		<Dialog open={open} onOpenChange={onOpenChange}>
@@ -91,7 +91,7 @@ export function MessagingInfoModal({ open, onOpenChange }: MessagingInfoModalPro
 					{/* Refresh Messages Button */}
 					<div className="border-t pt-3">
 						<Button
-							onClick={dataManager.resetMessageDataAndCache}
+							onClick={messaging.resetMessageDataAndCache}
 							className="w-full"
 							variant="outline"
 							size="sm"
