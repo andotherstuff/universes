@@ -44,7 +44,7 @@ self.addEventListener("push", e => {
       data: {url},
       icon: "/pwa-192x192.png",
       badge: "/pwa-64x64.png",
-      tag: "flotilla-notification",
+      tag: "universes-notification",
       requireInteraction: false,
     }),
   )
