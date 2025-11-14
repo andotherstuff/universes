@@ -1,6 +1,11 @@
 {
+<<<<<<< HEAD
   "name": "flotilla",
   "version": "1.5.3",
+=======
+  "name": "universes",
+  "version": "1.4.1",
+>>>>>>> 6cc0146 (Rename Flotilla references to Universes (#1))
   "private": true,
   "scripts": {
     "dev": "vite dev",

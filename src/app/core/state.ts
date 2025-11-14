@@ -256,7 +256,7 @@ export const MESSAGE_KINDS = [...CONTENT_KINDS, MESSAGE]
 
 // Settings
 
-export const SETTINGS = "flotilla/settings"
+export const SETTINGS = "universes/settings"
 
 export type SettingsValues = {
   show_media: boolean

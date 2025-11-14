@@ -1,8 +1,8 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'social.flotilla',
-  appName: 'Flotilla',
+  appId: 'social.universes',
+  appName: 'Universes',
   webDir: 'build'
   server: {
     androidScheme: "https"
