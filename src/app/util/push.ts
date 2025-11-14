@@ -114,7 +114,7 @@ export const getCapacitorPushInfo = async () => {
   const info: PushInfo = {device_token}
 
   if (platform === "ios") {
-    info.bundle_identifier = "social.flotilla"
+    info.bundle_identifier = "social.universes"
   }
 
   return info

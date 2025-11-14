@@ -146,7 +146,7 @@
         <input
           bind:value={nostrWalletConnectUrl}
           autocomplete="off"
-          name="flotilla-nwc"
+          name="universes-nwc"
           class="grow"
           type="password" />
         <Button onclick={toggleScanner}>

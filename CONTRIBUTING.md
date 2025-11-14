@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-Flotilla is a svelte/typescript/capacitor project. It's intended to be an alternative to Discord for Nostr users. A high-quality UX is a priority, with an emphasis on well-tested, intuitive designs, and robust implementations.
+Universes is a svelte/typescript/capacitor project. It's intended to be an alternative to Discord for Nostr users. A high-quality UX is a priority, with an emphasis on well-tested, intuitive designs, and robust implementations.
 
 ## Getting Started
 
@@ -59,7 +59,7 @@ The main stylistic/organizational rule when working in this project is that impo
 
 ## System Architecture
 
-Flotilla's architecture generally mirrors the file structure. State is stored using Svelte `store`s provided either by `@welshman/app` or by `app/core/state`, allowing for idiomatic svelte 4 usage (svelte 5 runes are [ghey](https://habla.news/u/hodlbod@coracle.social/1739830562159) and not allowed outside of UI components).
+Universes's architecture generally mirrors the file structure. State is stored using Svelte `store`s provided either by `@welshman/app` or by `app/core/state`, allowing for idiomatic svelte 4 usage (svelte 5 runes are [ghey](https://habla.news/u/hodlbod@coracle.social/1739830562159) and not allowed outside of UI components).
 
 State is then synchronized to local storage or indexeddb using storage helpers provided by welshman in `routes/+layout.svelte`. Other top level synchronization logic generally belongs there.
 
@@ -88,7 +88,7 @@ All work by contributors should be done against an issue. If there is no issue f
 
 ## Communication
 
-Discussion about development is done [on Flotilla](https://app.flotilla.social/spaces/internal.coracle.social). The group is currently closed, so please let me know if you'd like access.
+Discussion about development is done [on Universes](https://app.universes.social/spaces/internal.coracle.social). The group is currently closed, so please let me know if you'd like access.
 
 ## Project License
 
