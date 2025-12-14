@@ -39,10 +39,11 @@ import {
   plaintext,
   tracker,
   relays,
-  relayStats,
+  relaysByUrl,
+  relayStatsByUrl,
   repository,
-  handles,
-  zappers,
+  handlesByNip05,
+  zappersByLnurl,
   onZapper,
   onHandle,
   wrapManager,
@@ -158,7 +159,7 @@ const syncTracker = async () => {
 const syncRelays = async () => {
   const collection = new Collection<RelayProfile>({table: "relays", getId: prop("url")})
 
-  relays.set(await collection.get())
+  relaysByUrl.set(new Map((await collection.get()).map(relay => [relay.url, relay])))
 
   return throttled(3000, relays).subscribe(collection.set)
 }
@@ -166,15 +167,17 @@ const syncRelays = async () => {
 const syncRelayStats = async () => {
   const collection = new Collection<RelayStats>({table: "relayStats", getId: prop("url")})
 
-  relayStats.set(await collection.get())
+  relayStatsByUrl.set(new Map((await collection.get()).map(stats => [stats.url, stats])))
 
-  return throttled(3000, relayStats).subscribe(collection.set)
+  return throttled(3000, relayStatsByUrl).subscribe($relayStatsByUrl =>
+    collection.set(Array.from($relayStatsByUrl.values())),
+  )
 }
 
 const syncHandles = async () => {
   const collection = new Collection<Handle>({table: "handles", getId: prop("nip05")})
 
-  handles.set(await collection.get())
+  handlesByNip05.set(new Map((await collection.get()).map(handle => [handle.nip05, handle])))
 
   return onHandle(batch(3000, collection.add))
 }
@@ -182,7 +185,7 @@ const syncHandles = async () => {
 const syncZappers = async () => {
   const collection = new Collection<Zapper>({table: "zappers", getId: prop("lnurl")})
 
-  zappers.set(await collection.get())
+  zappersByLnurl.set(new Map((await collection.get()).map(zapper => [zapper.lnurl, zapper])))
 
   return onZapper(batch(3000, collection.add))
 }

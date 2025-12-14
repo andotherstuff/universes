@@ -8,7 +8,7 @@ sentry-cli \
   --api-key $VITE_GLITCHTIP_API_KEY \
   sourcemaps \
   --org coracle \
-  --project flotilla \
+  --project universes \
   --release $hash \
   upload \
   --url-prefix /_app/immutable/ \

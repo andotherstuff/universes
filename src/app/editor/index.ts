@@ -62,10 +62,10 @@ export const makeEditor = async ({
         onSearch: searchProfiles,
         getValue: (profile: PublishedProfile) => profile.event.pubkey,
         sortFn: ({score = 1, item}) => {
-          const wotScore = wotGraph.get().get(item.event.pubkey) || 0
+          const wotScore = get(wotGraph).get(item.event.pubkey) || 0
           const membershipScale = $spaceMembers.includes(item.event.pubkey) ? 2 : 1
 
-          return dec(score) * inc(wotScore / maxWot.get()) * membershipScale
+          return dec(score) * inc(wotScore / get(maxWot)) * membershipScale
         },
         fuseOptions: {
           keys: [

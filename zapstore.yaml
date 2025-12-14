@@ -1,10 +1,10 @@
-identifier: social.flotilla
-name: Flotilla
+identifier: social.universes
+name: Universes
 tags: nostr nip29 community chat group
 changelog: CHANGELOG.md
-homepage: https://flotilla.social
+homepage: https://universes.social
 description: Self-hosted community chat and threads built on the nostr protocol.
-repository: https://github.com/coracle-social/flotilla
+repository: https://github.com/andotherstuff/universes
 blossom_servers:
   - https://cdn.zapstore.dev
   - https://hbr.coracle.social

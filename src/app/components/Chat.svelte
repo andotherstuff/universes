@@ -28,8 +28,8 @@
     tagPubkey,
     sendWrapped,
     mergeThunks,
-    loadInboxRelaySelections,
-    inboxRelaySelectionsByPubkey,
+    loadMessagingRelayList,
+    messagingRelayListsByPubkey,
   } from "@welshman/app"
   import Danger from "@assets/icons/danger-triangle.svg?dataurl"
   import Icon from "@lib/components/Icon.svelte"
@@ -69,7 +69,7 @@
   const chat = deriveChat(id)
   const pubkeys = splitChatId(id)
   const others = remove($pubkey!, pubkeys)
-  const missingInboxes = $derived(pubkeys.filter(pk => !$inboxRelaySelectionsByPubkey.has(pk)))
+  const missingInboxes = $derived(pubkeys.filter(pk => !$messagingRelayListsByPubkey.has(pk)))
 
   const showMembers = () =>
     pushModal(ProfileList, {pubkeys: others, title: `People in this conversation`})
@@ -183,7 +183,7 @@
 
   onMount(() => {
     for (const pubkey of others) {
-      loadInboxRelaySelections(pubkey, INDEXER_RELAYS, true)
+      loadMessagingRelayList(pubkey, INDEXER_RELAYS)
     }
 
     const observer = new ResizeObserver(() => {
