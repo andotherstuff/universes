@@ -45,17 +45,7 @@ export default defineConfig({
     svg({
       svgoOptions: {
         multipass: true,
-        plugins: [
-          {
-            name: "preset-default",
-            params: {
-              overrides: {
-                removeViewBox: false,
-              },
-            },
-          },
-          "removeDimensions",
-        ],
+        plugins: ["preset-default", "removeDimensions"],
       },
     }),
   ],

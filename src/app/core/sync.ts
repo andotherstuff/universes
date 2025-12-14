@@ -24,14 +24,14 @@ import {request, load, pull} from "@welshman/net"
 import {
   pubkey,
   loadRelay,
-  userFollows,
-  userRelaySelections,
-  userInboxRelaySelections,
-  loadRelaySelections,
-  loadInboxRelaySelections,
-  loadBlossomServers,
-  loadFollows,
-  loadMutes,
+  userFollowList,
+  userRelayList,
+  userMessagingRelayList,
+  loadRelayList,
+  loadMessagingRelayList,
+  loadBlossomServerList,
+  loadFollowList,
+  loadMuteList,
   loadProfile,
   repository,
   shouldUnwrap,
@@ -207,33 +207,33 @@ const syncUserData = () => {
     }
   })
 
-  const unsubscribeSelections = userRelaySelections.subscribe($l => {
+  const unsubscribeSelections = userRelayList.subscribe($l => {
     const $pubkey = pubkey.get()
 
     if ($pubkey) {
       loadAlerts($pubkey)
       loadAlertStatuses($pubkey)
-      loadBlossomServers($pubkey)
-      loadFollows($pubkey)
+      loadBlossomServerList($pubkey)
+      loadFollowList($pubkey)
       loadGroupSelections($pubkey)
-      loadMutes($pubkey)
+      loadMuteList($pubkey)
       loadProfile($pubkey)
       loadSettings($pubkey)
     }
   })
 
-  const unsubscribeFollows = userFollows.subscribe(async $l => {
+  const unsubscribeFollows = userFollowList.subscribe(async $l => {
     for (const pubkeys of chunk(10, get(bootstrapPubkeys))) {
       // This isn't urgent, avoid clogging other stuff up
       await sleep(1000)
 
       await Promise.all(
         pubkeys.map(async pk => {
-          await loadRelaySelections(pk)
+          await loadRelayList(pk)
           await loadGroupSelections(pk)
           await loadProfile(pk)
-          await loadFollows(pk)
-          await loadMutes(pk)
+          await loadFollowList(pk)
+          await loadMuteList(pk)
         }),
       )
     }
@@ -241,7 +241,7 @@ const syncUserData = () => {
 
   const unsubscribePubkey = pubkey.subscribe($pubkey => {
     if ($pubkey) {
-      loadRelaySelections($pubkey)
+      loadRelayList($pubkey)
     }
   })
 
@@ -449,8 +449,8 @@ const syncDMs = () => {
 
       // If we have a pubkey, refresh our user's relay selections then sync our subscriptions
       if ($pubkey && $shouldUnwrap) {
-        loadRelaySelections($pubkey)
-          .then(() => loadInboxRelaySelections($pubkey))
+        loadRelayList($pubkey)
+          .then(() => loadMessagingRelayList($pubkey))
           .then($l => subscribeAll($pubkey, getRelayTagValues(getListTags($l))))
       }
 
@@ -459,12 +459,12 @@ const syncDMs = () => {
   )
 
   // When user inbox relays change, update synchronization
-  const unsubscribeSelections = userInboxRelaySelections.subscribe($userInboxRelaySelections => {
+  const unsubscribeSelections = userMessagingRelayList.subscribe($userMessagingRelayList => {
     const $pubkey = pubkey.get()
     const $shouldUnwrap = shouldUnwrap.get()
 
     if ($pubkey && $shouldUnwrap) {
-      subscribeAll($pubkey, getRelayTagValues(getListTags($userInboxRelaySelections)))
+      subscribeAll($pubkey, getRelayTagValues(getListTags($userMessagingRelayList)))
     }
   })
 

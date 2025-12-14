@@ -1,6 +1,5 @@
 <script lang="ts">
   import {goto} from "$app/navigation"
-  import {uniqBy, nth} from "@welshman/lib"
   import {displayRelayUrl, makeRoomMeta} from "@welshman/util"
   import {deriveRelay, waitForThunkError, createRoom, editRoom, joinRoom} from "@welshman/app"
   import StickerSmileSquare from "@assets/icons/sticker-smile-square.svg?dataurl"
@@ -30,7 +29,9 @@
   const back = () => history.back()
 
   const tryCreate = async () => {
-    room.tags = uniqBy(nth(0), [...room.tags, ["name", name]])
+    room.name = name
+    room.picture = undefined
+    room.pictureMeta = undefined
 
     if (imageFile) {
       const {error, result} = await uploadFile(imageFile)
@@ -39,9 +40,10 @@
         return pushToast({theme: "error", message: error})
       }
 
-      room.tags.push(["picture", result.url, ...result.tags])
+      room.picture = result.url
+      room.pictureMeta = result.tags
     } else if (selectedIcon) {
-      room.tags.push(["picture", selectedIcon])
+      room.picture = selectedIcon
     }
 
     const createMessage = await waitForThunkError(createRoom(url, room))
@@ -62,9 +64,9 @@
       return pushToast({theme: "error", message: joinMessage})
     }
 
-    await loadChannel(url, room.id)
+    await loadChannel(url, room.h)
 
-    goto(makeSpacePath(url, room.id))
+    goto(makeSpacePath(url, room.h))
   }
 
   const create = async () => {

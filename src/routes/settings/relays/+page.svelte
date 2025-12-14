@@ -1,6 +1,6 @@
 <script lang="ts">
   import {onMount} from "svelte"
-  import {pubkey, relaySelections, inboxRelaySelections, derivePubkeyRelays} from "@welshman/app"
+  import {pubkey, relayLists, messagingRelayLists, derivePubkeyRelays} from "@welshman/app"
   import {RelayMode} from "@welshman/util"
   import Icon from "@lib/components/Icon.svelte"
   import Button from "@lib/components/Button.svelte"
@@ -18,7 +18,7 @@
 
   const readRelayUrls = derivePubkeyRelays($pubkey!, RelayMode.Read)
   const writeRelayUrls = derivePubkeyRelays($pubkey!, RelayMode.Write)
-  const inboxRelayUrls = derivePubkeyRelays($pubkey!, RelayMode.Inbox)
+  const inboxRelayUrls = derivePubkeyRelays($pubkey!, RelayMode.Messaging)
 
   const addReadRelay = () =>
     pushModal(RelayAdd, {
@@ -45,7 +45,7 @@
   const removeInboxRelay = (url: string) => setInboxRelayPolicy(url, false)
 
   onMount(() => {
-    discoverRelays([...$relaySelections, ...$inboxRelaySelections])
+    discoverRelays([...$relayLists, ...$messagingRelayLists])
   })
 </script>
 

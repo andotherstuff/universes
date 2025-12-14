@@ -6,7 +6,7 @@
   import {deriveEvents} from "@welshman/store"
   import {formatTimestampRelative} from "@welshman/lib"
   import {NOTE, ROOMS, COMMENT} from "@welshman/util"
-  import {repository, loadRelaySelections} from "@welshman/app"
+  import {repository, loadRelayList} from "@welshman/app"
   import Button from "@lib/components/Button.svelte"
   import ProfileSpaces from "@app/components/ProfileSpaces.svelte"
   import {
@@ -34,7 +34,7 @@
 
   onMount(async () => {
     // Make sure we have their relay selections before we load their posts
-    await loadRelaySelections(pubkey)
+    await loadRelayList(pubkey)
 
     // Load groups and at least one note, regardless of time frame
     load({

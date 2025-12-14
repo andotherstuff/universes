@@ -1,6 +1,6 @@
 import twColors from "tailwindcss/colors"
 import {Capacitor} from "@capacitor/core"
-import {get, derived, writable} from "svelte/store"
+import {get, derived, readable, writable, type Readable} from "svelte/store"
 import * as nip19 from "nostr-tools/nip19"
 import {
   on,
@@ -106,10 +106,8 @@ import {
   repository,
   profilesByPubkey,
   tracker,
-  makeTrackerStore,
-  makeRepositoryStore,
   createSearch,
-  userFollows,
+  userFollowList,
   ensurePlaintext,
   thunks,
   signer,
@@ -117,8 +115,8 @@ import {
   appContext,
   getThunkError,
   publishThunk,
-  userRelaySelections,
-  userInboxRelaySelections,
+  userRelayList,
+  userMessagingRelayList,
   deriveRelay,
   makeUserData,
   makeUserLoader,
@@ -202,16 +200,27 @@ export const entityLink = (entity: string) => `https://coracle.social/${entity}`
 export const pubkeyLink = (pubkey: string, relays = Router.get().FromPubkeys([pubkey]).getUrls()) =>
   entityLink(nip19.nprofileEncode({pubkey, relays}))
 
-export const bootstrapPubkeys = derived(userFollows, $userFollows => {
+export const bootstrapPubkeys = derived(userFollowList, $userFollowList => {
   const appPubkeys = DEFAULT_PUBKEYS.split(",")
-  const userPubkeys = shuffle(getPubkeyTagValues(getListTags($userFollows)))
+  const userPubkeys = shuffle(getPubkeyTagValues(getListTags($userFollowList)))
 
   return userPubkeys.length > 5 ? userPubkeys : [...userPubkeys, ...appPubkeys]
 })
 
-export const trackerStore = makeTrackerStore()
+export const trackerStore = withGetter(
+  readable(tracker, set => {
+    const update = () => set(tracker)
+    const unsubscribers = ["add", "remove", "load", "clear"].map(event =>
+      on(tracker, event, update),
+    )
 
-export const repositoryStore = makeRepositoryStore()
+    return () => unsubscribers.forEach(call)
+  }),
+)
+
+export const repositoryStore = withGetter(
+  readable(repository, set => on(repository, "update", () => set(repository))),
+)
 
 export const deriveEvent = (idOrAddress: string, hints: string[] = []) => {
   let attempted = false
@@ -367,10 +376,7 @@ export const {
   load: makeOutboxLoader(APP_DATA, {"#d": [SETTINGS]}),
 })
 
-export const userSettings = makeUserData({
-  mapStore: settingsByPubkey,
-  loadItem: loadSettings,
-})
+export const userSettings = makeUserData<Settings>(settingsByPubkey, loadSettings)
 
 export const loadUserSettings = makeUserLoader(loadSettings)
 
@@ -390,15 +396,11 @@ export const relaysMostlyRestricted = writable<Record<string, string>>({})
 
 // Relay selections
 
-export const userReadRelays = derived(userRelaySelections, $l =>
-  getRelaysFromList($l, RelayMode.Read),
-)
+export const userReadRelays = derived(userRelayList, $l => getRelaysFromList($l, RelayMode.Read))
 
-export const userWriteRelays = derived(userRelaySelections, $l =>
-  getRelaysFromList($l, RelayMode.Write),
-)
+export const userWriteRelays = derived(userRelayList, $l => getRelaysFromList($l, RelayMode.Write))
 
-export const userInboxRelays = derived(userInboxRelaySelections, $l => getRelaysFromList($l))
+export const userInboxRelays = derived(userMessagingRelayList, $l => getRelaysFromList($l))
 
 // Alerts
 
@@ -694,14 +696,17 @@ export const getSpaceRoomsFromGroupSelections = (
   return sortBy(roomComparator(url), rooms)
 }
 
-export const userGroupSelections = makeUserData({
-  mapStore: groupSelectionsByPubkey,
-  loadItem: loadGroupSelections,
-})
+export const userGroupSelections = makeUserData<PublishedList>(
+  groupSelectionsByPubkey,
+  loadGroupSelections,
+)
 
 export const loadUserGroupSelections = makeUserLoader(loadGroupSelections)
 
-export const userSpaceUrls = derived(userGroupSelections, getSpaceUrlsFromGroupSelections)
+export const userSpaceUrls: Readable<string[]> = derived(
+  userGroupSelections,
+  getSpaceUrlsFromGroupSelections,
+)
 
 export const deriveUserRooms = (url: string) =>
   derived([userGroupSelections, channelsById], ([$userGroupSelections, $channelsById]) => {

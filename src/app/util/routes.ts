@@ -38,7 +38,7 @@ export const makeSpacePath = (url: string, ...extra: (string | undefined)[]) => 
         .map(s => encodeURIComponent(s as string))
         .join("/")
   } else {
-    const relay = relaysByUrl.get().get(url)
+    const relay = get(relaysByUrl).get(url)
 
     if (hasNip29(relay)) {
       path += "/recent"

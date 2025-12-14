@@ -67,3 +67,8 @@ GoogleService-Info.plist
 # OS generated
 .DS_Store
 Thumbs.db
+
+# Turborepo
+.turbo
+
+notes*.txt

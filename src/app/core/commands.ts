@@ -78,11 +78,11 @@ import {
   session,
   repository,
   publishThunk,
-  profilesByPubkey,
+  getProfilesByPubkey,
   tagEvent,
   tagEventForReaction,
-  userRelaySelections,
-  userInboxRelaySelections,
+  userRelayList,
+  userMessagingRelayList,
   nip44EncryptToSelf,
   loadRelay,
   dropSession,
@@ -90,7 +90,7 @@ import {
   tagEventForQuote,
   waitForThunkError,
   getPubkeyRelays,
-  userBlossomServers,
+  userBlossomServerList,
   shouldUnwrap,
 } from "@welshman/app"
 import {compressFile} from "@src/lib/html"
@@ -121,7 +121,7 @@ export const getPubkeyHints = (pubkey: string) => {
 }
 
 export const getPubkeyPetname = (pubkey: string) => {
-  const profile = profilesByPubkey.get().get(pubkey)
+  const profile = getProfilesByPubkey().get(pubkey)
   const display = displayProfile(profile)
 
   return display
@@ -213,7 +213,7 @@ export const removeRoomMembership = async (url: string, room: string) => {
 }
 
 export const setRelayPolicy = (url: string, read: boolean, write: boolean) => {
-  const list = get(userRelaySelections) || makeList({kind: RELAYS})
+  const list = get(userRelayList) || makeList({kind: RELAYS})
   const tags = getRelayTags(getListTags(list)).filter(t => normalizeRelayUrl(t[1]) !== url)
 
   if (read && write) {
@@ -231,7 +231,7 @@ export const setRelayPolicy = (url: string, read: boolean, write: boolean) => {
 }
 
 export const setInboxRelayPolicy = (url: string, enabled: boolean) => {
-  const list = get(userInboxRelaySelections) || makeList({kind: INBOX_RELAYS})
+  const list = get(userMessagingRelayList) || makeList({kind: INBOX_RELAYS})
 
   // Only update inbox policies if they already exist or we're adding them
   if (enabled || getRelaysFromList(list).includes(url)) {
@@ -695,7 +695,7 @@ export const getBlossomServer = async (options: GetBlossomServerOptions = {}) =>
     }
   }
 
-  const userUrls = getTagValues("server", getListTags(userBlossomServers.get()))
+  const userUrls = getTagValues("server", getListTags(get(userBlossomServerList)))
 
   for (const url of userUrls) {
     return normalizeBlossomUrl(url)
