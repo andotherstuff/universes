@@ -199,6 +199,7 @@ const syncUserData = () => {
     }
   })
 
+<<<<<<< HEAD
   const unsubscribeRelayList = userRelayList.subscribe($userRelayList => {
     if ($userRelayList) {
       loadAlerts($userRelayList.event.pubkey)
@@ -213,6 +214,24 @@ const syncUserData = () => {
   })
 
   const unsubscribeFollows = userFollowList.subscribe(async $userFollowList => {
+=======
+  const unsubscribeSelections = userRelayList.subscribe($l => {
+    const $pubkey = pubkey.get()
+
+    if ($pubkey) {
+      loadAlerts($pubkey)
+      loadAlertStatuses($pubkey)
+      loadBlossomServerList($pubkey)
+      loadFollowList($pubkey)
+      loadGroupSelections($pubkey)
+      loadMuteList($pubkey)
+      loadProfile($pubkey)
+      loadSettings($pubkey)
+    }
+  })
+
+  const unsubscribeFollows = userFollowList.subscribe(async $l => {
+>>>>>>> ac46870 (Add Turborepo build graph and tooling, switch `@welshman` deps to `workspace:*`, refactor application to match the latest `@welshman` APIs)
     for (const pubkeys of chunk(10, get(bootstrapPubkeys))) {
       // This isn't urgent, avoid clogging other stuff up
       await sleep(1000)
@@ -220,7 +239,11 @@ const syncUserData = () => {
       await Promise.all(
         pubkeys.map(async pk => {
           await loadRelayList(pk)
+<<<<<<< HEAD
           await loadGroupList(pk)
+=======
+          await loadGroupSelections(pk)
+>>>>>>> ac46870 (Add Turborepo build graph and tooling, switch `@welshman` deps to `workspace:*`, refactor application to match the latest `@welshman` APIs)
           await loadProfile(pk)
           await loadFollowList(pk)
           await loadMuteList(pk)
@@ -229,6 +252,15 @@ const syncUserData = () => {
     }
   })
 
+<<<<<<< HEAD
+=======
+  const unsubscribePubkey = pubkey.subscribe($pubkey => {
+    if ($pubkey) {
+      loadRelayList($pubkey)
+    }
+  })
+
+>>>>>>> ac46870 (Add Turborepo build graph and tooling, switch `@welshman` deps to `workspace:*`, refactor application to match the latest `@welshman` APIs)
   return () => {
     unsubscribersByKey.forEach(call)
     unsubscribeGroupList()
@@ -364,8 +396,13 @@ const syncDMs = () => {
     },
   )
 
+<<<<<<< HEAD
   // When user messaging relays change, update synchronization
   const unsubscribeList = userMessagingRelayList.subscribe($userMessagingRelayList => {
+=======
+  // When user inbox relays change, update synchronization
+  const unsubscribeSelections = userMessagingRelayList.subscribe($userMessagingRelayList => {
+>>>>>>> ac46870 (Add Turborepo build graph and tooling, switch `@welshman` deps to `workspace:*`, refactor application to match the latest `@welshman` APIs)
     const $pubkey = pubkey.get()
     const $shouldUnwrap = shouldUnwrap.get()
 

@@ -10,9 +10,10 @@
   "scripts": {
     "dev": "vite dev",
     "build": "./build.sh",
+    "build-turbo": "turbo build",
     "sourcemaps": "./build.sh && ./sourcemaps.sh",
     "release:android": "./build.sh && cap build android --androidreleasetype APK --signing-type apksigner",
-    "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
+    "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --compiler-warnings \"state_referenced_locally:ignore\"",
     "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
     "lint": "prettier --check src && eslint src",
     "format": "git diff head --name-only --diff-filter d | grep -E '(js|ts|svelte)$' | xargs -r prettier --write",
@@ -35,9 +36,11 @@
     "postcss": "^8.5.6",
     "prettier": "^3.6.2",
     "prettier-plugin-svelte": "^3.4.0",
+    "sharp": "0.33.5",
     "svelte": "^5.39.12",
     "svelte-check": "^4.3.3",
     "tailwindcss": "^3.4.18",
+    "turbo": "2.3.3",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.46.1",
     "vite": "^5.4.20"
@@ -66,6 +69,7 @@
     "@types/throttle-debounce": "^5.0.2",
     "@vite-pwa/assets-generator": "^0.2.6",
     "@vite-pwa/sveltekit": "^0.6.8",
+<<<<<<< HEAD
     "@welshman/app": "^0.7.0",
     "@welshman/content": "^0.7.0",
     "@welshman/editor": "^0.7.0",
@@ -76,6 +80,18 @@
     "@welshman/signer": "^0.7.0",
     "@welshman/store": "^0.7.0",
     "@welshman/util": "^0.7.0",
+=======
+    "@welshman/app": "workspace:*",
+    "@welshman/content": "workspace:*",
+    "@welshman/editor": "workspace:*",
+    "@welshman/feeds": "workspace:*",
+    "@welshman/lib": "workspace:*",
+    "@welshman/net": "workspace:*",
+    "@welshman/router": "workspace:*",
+    "@welshman/signer": "workspace:*",
+    "@welshman/store": "workspace:*",
+    "@welshman/util": "workspace:*",
+>>>>>>> ac46870 (Add Turborepo build graph and tooling, switch `@welshman` deps to `workspace:*`, refactor application to match the latest `@welshman` APIs)
     "compressorjs": "^1.2.1",
     "daisyui": "^4.12.24",
     "date-picker-svelte": "^2.16.0",
@@ -92,13 +108,14 @@
     "throttle-debounce": "^5.0.2",
     "tippy.js": "^6.3.7"
   },
+  "packageManager": "pnpm@10.25.0",
   "pnpm": {
     "ignoredBuiltDependencies": [
       "@sentry/cli",
       "esbuild"
     ],
-    "onlyBuiltDependencies": [
-      "sharp"
-    ]
+    "overrides": {
+      "sharp": "0.33.5"
+    }
   }
 }

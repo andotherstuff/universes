@@ -1,6 +1,10 @@
 <script lang="ts">
   import {onMount} from "svelte"
+<<<<<<< HEAD
   import {pubkey, getRelayLists, getMessagingRelayLists, derivePubkeyRelays} from "@welshman/app"
+=======
+  import {pubkey, relayLists, messagingRelayLists, derivePubkeyRelays} from "@welshman/app"
+>>>>>>> ac46870 (Add Turborepo build graph and tooling, switch `@welshman` deps to `workspace:*`, refactor application to match the latest `@welshman` APIs)
   import {RelayMode} from "@welshman/util"
   import Icon from "@lib/components/Icon.svelte"
   import Button from "@lib/components/Button.svelte"
@@ -18,7 +22,11 @@
 
   const readRelayUrls = derivePubkeyRelays($pubkey!, RelayMode.Read)
   const writeRelayUrls = derivePubkeyRelays($pubkey!, RelayMode.Write)
+<<<<<<< HEAD
   const messagingRelayUrls = derivePubkeyRelays($pubkey!, RelayMode.Messaging)
+=======
+  const inboxRelayUrls = derivePubkeyRelays($pubkey!, RelayMode.Messaging)
+>>>>>>> ac46870 (Add Turborepo build graph and tooling, switch `@welshman` deps to `workspace:*`, refactor application to match the latest `@welshman` APIs)
 
   const addReadRelay = () =>
     pushModal(RelayAdd, {
@@ -45,7 +53,11 @@
   const removeMessagingRelay = (url: string) => setMessagingRelayPolicy(url, false)
 
   onMount(() => {
+<<<<<<< HEAD
     discoverRelays([...getRelayLists(), ...getMessagingRelayLists()])
+=======
+    discoverRelays([...$relayLists, ...$messagingRelayLists])
+>>>>>>> ac46870 (Add Turborepo build graph and tooling, switch `@welshman` deps to `workspace:*`, refactor application to match the latest `@welshman` APIs)
   })
 </script>
 

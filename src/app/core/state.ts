@@ -1,6 +1,10 @@
 import twColors from "tailwindcss/colors"
 import {Capacitor} from "@capacitor/core"
+<<<<<<< HEAD
 import {get, derived, readable, writable} from "svelte/store"
+=======
+import {get, derived, readable, writable, type Readable} from "svelte/store"
+>>>>>>> ac46870 (Add Turborepo build graph and tooling, switch `@welshman` deps to `workspace:*`, refactor application to match the latest `@welshman` APIs)
 import * as nip19 from "nostr-tools/nip19"
 import {
   on,
@@ -119,6 +123,11 @@ import {
   appContext,
   getThunkError,
   publishThunk,
+<<<<<<< HEAD
+=======
+  userRelayList,
+  userMessagingRelayList,
+>>>>>>> ac46870 (Add Turborepo build graph and tooling, switch `@welshman` deps to `workspace:*`, refactor application to match the latest `@welshman` APIs)
   deriveRelay,
   makeUserData,
   makeUserLoader,
@@ -210,11 +219,84 @@ export const bootstrapPubkeys = derived(userFollowList, $userFollowList => {
   return userPubkeys.length > 5 ? userPubkeys : [...userPubkeys, ...appPubkeys]
 })
 
+<<<<<<< HEAD
 export const deriveEvent = makeDeriveEvent({
   repository,
   includeDeleted: true,
   onDerive: (filters: Filter[], relays: string[]) => load({filters, relays}),
 })
+=======
+export const trackerStore = withGetter(
+  readable(tracker, set => {
+    const update = () => set(tracker)
+    const unsubscribers = ["add", "remove", "load", "clear"].map(event =>
+      on(tracker, event, update),
+    )
+
+    return () => unsubscribers.forEach(call)
+  }),
+)
+
+export const repositoryStore = withGetter(
+  readable(repository, set => on(repository, "update", () => set(repository))),
+)
+
+export const deriveEvent = (idOrAddress: string, hints: string[] = []) => {
+  let attempted = false
+
+  const filters = getIdFilters([idOrAddress])
+  const relays = [...hints, ...INDEXER_RELAYS]
+
+  return derived(
+    deriveEvents(repository, {filters, includeDeleted: true}),
+    (events: TrustedEvent[]) => {
+      if (!attempted && events.length === 0) {
+        load({relays, filters})
+        attempted = true
+      }
+
+      return events[0]
+    },
+  )
+}
+
+export const getUrlsForEvent = withGetter(
+  derived([trackerStore, thunks], ([$tracker, $thunks]) => {
+    const getThunksByEventId = memoize(() => {
+      const thunksByEventId = new Map<string, Thunk[]>()
+
+      for (const thunk of $thunks) {
+        pushToMapKey(thunksByEventId, thunk.event.id, thunk)
+      }
+
+      return thunksByEventId
+    })
+
+    return (id: string) => {
+      const urls = Array.from($tracker.getRelays(id))
+
+      for (const thunk of getThunksByEventId().get(id) || []) {
+        for (const url of thunk.options.relays) {
+          urls.push(url)
+        }
+      }
+
+      return uniq(urls)
+    }
+  }),
+)
+
+export const getEventsForUrl = (url: string, filters: Filter[]) => {
+  const ids = uniq([
+    ...tracker.getIds(url),
+    ...get(thunks)
+      .filter(t => t.options.relays.includes(url))
+      .map(t => t.event.id),
+  ])
+
+  return repository.query(filters.map(assoc("ids", ids)))
+}
+>>>>>>> ac46870 (Add Turborepo build graph and tooling, switch `@welshman` deps to `workspace:*`, refactor application to match the latest `@welshman` APIs)
 
 export const deriveEventsForUrl = (url: string, filters: Filter[]) =>
   deriveArray(deriveEventsByIdForUrl({url, tracker, repository, filters}))
@@ -298,6 +380,7 @@ export const settingsByPubkey = deriveItemsByKey({
   },
 })
 
+<<<<<<< HEAD
 export const getSettingsByPubkey = getter(settingsByPubkey)
 
 export const getSettings = (pubkey: string) => getSettingsByPubkey().get(pubkey)
@@ -308,6 +391,9 @@ export const loadSettings = makeLoadItem(
 )
 
 export const userSettings = makeUserData(settingsByPubkey, loadSettings)
+=======
+export const userSettings = makeUserData<Settings>(settingsByPubkey, loadSettings)
+>>>>>>> ac46870 (Add Turborepo build graph and tooling, switch `@welshman` deps to `workspace:*`, refactor application to match the latest `@welshman` APIs)
 
 export const loadUserSettings = makeUserLoader(loadSettings)
 
@@ -323,6 +409,17 @@ export const relaysPendingTrust = writable<string[]>([])
 
 export const relaysMostlyRestricted = writable<Record<string, string>>({})
 
+<<<<<<< HEAD
+=======
+// Relay selections
+
+export const userReadRelays = derived(userRelayList, $l => getRelaysFromList($l, RelayMode.Read))
+
+export const userWriteRelays = derived(userRelayList, $l => getRelaysFromList($l, RelayMode.Write))
+
+export const userInboxRelays = derived(userMessagingRelayList, $l => getRelaysFromList($l))
+
+>>>>>>> ac46870 (Add Turborepo build graph and tooling, switch `@welshman` deps to `workspace:*`, refactor application to match the latest `@welshman` APIs)
 // Alerts
 
 export type Alert = {
@@ -617,11 +714,25 @@ export const getSpaceRoomsFromGroupList = (url: string, groupList: List | undefi
   return sortBy(roomComparator(url), rooms)
 }
 
+<<<<<<< HEAD
 export const userGroupList = makeUserData(groupListsByPubkey, loadGroupList)
+=======
+export const userGroupSelections = makeUserData<PublishedList>(
+  groupSelectionsByPubkey,
+  loadGroupSelections,
+)
+>>>>>>> ac46870 (Add Turborepo build graph and tooling, switch `@welshman` deps to `workspace:*`, refactor application to match the latest `@welshman` APIs)
 
 export const loadUserGroupList = makeUserLoader(loadGroupList)
 
+<<<<<<< HEAD
 export const userSpaceUrls = derived(userGroupList, getSpaceUrlsFromGroupList)
+=======
+export const userSpaceUrls: Readable<string[]> = derived(
+  userGroupSelections,
+  getSpaceUrlsFromGroupSelections,
+)
+>>>>>>> ac46870 (Add Turborepo build graph and tooling, switch `@welshman` deps to `workspace:*`, refactor application to match the latest `@welshman` APIs)
 
 export const deriveUserRooms = (url: string) =>
   derived([userGroupList, roomsById], ([$userGroupList, $roomsById]) => {

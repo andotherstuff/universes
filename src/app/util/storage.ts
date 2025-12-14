@@ -39,11 +39,18 @@ import type {RepositoryUpdate, WrapItem} from "@welshman/net"
 import type {Handle, RelayStats} from "@welshman/app"
 import {
   tracker,
+<<<<<<< HEAD
   plaintext,
   repository,
   relaysByUrl,
   relayStatsByUrl,
   onRelayStats,
+=======
+  relays,
+  relaysByUrl,
+  relayStatsByUrl,
+  repository,
+>>>>>>> ac46870 (Add Turborepo build graph and tooling, switch `@welshman` deps to `workspace:*`, refactor application to match the latest `@welshman` APIs)
   handlesByNip05,
   zappersByLnurl,
   onZapper,
@@ -198,8 +205,14 @@ const relayStatsAdapter = {
   init: async (table: IDBTable<RelayStats>) => {
     relayStatsByUrl.set(indexBy(r => r.url, await table.getAll()))
 
+<<<<<<< HEAD
     return onRelayStats(batch(1000, table.bulkPut))
   },
+=======
+  relaysByUrl.set(new Map((await collection.get()).map(relay => [relay.url, relay])))
+
+  return throttled(3000, relays).subscribe(collection.set)
+>>>>>>> ac46870 (Add Turborepo build graph and tooling, switch `@welshman` deps to `workspace:*`, refactor application to match the latest `@welshman` APIs)
 }
 
 const handlesAdapter = {
@@ -208,8 +221,16 @@ const handlesAdapter = {
   init: async (table: IDBTable<Handle>) => {
     handlesByNip05.set(indexBy(r => r.nip05, await table.getAll()))
 
+<<<<<<< HEAD
     return onHandle(batch(1000, table.bulkPut))
   },
+=======
+  relayStatsByUrl.set(new Map((await collection.get()).map(stats => [stats.url, stats])))
+
+  return throttled(3000, relayStatsByUrl).subscribe($relayStatsByUrl =>
+    collection.set(Array.from($relayStatsByUrl.values())),
+  )
+>>>>>>> ac46870 (Add Turborepo build graph and tooling, switch `@welshman` deps to `workspace:*`, refactor application to match the latest `@welshman` APIs)
 }
 
 const zappersAdapter = {
@@ -218,17 +239,27 @@ const zappersAdapter = {
   init: async (table: IDBTable<Zapper>) => {
     zappersByLnurl.set(indexBy(z => z.lnurl, await table.getAll()))
 
+<<<<<<< HEAD
     return onZapper(batch(3000, table.bulkPut))
   },
+=======
+  handlesByNip05.set(new Map((await collection.get()).map(handle => [handle.nip05, handle])))
+
+  return onHandle(batch(3000, collection.add))
+>>>>>>> ac46870 (Add Turborepo build graph and tooling, switch `@welshman` deps to `workspace:*`, refactor application to match the latest `@welshman` APIs)
 }
 
 type PlaintextItem = {key: string; value: string}
 
+<<<<<<< HEAD
 const plaintextAdapter = {
   name: "plaintext",
   keyPath: "key",
   init: async (table: IDBTable<PlaintextItem>) => {
     const initialRecords = await table.getAll()
+=======
+  zappersByLnurl.set(new Map((await collection.get()).map(zapper => [zapper.lnurl, zapper])))
+>>>>>>> ac46870 (Add Turborepo build graph and tooling, switch `@welshman` deps to `workspace:*`, refactor application to match the latest `@welshman` APIs)
 
     plaintext.set(fromPairs(initialRecords.map(({key, value}) => [key, value])))
 

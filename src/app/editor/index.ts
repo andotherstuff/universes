@@ -62,10 +62,17 @@ export const makeEditor = async ({
         onSearch: searchProfiles,
         getValue: (profile: PublishedProfile) => profile.event.pubkey,
         sortFn: ({score = 1, item}) => {
+<<<<<<< HEAD
           const wotScore = getWotGraph().get(item.event.pubkey) || 0
           const membershipScale = $spaceMembers.includes(item.event.pubkey) ? 2 : 1
 
           return dec(score) * inc(wotScore / getMaxWot()) * membershipScale
+=======
+          const wotScore = get(wotGraph).get(item.event.pubkey) || 0
+          const membershipScale = $spaceMembers.includes(item.event.pubkey) ? 2 : 1
+
+          return dec(score) * inc(wotScore / get(maxWot)) * membershipScale
+>>>>>>> ac46870 (Add Turborepo build graph and tooling, switch `@welshman` deps to `workspace:*`, refactor application to match the latest `@welshman` APIs)
         },
         fuseOptions: {
           keys: [

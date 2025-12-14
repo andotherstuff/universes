@@ -38,6 +38,17 @@ export const makeSpacePath = (url: string, ...extra: (string | undefined)[]) => 
         .filter(identity)
         .map(s => encodeURIComponent(s as string))
         .join("/")
+<<<<<<< HEAD
+=======
+  } else {
+    const relay = get(relaysByUrl).get(url)
+
+    if (hasNip29(relay)) {
+      path += "/recent"
+    } else {
+      path += "/chat"
+    }
+>>>>>>> ac46870 (Add Turborepo build graph and tooling, switch `@welshman` deps to `workspace:*`, refactor application to match the latest `@welshman` APIs)
   }
 
   return path

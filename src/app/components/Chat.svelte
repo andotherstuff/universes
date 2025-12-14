@@ -62,7 +62,11 @@
 
   const chat = deriveChat(pubkeys)
   const others = remove($pubkey!, pubkeys)
+<<<<<<< HEAD
   const missingRelayLists = $derived(pubkeys.filter(pk => !$messagingRelayListsByPubkey.has(pk)))
+=======
+  const missingInboxes = $derived(pubkeys.filter(pk => !$messagingRelayListsByPubkey.has(pk)))
+>>>>>>> ac46870 (Add Turborepo build graph and tooling, switch `@welshman` deps to `workspace:*`, refactor application to match the latest `@welshman` APIs)
 
   const showMembers = () =>
     others.length === 1
@@ -178,7 +182,11 @@
 
   onMount(() => {
     for (const pubkey of others) {
+<<<<<<< HEAD
       loadMessagingRelayList(pubkey, INDEXER_RELAYS, true)
+=======
+      loadMessagingRelayList(pubkey, INDEXER_RELAYS)
+>>>>>>> ac46870 (Add Turborepo build graph and tooling, switch `@welshman` deps to `workspace:*`, refactor application to match the latest `@welshman` APIs)
     }
 
     const observer = new ResizeObserver(() => {

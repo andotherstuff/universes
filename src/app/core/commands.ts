@@ -78,6 +78,10 @@ import {
   session,
   repository,
   publishThunk,
+<<<<<<< HEAD
+=======
+  getProfilesByPubkey,
+>>>>>>> ac46870 (Add Turborepo build graph and tooling, switch `@welshman` deps to `workspace:*`, refactor application to match the latest `@welshman` APIs)
   tagEvent,
   tagEventForReaction,
   userRelayList,
@@ -119,6 +123,16 @@ export const getPubkeyHints = (pubkey: string) => {
   return hints
 }
 
+<<<<<<< HEAD
+=======
+export const getPubkeyPetname = (pubkey: string) => {
+  const profile = getProfilesByPubkey().get(pubkey)
+  const display = displayProfile(profile)
+
+  return display
+}
+
+>>>>>>> ac46870 (Add Turborepo build graph and tooling, switch `@welshman` deps to `workspace:*`, refactor application to match the latest `@welshman` APIs)
 export const prependParent = (parent: TrustedEvent | undefined, {content, tags}: EventContent) => {
   if (parent) {
     const nevent = nip19.neventEncode({
@@ -222,8 +236,13 @@ export const setRelayPolicy = (url: string, read: boolean, write: boolean) => {
   })
 }
 
+<<<<<<< HEAD
 export const setMessagingRelayPolicy = (url: string, enabled: boolean) => {
   const list = get(userMessagingRelayList) || makeList({kind: MESSAGING_RELAYS})
+=======
+export const setInboxRelayPolicy = (url: string, enabled: boolean) => {
+  const list = get(userMessagingRelayList) || makeList({kind: INBOX_RELAYS})
+>>>>>>> ac46870 (Add Turborepo build graph and tooling, switch `@welshman` deps to `workspace:*`, refactor application to match the latest `@welshman` APIs)
 
   // Only update messaging policies if they already exist or we're adding them
   if (enabled || getRelaysFromList(list).includes(url)) {
