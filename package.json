@@ -90,9 +90,7 @@
   "pnpm": {
     "ignoredBuiltDependencies": [
       "@sentry/cli",
-      "esbuild"
-    ],
-    "onlyBuiltDependencies": [
+      "esbuild",
       "sharp"
     ]
   }
