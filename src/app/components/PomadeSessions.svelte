@@ -7,6 +7,7 @@
   import TrashBin2 from "@assets/icons/trash-bin-2.svg?dataurl"
   import {pushToast} from "@app/util/toast"
   import {onMount} from "svelte"
+  import {SvelteMap} from "svelte/reactivity"
 
   type SessionWithPeers = SessionItem & {peers: string[]}
 
@@ -23,7 +24,7 @@
 
       if (result.ok) {
         // Group sessions by client pubkey and collect peers
-        const sessionMap = new Map<string, SessionWithPeers>()
+        const sessionMap = new SvelteMap<string, SessionWithPeers>()
 
         for (const message of result.messages) {
           if (!message?.payload.items) continue

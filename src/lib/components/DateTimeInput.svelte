@@ -5,6 +5,7 @@
   import CalendarMinimalistic from "@assets/icons/calendar-minimalistic.svg?dataurl"
   import Icon from "@lib/components/Icon.svelte"
   import Button from "@lib/components/Button.svelte"
+  import {SvelteDate} from "svelte/reactivity"
 
   interface Props {
     value?: number | undefined
@@ -18,7 +19,7 @@
 
   const setTime = (d: Date, time: string) => {
     const [hours, minutes] = time.split(":").map(x => parseInt(x))
-    const newDate = new Date(d)
+    const newDate = new SvelteDate(d)
 
     newDate.setHours(hours, minutes, 0, 0)
 
@@ -28,7 +29,7 @@
   const onTimeChange = () => {
     if (time) {
       minutes = time.slice(-2)
-      date = setTime(date || new Date(), time)
+      date = setTime(date || new SvelteDate(), time)
     }
   }
 
@@ -39,11 +40,11 @@
     time = undefined
   }
 
-  const initialDate = value ? secondsToDate(value) : undefined
+  const initialDate = value ? new SvelteDate(secondsToDate(value)) : undefined
   const initialTime = initialDate ? getTime(initialDate, pad(initialDate.getMinutes())) : undefined
   const initialMinutes = initialTime ? initialTime.slice(-2) : "00"
 
-  let date: Date | undefined = $state(initialDate)
+  let date: SvelteDate | undefined = $state(initialDate)
   let time: string | undefined = $state(initialTime)
   let minutes: string = $state(initialMinutes)
   let element: HTMLElement
@@ -60,7 +61,7 @@
 
   // Sync updates to value to date/time
   $effect(() => {
-    const derivedDate = value ? secondsToDate(value) : undefined
+    const derivedDate = value ? new SvelteDate(secondsToDate(value)) : undefined
     const derivedTime = derivedDate ? getTime(derivedDate, minutes) : undefined
 
     date = derivedDate

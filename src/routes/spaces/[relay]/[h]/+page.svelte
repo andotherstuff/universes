@@ -2,6 +2,7 @@
   import cx from "classnames"
   import {readable} from "svelte/store"
   import {onMount, onDestroy} from "svelte"
+  import {SvelteSet} from "svelte/reactivity"
   import {page} from "$app/stores"
   import type {Readable} from "svelte/store"
   import type {MakeNonOptional} from "@welshman/lib"
@@ -209,7 +210,7 @@
 
   const elements = $derived.by(() => {
     const elements = []
-    const seen = new Set()
+    const seen = new SvelteSet()
 
     let previousDate
     let previousKind
