@@ -7,6 +7,7 @@
   import {App, type URLOpenListenerEvent} from "@capacitor/app"
   import {dev} from "$app/environment"
   import {goto} from "$app/navigation"
+  import {resolve} from "$app/paths"
   import {sync, throttled} from "@welshman/store"
   import {call} from "@welshman/lib"
   import {defaultSocketPolicies} from "@welshman/net"
@@ -38,6 +39,7 @@
   import * as notifications from "@app/util/notifications"
   import * as storage from "@app/util/storage"
   import {syncKeyboard} from "@app/util/keyboard"
+  import {stripResolvedBase} from "@app/util/paths"
   import NewNotificationSound from "@src/app/components/NewNotificationSound.svelte"
 
   const {children} = $props()
@@ -69,7 +71,7 @@
   // Listen for navigation messages from service worker
   navigator.serviceWorker?.addEventListener("message", event => {
     if (event.data && event.data.type === "NAVIGATE") {
-      goto(event.data.url)
+      goto(resolve(stripResolvedBase(event.data.url)))
     }
   })
 
@@ -77,7 +79,7 @@
   App.addListener("appUrlOpen", (event: URLOpenListenerEvent) => {
     const url = new URL(event.url)
     const target = `${url.pathname}${url.search}${url.hash}`
-    goto(target, {replaceState: false, noScroll: false})
+    goto(resolve(stripResolvedBase(target)), {replaceState: false, noScroll: false})
   })
 
   // Handle back button on mobile
@@ -152,7 +154,7 @@
             message: "Your signer appears to be unresponsive.",
             action: {
               message: "Details",
-              onclick: () => goto("/settings/profile"),
+              onclick: () => goto(resolve("/settings/profile")),
             },
           })
         }

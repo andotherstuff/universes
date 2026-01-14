@@ -1,5 +1,6 @@
 <script module lang="ts">
   import {goto} from "$app/navigation"
+  import {resolve} from "$app/paths"
   import {dissoc} from "@welshman/lib"
   import {pushToast} from "@app/util/toast"
   import {makeSpacePath} from "@app/util/routes"
@@ -11,7 +12,7 @@
 
     broadcastUserData([url])
     relaysMostlyRestricted.update(dissoc(url))
-    goto(makeSpacePath(url), {replaceState: true})
+    goto(resolve(makeSpacePath(url)), {replaceState: true})
     pushToast({message: "Welcome to the space!"})
   }
 </script>

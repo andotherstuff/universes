@@ -1,8 +1,10 @@
 import type {Component} from "svelte"
-import {derived, writable} from "svelte/store"
+import {derived, writable, get} from "svelte/store"
 import {randomId, always, assoc, Emitter} from "@welshman/lib"
 import {goto} from "$app/navigation"
+import {resolve} from "$app/paths"
 import {page} from "$app/stores"
+import {stripResolvedBase} from "@app/util/paths"
 
 export type ModalOptions = {
   drawer?: boolean
@@ -34,10 +36,13 @@ export const pushModal = (
 ) => {
   const id = randomId()
   const path = options.path || ""
+  const currentUrl = get(page).url
+  const currentPath = `${currentUrl.pathname}${currentUrl.search}`
+  const targetPath = (path || currentPath).split("#")[0]
 
   modals.update(assoc(id, {id, component, props, options}))
 
-  goto(path + "#" + id, {replaceState: options.replaceState})
+  goto(resolve(stripResolvedBase(`${targetPath}#${id}`)), {replaceState: options.replaceState})
 
   return id
 }

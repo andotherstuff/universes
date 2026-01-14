@@ -1,5 +1,6 @@
 <script lang="ts">
   import {goto} from "$app/navigation"
+  import {resolve} from "$app/paths"
   import {preventDefault} from "@lib/html"
   import {shouldUnwrap} from "@welshman/app"
   import AltArrowLeft from "@assets/icons/alt-arrow-left.svg?dataurl"
@@ -11,6 +12,7 @@
   import ModalFooter from "@lib/components/ModalFooter.svelte"
   import {PLATFORM_NAME} from "@app/core/state"
   import {clearModals} from "@app/util/modal"
+  import {stripResolvedBase} from "@app/util/paths"
 
   const {next} = $props()
 
@@ -24,7 +26,7 @@
     try {
       shouldUnwrap.set(true)
       clearModals()
-      goto(nextUrl)
+      goto(resolve(stripResolvedBase(nextUrl)))
     } finally {
       loading = false
     }

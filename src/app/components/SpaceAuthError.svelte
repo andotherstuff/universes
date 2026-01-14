@@ -1,5 +1,6 @@
 <script lang="ts">
   import {goto} from "$app/navigation"
+  import {resolve} from "$app/paths"
   import {displayRelayUrl} from "@welshman/util"
   import {parse, renderAsHtml} from "@welshman/content"
   import Button from "@lib/components/Button.svelte"
@@ -16,7 +17,7 @@
 
   const {url, error} = $props()
 
-  const back = () => goto("/home")
+  const back = () => goto(resolve("/home"))
 
   const requestAccess = () => pushModal(SpaceAccessRequest, {url})
 
@@ -31,7 +32,7 @@
       loading = false
     }
 
-    goto("/home")
+    goto(resolve("/home"))
   }
 
   let loading = $state(false)

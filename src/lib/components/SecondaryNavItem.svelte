@@ -23,15 +23,18 @@
 <script lang="ts">
   import {fade} from "@lib/transition"
   import {page} from "$app/stores"
+  import {resolve} from "$app/paths"
+  import {stripResolvedBase} from "@app/util/paths"
 
   const {children, href = "", notification = false, replaceState = false, ...restProps} = $props()
 
-  const active = $derived($page.url.pathname === href)
+  const active = $derived(stripResolvedBase($page.url.pathname) === href)
+  const resolvedHref = resolve(stripResolvedBase(href))
 </script>
 
 {#if href}
   <a
-    {href}
+    href={resolvedHref}
     {...restProps}
     data-sveltekit-replacestate={replaceState}
     class="{restProps.class} relative flex items-center gap-3 text-left transition-all hover:bg-base-100 hover:text-base-content"

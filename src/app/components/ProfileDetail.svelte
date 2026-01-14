@@ -1,5 +1,6 @@
 <script lang="ts">
   import {goto} from "$app/navigation"
+  import {resolve} from "$app/paths"
   import {removeUndefined} from "@welshman/lib"
   import {ManagementMethod} from "@welshman/util"
   import {shouldUnwrap, manageRelay, deriveProfile, displayProfileByPubkey} from "@welshman/app"
@@ -43,7 +44,8 @@
 
   const showInfo = () => pushModal(EventInfo, {url, event: $profile!.event})
 
-  const openChat = () => ($shouldUnwrap ? goto(chatPath) : pushModal(ChatEnable, {next: chatPath}))
+  const openChat = () =>
+    $shouldUnwrap ? goto(resolve(chatPath)) : pushModal(ChatEnable, {next: chatPath})
 
   const toggleMenu = (pubkey: string) => {
     showMenu = !showMenu

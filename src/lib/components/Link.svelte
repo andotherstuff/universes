@@ -1,6 +1,8 @@
 <script lang="ts">
   import type {Snippet} from "svelte"
   import {goto} from "$app/navigation"
+  import {resolve} from "$app/paths"
+  import {stripResolvedBase} from "@app/util/paths"
   import {stopPropagation} from "@lib/html"
 
   const {
@@ -22,17 +24,27 @@
     if (!external) {
       e.preventDefault()
 
-      goto(href, {replaceState})
+      goto(resolve(stripResolvedBase(href)), {replaceState})
     }
   }
 </script>
 
-<a
-  {href}
-  {...restProps}
-  onclick={stopPropagation(go)}
-  class="cursor-pointer {restProps.class}"
-  rel={external ? "noopener noreferer" : ""}
-  target={external ? "_blank" : ""}>
-  {@render children?.()}
-</a>
+{#if external}
+  <a
+    {href}
+    {...restProps}
+    onclick={stopPropagation(go)}
+    class="cursor-pointer {restProps.class}"
+    rel="external noopener noreferer"
+    target="_blank">
+    {@render children?.()}
+  </a>
+{:else}
+  <a
+    href={resolve(stripResolvedBase(href))}
+    {...restProps}
+    onclick={stopPropagation(go)}
+    class="cursor-pointer {restProps.class}">
+    {@render children?.()}
+  </a>
+{/if}

@@ -1,5 +1,6 @@
 <script lang="ts">
   import {goto} from "$app/navigation"
+  import {resolve} from "$app/paths"
   import type {RoomMeta} from "@welshman/util"
   import {displayRelayUrl} from "@welshman/util"
   import AltArrowLeft from "@assets/icons/alt-arrow-left.svg?dataurl"
@@ -23,7 +24,7 @@
 
   const back = () => history.back()
 
-  const onsubmit = (room: RoomMeta) => goto(makeSpacePath(url, h))
+  const onsubmit = (room: RoomMeta) => goto(resolve(makeSpacePath(url, h)))
 </script>
 
 <RoomForm {url} {onsubmit} initialValues={$room}>

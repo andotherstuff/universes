@@ -1,7 +1,9 @@
 import type {Page} from "@sveltejs/kit"
+import type {Pathname} from "$app/types"
 import {get} from "svelte/store"
 import * as nip19 from "nostr-tools/nip19"
 import {goto} from "$app/navigation"
+import {resolve} from "$app/paths"
 import {nthEq, sleep} from "@welshman/lib"
 import type {TrustedEvent} from "@welshman/util"
 import {tracker, loadRelay} from "@welshman/app"
@@ -27,6 +29,7 @@ import {
   ROOM,
 } from "@app/core/state"
 import {lastPageBySpaceUrl} from "@app/util/history"
+import {stripResolvedBase} from "@app/util/paths"
 
 export const makeSpacePath = (url: string, ...extra: (string | undefined)[]) => {
   let path = `/spaces/${encodeRelay(url)}`
@@ -40,24 +43,25 @@ export const makeSpacePath = (url: string, ...extra: (string | undefined)[]) => 
         .join("/")
   }
 
-  return path
+  return path as Pathname
 }
 
 export const goToSpace = async (url: string) => {
   const prevPath = lastPageBySpaceUrl.get(encodeRelay(url))
 
   if (prevPath) {
-    goto(prevPath)
+    goto(resolve(stripResolvedBase(prevPath)))
   } else if (hasNip29(await loadRelay(url))) {
-    goto(makeSpacePath(url, "recent"))
+    goto(resolve(makeSpacePath(url, "recent")))
   } else {
-    goto(makeSpacePath(url, "chat"))
+    goto(resolve(makeSpacePath(url, "chat")))
   }
 }
 
-export const makeChatPath = (pubkeys: string[]) => `/chat/${makeChatId(pubkeys)}`
+export const makeChatPath = (pubkeys: string[]) => `/chat/${makeChatId(pubkeys)}` as Pathname
 
-export const makeRoomPath = (url: string, h: string) => `/spaces/${encodeRelay(url)}/${h}`
+export const makeRoomPath = (url: string, h: string) =>
+  `/spaces/${encodeRelay(url)}/${h}` as Pathname
 
 export const makeSpaceChatPath = (url: string) => makeRoomPath(url, "chat")
 
@@ -96,7 +100,7 @@ export const goToEvent = async (event: TrustedEvent, options: Record<string, any
   if (path.includes("://")) {
     window.open(path)
   } else {
-    goto(path, options)
+    goto(resolve(stripResolvedBase(path)), options)
 
     await sleep(300)
     await scrollToEvent(event.id)

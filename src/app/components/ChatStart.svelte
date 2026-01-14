@@ -3,6 +3,7 @@
   import {onMount} from "svelte"
   import {writable} from "svelte/store"
   import {goto} from "$app/navigation"
+  import {resolve} from "$app/paths"
   import {tryCatch, uniq} from "@welshman/lib"
   import {fromNostrURI} from "@welshman/util"
   import {preventDefault} from "@lib/html"
@@ -18,7 +19,7 @@
 
   const back = () => history.back()
 
-  const onSubmit = () => goto(makeChatPath(pubkeys))
+  const onSubmit = () => goto(resolve(makeChatPath(pubkeys)))
 
   const addPubkey = (pubkey: string) => {
     pubkeys = uniq([...pubkeys, pubkey])

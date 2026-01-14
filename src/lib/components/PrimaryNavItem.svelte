@@ -1,6 +1,8 @@
 <script lang="ts">
   import {page} from "$app/stores"
+  import {resolve} from "$app/paths"
   import Button from "@lib/components/Button.svelte"
+  import {stripResolvedBase} from "@app/util/paths"
 
   const {
     children,
@@ -12,11 +14,15 @@
     ...restProps
   } = $props()
 
-  const active = $derived($page.url?.pathname?.startsWith(prefix || href || "bogus"))
+  const active = $derived(
+    stripResolvedBase($page.url?.pathname || "/").startsWith(prefix || href || "bogus"),
+  )
+
+  const resolvedHref = resolve(stripResolvedBase(href))
 </script>
 
 {#if href}
-  <a {href} class="relative z-nav-item flex h-14 w-14 items-center justify-center">
+  <a href={resolvedHref} class="relative z-nav-item flex h-14 w-14 items-center justify-center">
     <div
       class="avatar cursor-pointer rounded-full p-2 {restProps.class} transition-colors hover:bg-base-300"
       class:bg-base-300={active}

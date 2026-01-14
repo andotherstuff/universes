@@ -1,6 +1,7 @@
 <script lang="ts">
   import {page} from "$app/stores"
   import {goto} from "$app/navigation"
+  import {resolve} from "$app/paths"
   import AltArrowLeft from "@assets/icons/alt-arrow-left.svg?dataurl"
   import Icon from "@lib/components/Icon.svelte"
   import Dialog from "@lib/components/Dialog.svelte"
@@ -11,7 +12,7 @@
 <Dialog>
   <SpaceInviteAccept invite={$page.url.href}>
     {#snippet abortAction()}
-      <Button class="btn btn-link" onclick={() => goto("/home")}>
+      <Button class="btn btn-link" onclick={() => goto(resolve("/home"))}>
         <Icon icon={AltArrowLeft} />
         Go back
       </Button>

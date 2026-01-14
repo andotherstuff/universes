@@ -7,6 +7,7 @@
   import {load, LOCAL_RELAY_URL} from "@welshman/net"
   import {page} from "$app/stores"
   import {goto} from "$app/navigation"
+  import {resolve} from "$app/paths"
   import Spinner from "@lib/components/Spinner.svelte"
   import {goToEvent} from "@app/util/routes"
 
@@ -16,7 +17,7 @@
     const {type, data} = nip19.decode(bech32) as any
 
     if (!["nevent", "naddr"].includes(type) && data.relays.length > 0) {
-      return goto("/", {replaceState: true})
+      return goto(resolve("/"), {replaceState: true})
     }
 
     let found = false
@@ -30,7 +31,7 @@
       },
       onClose: () => {
         if (!found) {
-          goto("/", {replaceState: true})
+          goto(resolve("/"), {replaceState: true})
         }
       },
     })
@@ -40,7 +41,7 @@
     try {
       await attemptToNavigate()
     } catch (e) {
-      goto("/", {replaceState: true})
+      goto(resolve("/"), {replaceState: true})
     }
   })
 </script>

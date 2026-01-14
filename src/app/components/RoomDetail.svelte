@@ -1,5 +1,6 @@
 <script lang="ts">
   import {goto} from "$app/navigation"
+  import {resolve} from "$app/paths"
   import type {RoomMeta} from "@welshman/util"
   import {displayRelayUrl, makeRoomMeta} from "@welshman/util"
   import type {Thunk} from "@welshman/app"
@@ -82,7 +83,7 @@
           repository.removeEvent(thunk.event.id)
           pushToast({theme: "error", message})
         } else {
-          goto(makeSpacePath(url))
+          goto(resolve(makeSpacePath(url)))
         }
       },
     })

@@ -2,6 +2,7 @@
   import type {Snippet} from "svelte"
   import {page} from "$app/stores"
   import {goto} from "$app/navigation"
+  import {resolve} from "$app/paths"
   import {splitAt} from "@welshman/lib"
   import {userProfile, shouldUnwrap} from "@welshman/app"
   import Widget from "@assets/icons/widget.svg?dataurl"
@@ -34,7 +35,8 @@
 
   const showSettingsMenu = () => pushModal(MenuSettings)
 
-  const openChat = () => ($shouldUnwrap ? goto("/chat") : pushModal(ChatEnable, {next: "/chat"}))
+  const openChat = () =>
+    $shouldUnwrap ? goto(resolve("/chat")) : pushModal(ChatEnable, {next: "/chat"})
 
   const hasNotification = (url: string) => {
     const path = makeSpacePath(url)

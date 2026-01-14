@@ -1,5 +1,6 @@
 <script lang="ts">
   import {goto} from "$app/navigation"
+  import {resolve} from "$app/paths"
   import {remove} from "@welshman/lib"
   import {displayRelayUrl} from "@welshman/util"
   import {preventDefault} from "@lib/html"
@@ -28,7 +29,7 @@
     try {
       await removeSpaceMembership(url)
       await removeTrustedRelay(url)
-      goto("/home")
+      goto(resolve("/home"))
     } finally {
       loading = false
     }

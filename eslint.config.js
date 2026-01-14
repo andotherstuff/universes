@@ -42,7 +42,6 @@ export default [
       "prefer-const": ["error", {destructuring: "all"}],
       "svelte/valid-compile": "off",
       "svelte/no-at-html-tags": "off",
-      "svelte/no-navigation-without-resolve": "off",
       "@typescript-eslint/no-explicit-any": "off",
       "@typescript-eslint/no-extra-semi": "off",
       "@typescript-eslint/ban-ts-comment": "off",

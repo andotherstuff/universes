@@ -1,5 +1,6 @@
 <script lang="ts">
   import {goto} from "$app/navigation"
+  import {resolve} from "$app/paths"
   import {displayRelayUrl} from "@welshman/util"
   import {preventDefault} from "@lib/html"
   import Spinner from "@lib/components/Spinner.svelte"
@@ -25,7 +26,7 @@
       loading = false
     }
 
-    goto("/home")
+    goto(resolve("/home"))
   }
 
   let loading = $state(false)

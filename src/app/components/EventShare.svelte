@@ -1,5 +1,6 @@
 <script lang="ts">
   import {goto} from "$app/navigation"
+  import {resolve} from "$app/paths"
   import type {TrustedEvent} from "@welshman/util"
   import {preventDefault} from "@lib/html"
   import AltArrowLeft from "@assets/icons/alt-arrow-left.svg?dataurl"
@@ -19,7 +20,7 @@
 
   const onSubmit = () => {
     setKey("share", event)
-    goto(makeRoomPath(url, selection), {replaceState: true})
+    goto(resolve(makeRoomPath(url, selection)), {replaceState: true})
   }
 
   const toggleRoom = (h: string) => {

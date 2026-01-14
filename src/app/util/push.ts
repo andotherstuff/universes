@@ -5,8 +5,10 @@ import {PushNotifications} from "@capacitor/push-notifications"
 import {parseJson, sleep, poll} from "@welshman/lib"
 import {isSignedEvent} from "@welshman/util"
 import {goto} from "$app/navigation"
+import {resolve} from "$app/paths"
 import {ucFirst} from "@lib/util"
 import {VAPID_PUBLIC_KEY} from "@app/core/state"
+import {stripResolvedBase} from "@app/util/paths"
 
 export const platform = Capacitor.getPlatform()
 
@@ -21,7 +23,7 @@ export const initializePushNotifications = () => {
     const relays = Array.isArray(parsedRelays) ? parsedRelays : []
 
     if (isSignedEvent(event)) {
-      goto("/" + nip19.neventEncode({id: event.id, relays}))
+      goto(resolve(stripResolvedBase("/" + nip19.neventEncode({id: event.id, relays}))))
     }
   })
 }

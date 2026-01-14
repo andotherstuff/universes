@@ -2,6 +2,7 @@
   import {onMount} from "svelte"
   import type {Snippet} from "svelte"
   import {goto} from "$app/navigation"
+  import {resolve} from "$app/paths"
   import type {TrustedEvent} from "@welshman/util"
   import {COMMENT, ManagementMethod} from "@welshman/util"
   import {pubkey, repository, relaysByUrl, manageRelay} from "@welshman/app"
@@ -44,7 +45,7 @@
       pushModal(EventShare, {url, event})
     } else {
       setKey("share", event)
-      goto(makeSpaceChatPath(url))
+      goto(resolve(makeSpaceChatPath(url)))
     }
   }
 

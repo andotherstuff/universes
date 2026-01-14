@@ -1,6 +1,7 @@
 <script lang="ts">
   import {onMount} from "svelte"
   import {goto} from "$app/navigation"
+  import {resolve} from "$app/paths"
   import {goToSpace} from "@app/util/routes"
   import {PLATFORM_RELAYS} from "@app/core/state"
 
@@ -8,7 +9,7 @@
     if (PLATFORM_RELAYS.length > 0) {
       goToSpace(PLATFORM_RELAYS[0])
     } else {
-      goto("/home")
+      goto(resolve("/home"))
     }
   })
 </script>
