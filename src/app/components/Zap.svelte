@@ -92,21 +92,16 @@
     }
   }
 
-  let pos = $state(minPos)
   let amount = $state(minVal)
   let content = $state("⚡️")
   let loading = $state(false)
 
-  $effect(() => {
-    amount = posToAmount(pos)
-  })
+  const pos = $derived(amountToPos(amount))
 
-  $effect(() => {
-    const newPos = amountToPos(amount)
-    if (newPos !== pos) {
-      pos = newPos
-    }
-  })
+  const onPosInput = (event: Event) => {
+    const nextPos = Number((event.currentTarget as HTMLInputElement).value)
+    amount = posToAmount(nextPos)
+  }
 </script>
 
 <div class="column gap-4">
@@ -148,7 +143,8 @@
     type="range"
     min={minPos}
     max={maxPos}
-    bind:value={pos} />
+    value={pos}
+    oninput={onPosInput} />
   <ModalFooter>
     <Button class="btn btn-link" onclick={back}>
       <Icon icon={AltArrowLeft} />

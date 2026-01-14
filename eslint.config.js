@@ -43,7 +43,6 @@ export default [
       "svelte/valid-compile": "off",
       "svelte/no-at-html-tags": "off",
       "svelte/no-navigation-without-resolve": "off",
-      "svelte/prefer-writable-derived": "off",
       "@typescript-eslint/no-explicit-any": "off",
       "@typescript-eslint/no-extra-semi": "off",
       "@typescript-eslint/ban-ts-comment": "off",
