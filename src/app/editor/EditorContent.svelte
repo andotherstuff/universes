@@ -1,6 +1,6 @@
 <script lang="ts">
   import {Editor} from "@welshman/editor"
-  import {onDestroy, onMount} from "svelte"
+  import {onDestroy} from "svelte"
 
   type Props = {
     editor: Promise<Editor>
@@ -8,23 +8,29 @@
 
   const {editor}: Props = $props()
 
-  let element: HTMLElement
+  const mountEditor = (node: HTMLElement) => {
+    let active = true
 
-  onMount(() => {
-    editor.then(({options}) => {
-      if (options.element) {
-        element?.append(options.element)
-      }
+    editor.then($editor => {
+      if (!active) return
 
-      if (options.autofocus) {
-        ;(element?.querySelector("[contenteditable]") as HTMLElement)?.focus()
+      $editor.setOptions({element: node})
+
+      if ($editor.options.autofocus) {
+        ;(node.querySelector("[contenteditable]") as HTMLElement | null)?.focus()
       }
     })
-  })
+
+    return {
+      destroy() {
+        active = false
+      },
+    }
+  }
 
   onDestroy(() => {
     editor.then($editor => $editor.destroy())
   })
 </script>
 
-<div bind:this={element}></div>
+<div use:mountEditor></div>

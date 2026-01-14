@@ -42,7 +42,6 @@ export default [
       "prefer-const": ["error", {destructuring: "all"}],
       "svelte/valid-compile": "off",
       "svelte/no-at-html-tags": "off",
-      "svelte/no-dom-manipulating": "off",
       "svelte/no-navigation-without-resolve": "off",
       "svelte/prefer-svelte-reactivity": "off",
       "svelte/prefer-writable-derived": "off",
