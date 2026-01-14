@@ -5,7 +5,7 @@
     children?: Snippet
   }
 
-  const {children, ...props}: Props = $props()
+  const {children}: Props = $props()
 </script>
 
 <div class="flex items-center gap-2 p-2 text-xs uppercase opacity-50">
