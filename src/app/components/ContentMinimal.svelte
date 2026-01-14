@@ -102,7 +102,7 @@
     </div>
   {:else}
     <div class="overflow-hidden text-ellipsis break-words">
-      {#each shortContent as parsed, i}
+      {#each shortContent as parsed, i (i)}
         {#if isNewline(parsed)}
           <ContentNewline value={parsed.value} />
         {:else if isTopic(parsed)}

@@ -129,7 +129,7 @@
         <span>{$reports.length}</span>
       </button>
     {/if}
-    {#each groupedZaps.entries() as [key, zaps]}
+    {#each groupedZaps.entries() as [key, zaps] (key)}
       {@const amount = fromMsats(sum(zaps.map(zap => zap.invoiceAmount)))}
       {@const pubkeys = uniq(zaps.map(zap => zap.request.pubkey))}
       {@const isOwn = $pubkey && pubkeys.includes($pubkey)}
@@ -151,7 +151,7 @@
         <span>{amount}</span>
       </button>
     {/each}
-    {#each groupedReactions.entries() as [key, events]}
+    {#each groupedReactions.entries() as [key, events] (key)}
       {@const pubkeys = events.map(e => e.pubkey)}
       {@const isOwn = $pubkey && pubkeys.includes($pubkey)}
       {@const info = displayList(pubkeys.map(pubkey => displayProfileByPubkey(pubkey)))}

@@ -13,7 +13,7 @@
 {:else if event.content === "-"}
   <Icon icon={ThumbsDown} />
 {:else}
-  {#each parse(event) as parsed}
+  {#each parse(event) as parsed, i (i)}
     {#if isEmoji(parsed)}
       <ContentEmoji value={parsed.value} />
     {:else}

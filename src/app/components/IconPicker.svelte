@@ -50,7 +50,7 @@
   </label>
   <div class="mt-2 max-h-80 overflow-y-auto">
     <div class="grid grid-cols-8 gap-2 p-2">
-      {#each filteredIcons as icon}
+      {#each filteredIcons as icon (icon.name)}
         <button
           class="flex aspect-square items-center justify-center rounded-box transition-colors hover:bg-primary hover:text-primary-content"
           onclick={() => handleSelect(icon.url)}

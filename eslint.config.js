@@ -47,7 +47,6 @@ export default [
       "svelte/no-useless-children-snippet": "off",
       "svelte/prefer-svelte-reactivity": "off",
       "svelte/prefer-writable-derived": "off",
-      "svelte/require-each-key": "off",
       "@typescript-eslint/no-explicit-any": "off",
       "@typescript-eslint/no-extra-semi": "off",
       "@typescript-eslint/ban-ts-comment": "off",

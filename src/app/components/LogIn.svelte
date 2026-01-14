@@ -18,8 +18,9 @@
   import {PLATFORM_NAME, POMADE_SIGNERS} from "@app/core/state"
   import {pushToast} from "@app/util/toast"
   import {setChecked} from "@app/util/notifications"
+  import type {AppInfo} from "nostr-signer-capacitor-plugin"
 
-  let signers: any[] = $state([])
+  let signers: AppInfo[] = $state([])
   let loading: string | undefined = $state()
 
   const hasPomade = POMADE_SIGNERS.length >= 3
@@ -104,7 +105,7 @@
       Log in with Extension
     </Button>
   {/if}
-  {#each signers as app}
+  {#each signers as app, todoTmpIndexKey (todoTmpIndexKey)}
     <Button {disabled} class="btn btn-primary" onclick={() => loginWithNip55(app)}>
       {#if loading === "nip55"}
         <span class="loading loading-spinner mr-3"></span>

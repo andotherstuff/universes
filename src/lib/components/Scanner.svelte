@@ -61,7 +61,7 @@
       class="select select-bordered select-sm absolute bottom-1 right-1"
       bind:value={camera}
       onchange={changeCamera}>
-      {#each cameras as camera}
+      {#each cameras as camera (camera.id)}
         <option value={camera.id}>{camera.label || `Camera ${camera.id}`}</option>
       {/each}
     </select>

@@ -11,7 +11,7 @@
   const {url, event}: Props = $props()
 </script>
 
-{#each getPubkeyTagValues(event.tags) as pubkey}
+{#each getPubkeyTagValues(event.tags) as pubkey (pubkey)}
   <div class="py-1 text-center text-xs opacity-75">
     <ProfileLink unstyled class="text-primary" {url} {pubkey} /> joined the room
   </div>
