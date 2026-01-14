@@ -19,7 +19,7 @@
     try {
       const client = new Client($session.clientOptions)
       const result = await client.listSessions()
-      const pubkey = await client.getPubkey()
+      const pubkey = client.userPubkey
 
       if (result.ok) {
         // Group sessions by client pubkey and collect peers

@@ -37,7 +37,7 @@
 
 <div class="relative h-[14px] w-[14px]">
   <svg height="14" width="14" class="absolute">
-    <circle class="wot-background" cx={center} cy={center} r={radius} />
+    <circle class="wot-background" cx={center} cy={center} r={radius}></circle>
     <circle
       cx={center}
       cy={center}
@@ -45,6 +45,6 @@
       class="wot-highlight"
       stroke-dashoffset={dashOffset}
       {style}
-      {stroke} />
+      {stroke}></circle>
   </svg>
 </div>
