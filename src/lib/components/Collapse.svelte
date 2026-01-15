@@ -21,13 +21,19 @@
 <div class="relative flex flex-col gap-4 {props.class}">
   <button
     type="button"
-    class="absolute right-8 top-8 h-4 w-4 cursor-pointer transition-all"
-    class:rotate-90={!isOpen}
+    class="relative flex w-full items-start p-4 text-left sm:-m-6 sm:p-6"
+    aria-expanded={isOpen}
     onclick={toggle}>
-    <Icon icon={AltArrowDown} />
+    <div class="flex flex-col gap-2 pr-10">
+      {@render props.title?.()}
+      {@render props.description?.()}
+    </div>
+    <span
+      class="absolute right-0 top-8 h-4 w-4 transition-all max-lg:right-3"
+      class:rotate-90={!isOpen}>
+      <Icon icon={AltArrowDown} />
+    </span>
   </button>
-  {@render props.title?.()}
-  {@render props.description?.()}
   {#if isOpen}
     <div transition:slide>
       {@render props.children?.()}
