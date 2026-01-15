@@ -14,6 +14,7 @@
   import {pushToast} from "@app/util/toast"
   import {PROTECTED} from "@app/core/state"
   import {makeEditor} from "@app/editor"
+  import {mergeImetaTags, warnMissingImeta} from "@app/util/imeta"
   import {canEnforceNip70} from "@app/core/commands"
 
   type Props = {
@@ -51,7 +52,10 @@
       })
     }
 
-    const tags = [...ed.storage.nostr.getEditorTags(), ["title", title]]
+    let tags = [...ed.storage.nostr.getEditorTags(), ["title", title]]
+    const imeta = mergeImetaTags(content, tags)
+    tags = imeta.tags
+    warnMissingImeta(imeta.missing)
 
     if (await shouldProtect) {
       tags.push(PROTECTED)

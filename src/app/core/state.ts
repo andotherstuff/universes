@@ -457,7 +457,7 @@ export const chatsById = call(() => {
       }
     }
 
-    addEvents(repository.query([{kinds: [DIRECT_MESSAGE, PROFILE]}]))
+    addEvents(repository.query([{kinds: [DIRECT_MESSAGE, DIRECT_MESSAGE_FILE, PROFILE]}]))
 
     const unsubscribers = [
       on(repository, "update", ({added}: RepositoryUpdate) => addEvents(added)),

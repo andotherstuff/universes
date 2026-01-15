@@ -20,6 +20,7 @@ import ProfileSuggestion from "@app/editor/ProfileSuggestion.svelte"
 import {uploadFile} from "@app/core/commands"
 import {deriveSpaceMembers} from "@app/core/state"
 import {pushToast} from "@app/util/toast"
+import {recordImetaFromFiles} from "@app/util/imeta"
 
 export const makeEditor = async ({
   encryptFiles = false,
@@ -105,6 +106,10 @@ export const makeEditor = async ({
               upload: (attrs: FileAttributes) =>
                 uploadFile(attrs.file, {url, encrypt: encryptFiles}),
               onDrop: () => uploading?.set(true),
+              onUpload(currentEditor) {
+                const files = currentEditor.storage.fileUpload?.getFiles?.() || []
+                recordImetaFromFiles(files)
+              },
               onComplete: () => uploading?.set(false),
               onUploadError(currentEditor, task) {
                 currentEditor.commands.removeFailedUploads()

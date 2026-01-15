@@ -8,6 +8,7 @@
   import Button from "@lib/components/Button.svelte"
   import EditorContent from "@app/editor/EditorContent.svelte"
   import {makeEditor} from "@app/editor"
+  import {mergeImetaTags, warnMissingImeta} from "@app/util/imeta"
 
   type Props = {
     onSubmit: (event: EventContent) => void
@@ -28,9 +29,12 @@
 
     const ed = await editor
     const content = ed.getText({blockSeparator: "\n"}).trim()
-    const tags = ed.storage.nostr.getEditorTags()
-
     if (!content) return
+
+    let tags = ed.storage.nostr.getEditorTags()
+    const imeta = mergeImetaTags(content, tags)
+    tags = imeta.tags
+    warnMissingImeta(imeta.missing)
 
     onSubmit({content, tags})
 
