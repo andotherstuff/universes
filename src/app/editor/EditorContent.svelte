@@ -14,10 +14,14 @@
     editor.then($editor => {
       if (!active) return
 
-      $editor.setOptions({element: node})
+      const container = $editor.options.element as HTMLElement | undefined
+
+      if (container) {
+        node.replaceChildren(container)
+      }
 
       if ($editor.options.autofocus) {
-        ;(node.querySelector("[contenteditable]") as HTMLElement | null)?.focus()
+        ;($editor.view.dom as HTMLElement | null)?.focus()
       }
     })
 
