@@ -4,7 +4,7 @@
   import {page} from "$app/stores"
   import {groupBy, ago, MONTH, first, last, uniq, avg, overlappingPairs} from "@welshman/lib"
   import type {TrustedEvent} from "@welshman/util"
-  import {MESSAGE, getTagValue} from "@welshman/util"
+  import {MESSAGE, getTagValue, displayRelayUrl} from "@welshman/util"
   import History from "@assets/icons/history.svg?dataurl"
   import {createScroller} from "@lib/html"
   import Icon from "@lib/components/Icon.svelte"
@@ -13,10 +13,12 @@
   import SpaceMenuButton from "@app/components/SpaceMenuButton.svelte"
   import ConversationCard from "@app/components/ConversationCard.svelte"
   import {decodeRelay, deriveEventsForUrl} from "@app/core/state"
+  import {makeTitle} from "@app/util/title"
 
   const url = decodeRelay($page.params.relay!)
   const since = ago(MONTH)
   const messages = deriveEventsForUrl(url, [{kinds: [MESSAGE], since}])
+  const pageTitle = makeTitle("Recent Activity", displayRelayUrl(url))
 
   const conversations = derived(messages, $messages => {
     const convs = []
@@ -73,6 +75,10 @@
     return () => scroller.stop()
   })
 </script>
+
+<svelte:head>
+  <title>{pageTitle}</title>
+</svelte:head>
 
 <PageBar>
   {#snippet icon()}

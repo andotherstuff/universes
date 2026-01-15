@@ -40,6 +40,7 @@
   import * as storage from "@app/util/storage"
   import {syncKeyboard} from "@app/util/keyboard"
   import {stripResolvedBase} from "@app/util/paths"
+  import {makeTitle} from "@app/util/title"
   import NewNotificationSound from "@src/app/components/NewNotificationSound.svelte"
 
   const {children} = $props()
@@ -183,6 +184,7 @@
 </script>
 
 <svelte:head>
+  <title>{makeTitle()}</title>
   {#if !dev}
     <link rel="manifest" href="/manifest.webmanifest" />
   {/if}

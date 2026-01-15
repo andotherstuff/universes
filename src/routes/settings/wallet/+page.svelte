@@ -11,6 +11,7 @@
   import WalletDisconnect from "@app/components/WalletDisconnect.svelte"
   import WalletUpdateReceivingAddress from "@app/components/WalletUpdateReceivingAddress.svelte"
   import {pushModal} from "@app/util/modal"
+  import {makeTitle} from "@app/util/title"
   import {getWebLn} from "@app/core/commands"
   import Wallet2 from "@assets/icons/wallet.svg?dataurl"
   import CheckCircle from "@assets/icons/check-circle.svg?dataurl"
@@ -32,6 +33,10 @@
 
   const pay = () => pushModal(WalletPay)
 </script>
+
+<svelte:head>
+  <title>{makeTitle("Settings", "Wallet")}</title>
+</svelte:head>
 
 <div class="content column gap-4">
   <div class="card2 bg-alt flex flex-col gap-6 shadow-md">

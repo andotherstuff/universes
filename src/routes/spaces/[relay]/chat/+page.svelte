@@ -6,7 +6,13 @@
   import {readable} from "svelte/store"
   import {now, formatTimestampAsDate, MINUTE, ago} from "@welshman/lib"
   import type {TrustedEvent, EventContent} from "@welshman/util"
-  import {makeEvent, MESSAGE, RELAY_ADD_MEMBER, RELAY_REMOVE_MEMBER} from "@welshman/util"
+  import {
+    makeEvent,
+    MESSAGE,
+    RELAY_ADD_MEMBER,
+    RELAY_REMOVE_MEMBER,
+    displayRelayUrl,
+  } from "@welshman/util"
   import {pubkey, publishThunk} from "@welshman/app"
   import {fade, fly} from "@lib/transition"
   import ChatRound from "@assets/icons/chat-round.svg?dataurl"
@@ -29,6 +35,7 @@
   import {prependParent, canEnforceNip70, publishDelete} from "@app/core/commands"
   import {setChecked, checked} from "@app/util/notifications"
   import {pushToast} from "@app/util/toast"
+  import {makeTitle} from "@app/util/title"
   import {makeFeed} from "@app/core/requests"
   import {popKey} from "@lib/implicit"
 
@@ -36,6 +43,7 @@
   const lastChecked = $checked[$page.url.pathname]
   const url = decodeRelay($page.params.relay!)
   const shouldProtect = canEnforceNip70(url)
+  const pageTitle = makeTitle("Space Chat", displayRelayUrl(url))
 
   const replyTo = (event: TrustedEvent) => {
     parent = event
@@ -255,6 +263,10 @@
     }
   })
 </script>
+
+<svelte:head>
+  <title>{pageTitle}</title>
+</svelte:head>
 
 <PageBar>
   {#snippet icon()}

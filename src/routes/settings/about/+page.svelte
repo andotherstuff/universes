@@ -6,6 +6,7 @@
   import ProfileDetail from "@app/components/ProfileDetail.svelte"
   import {PLATFORM_NAME} from "@app/core/state"
   import {pushModal} from "@app/util/modal"
+  import {makeTitle} from "@app/util/title"
   import Code from "@assets/icons/code-2.svg?dataurl"
   import Global from "@assets/icons/global.svg?dataurl"
   import Pen from "@assets/icons/pen.svg?dataurl"
@@ -17,6 +18,10 @@
 
   const openProfile = () => pushModal(ProfileDetail, {pubkey})
 </script>
+
+<svelte:head>
+  <title>{makeTitle("Settings", "About")}</title>
+</svelte:head>
 
 <div class="mt-8 min-h-screen bg-base-200 sm:hero">
   <div class="hero-content">

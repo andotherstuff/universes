@@ -3,6 +3,7 @@
   import {goto} from "$app/navigation"
   import {resolve} from "$app/paths"
   import {goToSpace} from "@app/util/routes"
+  import {makeTitle} from "@app/util/title"
   import {PLATFORM_RELAYS} from "@app/core/state"
 
   onMount(async () => {
@@ -13,3 +14,7 @@
     }
   })
 </script>
+
+<svelte:head>
+  <title>{makeTitle("Redirecting")}</title>
+</svelte:head>

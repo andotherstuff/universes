@@ -14,6 +14,7 @@
   import {chatSearch} from "@app/core/state"
   import {pushModal} from "@app/util/modal"
   import {setChecked} from "@app/util/notifications"
+  import {makeTitle} from "@app/util/title"
 
   let term = $state("")
 
@@ -26,7 +27,13 @@
   onDestroy(() => {
     setChecked($page.url.pathname)
   })
+
+  const pageTitle = makeTitle("Messages")
 </script>
+
+<svelte:head>
+  <title>{pageTitle}</title>
+</svelte:head>
 
 <div class="hidden min-h-screen md:hero">
   <div class="col-2 hero-content text-center">

@@ -5,7 +5,7 @@
   import {page} from "$app/stores"
   import {sortBy, partition, spec, pushToMapKey, max} from "@welshman/lib"
   import type {TrustedEvent} from "@welshman/util"
-  import {ZAP_GOAL, getTagValue} from "@welshman/util"
+  import {ZAP_GOAL, getTagValue, displayRelayUrl} from "@welshman/util"
   import {fly} from "@lib/transition"
   import NotesMinimalistic from "@assets/icons/notes-minimalistic.svg?dataurl"
   import Icon from "@lib/components/Icon.svelte"
@@ -20,8 +20,10 @@
   import {setChecked} from "@app/util/notifications"
   import {makeFeed} from "@app/core/requests"
   import {pushModal} from "@app/util/modal"
+  import {makeTitle} from "@app/util/title"
 
   const url = decodeRelay($page.params.relay!)
+  const pageTitle = makeTitle("Goals", displayRelayUrl(url))
 
   let loading = $state(true)
   let element: HTMLElement | undefined = $state()
@@ -62,6 +64,10 @@
     }
   })
 </script>
+
+<svelte:head>
+  <title>{pageTitle}</title>
+</svelte:head>
 
 <PageBar>
   {#snippet icon()}

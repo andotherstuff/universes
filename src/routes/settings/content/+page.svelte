@@ -17,6 +17,7 @@
   import Button from "@lib/components/Button.svelte"
   import ProfileMultiSelect from "@app/components/ProfileMultiSelect.svelte"
   import {pushToast} from "@app/util/toast"
+  import {makeTitle} from "@app/util/title"
   import {PLATFORM_NAME, userSettingsValues} from "@app/core/state"
   import {publishSettings} from "@app/core/commands"
 
@@ -46,6 +47,10 @@
   let mutedPubkeys = $state(getPubkeyTagValues(getListTags($userMuteList)))
   let blossomServers = $state(getTagValues("server", getListTags($userBlossomServerList)))
 </script>
+
+<svelte:head>
+  <title>{makeTitle("Settings", "Content")}</title>
+</svelte:head>
 
 <form class="content column gap-4" {onsubmit}>
   <div class="card2 bg-alt col-4 shadow-md">

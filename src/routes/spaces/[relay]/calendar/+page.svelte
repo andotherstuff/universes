@@ -5,7 +5,7 @@
   import {page} from "$app/stores"
   import {now, last, formatTimestampAsDate} from "@welshman/lib"
   import type {TrustedEvent} from "@welshman/util"
-  import {EVENT_TIME, getTagValue} from "@welshman/util"
+  import {EVENT_TIME, getTagValue, displayRelayUrl} from "@welshman/util"
   import {fly} from "@lib/transition"
   import CalendarMinimalistic from "@assets/icons/calendar-minimalistic.svg?dataurl"
   import CalendarAdd from "@assets/icons/calendar-add.svg?dataurl"
@@ -22,8 +22,10 @@
   import {decodeRelay, makeCommentFilter} from "@app/core/state"
   import {makeCalendarFeed} from "@app/core/requests"
   import {setChecked} from "@app/util/notifications"
+  import {makeTitle} from "@app/util/title"
 
   const url = decodeRelay($page.params.relay!)
+  const pageTitle = makeTitle("Calendar", displayRelayUrl(url))
 
   const makeEvent = () => pushModal(CalendarEventCreate, {url})
 
@@ -112,6 +114,10 @@
     }
   })
 </script>
+
+<svelte:head>
+  <title>{pageTitle}</title>
+</svelte:head>
 
 <PageBar>
   {#snippet icon()}
