@@ -10,8 +10,11 @@
     makeBlossomAuthEvent,
   } from "@welshman/util"
   import {signer} from "@welshman/app"
+  import {downloadLinkFile} from "@app/util/download"
+  import {pushToast} from "@app/util/toast"
   import LinkRound from "@assets/icons/link-round.svg?dataurl"
   import Icon from "@lib/components/Icon.svelte"
+  import {preventDefault, stopPropagation} from "svelte/legacy"
 
   const {value, event, ...props} = $props()
 
@@ -25,6 +28,15 @@
   const key = getTagValue("decryption-key", meta)
   const nonce = getTagValue("decryption-nonce", meta)
   const algorithm = getTagValue("encryption-algorithm", meta)
+
+  const download = async () => {
+    try {
+      await downloadLinkFile({url, event})
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Failed to download file"
+      pushToast({theme: "error", message})
+    }
+  }
 
   const onError = async () => {
     // If the image failed to load, try authenticating
@@ -69,10 +81,24 @@
 </script>
 
 {#if hasError}
-  <a href={url} rel="external" class="link-content whitespace-nowrap">
-    <Icon icon={LinkRound} size={3} class="inline-block" />
-    {displayUrl(url)}
-  </a>
+  <div class="flex flex-wrap items-center gap-2">
+    <a
+      href={url}
+      rel="external"
+      class="link-content whitespace-nowrap"
+      onclick={e => {
+        e.stopPropagation()
+      }}>
+      <Icon icon={LinkRound} size={3} class="inline-block" />
+      {displayUrl(url)}
+    </a>
+    <button
+      type="button"
+      class="btn btn-neutral btn-xs"
+      onclick={stopPropagation(preventDefault(download))}>
+      Download
+    </button>
+  </div>
 {:else if src}
   <img alt="" {src} onerror={onError} {...props} />
 {/if}
