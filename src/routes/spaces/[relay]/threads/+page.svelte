@@ -5,7 +5,7 @@
   import {page} from "$app/stores"
   import {sortBy, partition, spec, max, pushToMapKey} from "@welshman/lib"
   import type {TrustedEvent} from "@welshman/util"
-  import {THREAD, getTagValue} from "@welshman/util"
+  import {THREAD, getTagValue, displayRelayUrl} from "@welshman/util"
   import {fly} from "@lib/transition"
   import NotesMinimalistic from "@assets/icons/notes-minimalistic.svg?dataurl"
   import Icon from "@lib/components/Icon.svelte"
@@ -21,8 +21,10 @@
   import {makeCommentFilter} from "@app/core/state"
   import {makeFeed} from "@app/core/requests"
   import {pushModal} from "@app/util/modal"
+  import {makeTitle} from "@app/util/title"
 
   const url = decodeRelay($page.params.relay!)
+  const pageTitle = makeTitle("Threads", displayRelayUrl(url))
 
   let loading = $state(true)
   let element: HTMLElement | undefined = $state()
@@ -63,6 +65,10 @@
     }
   })
 </script>
+
+<svelte:head>
+  <title>{pageTitle}</title>
+</svelte:head>
 
 <PageBar>
   {#snippet icon()}

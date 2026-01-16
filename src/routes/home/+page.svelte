@@ -14,6 +14,7 @@
   import ChatEnable from "@app/components/ChatEnable.svelte"
   import {pushModal} from "@app/util/modal"
   import {goToSpace} from "@app/util/routes"
+  import {makeTitle} from "@app/util/title"
   import {PLATFORM_NAME, PLATFORM_RELAYS} from "@app/core/state"
 
   const addSpace = () => pushModal(SpaceAdd)
@@ -26,7 +27,13 @@
       goToSpace(PLATFORM_RELAYS[0])
     }
   })
+
+  const pageTitle = makeTitle("Home")
 </script>
+
+<svelte:head>
+  <title>{pageTitle}</title>
+</svelte:head>
 
 <div class="hero min-h-screen overflow-auto pb-8">
   <div class="hero-content">

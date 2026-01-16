@@ -14,6 +14,7 @@
     MESSAGE,
     ROOM_ADD_MEMBER,
     ROOM_REMOVE_MEMBER,
+    displayRelayUrl,
   } from "@welshman/util"
   import {pubkey, publishThunk, waitForThunkError, joinRoom, leaveRoom} from "@welshman/app"
   import {slide, fade, fly} from "@lib/transition"
@@ -61,12 +62,16 @@
   import {popKey} from "@lib/implicit"
   import {pushToast} from "@app/util/toast"
   import {pushModal} from "@app/util/modal"
+  import {makeTitle} from "@app/util/title"
 
   const {h, relay} = $page.params as MakeNonOptional<typeof $page.params>
   const mounted = now()
   const lastChecked = $checked[$page.url.pathname]
   const url = decodeRelay(relay)
   const room = deriveRoom(url, h)
+  const relayTitle = displayRelayUrl(url)
+  const roomLabel = $derived(() => $room?.name || h)
+  const pageTitle = $derived(() => makeTitle(roomLabel ? `Room: ${roomLabel}` : "Room", relayTitle))
   const shouldProtect = canEnforceNip70(url)
   const userRooms = deriveUserRooms(url)
   const isFavorite = $derived($userRooms.includes(h))
@@ -335,6 +340,10 @@
     }, 800)
   })
 </script>
+
+<svelte:head>
+  <title>{pageTitle}</title>
+</svelte:head>
 
 <PageBar>
   {#snippet icon()}

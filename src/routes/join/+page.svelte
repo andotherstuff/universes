@@ -7,7 +7,12 @@
   import Dialog from "@lib/components/Dialog.svelte"
   import Button from "@lib/components/Button.svelte"
   import SpaceInviteAccept from "@app/components/SpaceInviteAccept.svelte"
+  import {makeTitle} from "@app/util/title"
 </script>
+
+<svelte:head>
+  <title>{makeTitle("Join Space")}</title>
+</svelte:head>
 
 <Dialog>
   <SpaceInviteAccept invite={$page.url.href}>

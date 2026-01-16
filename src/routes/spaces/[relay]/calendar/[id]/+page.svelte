@@ -3,7 +3,7 @@
   import {page} from "$app/stores"
   import {sortBy, sleep} from "@welshman/lib"
   import type {MakeNonOptional} from "@welshman/lib"
-  import {COMMENT, getTagValue} from "@welshman/util"
+  import {COMMENT, getTagValue, displayRelayUrl} from "@welshman/util"
   import {request} from "@welshman/net"
   import {repository} from "@welshman/app"
   import {deriveEventsById, deriveEventsAsc} from "@welshman/store"
@@ -25,12 +25,16 @@
   import EventReply from "@app/components/EventReply.svelte"
   import {deriveEvent, decodeRelay} from "@app/core/state"
   import {setChecked} from "@app/util/notifications"
+  import {makeTitle} from "@app/util/title"
 
   const {relay, id} = $page.params as MakeNonOptional<typeof $page.params>
   const url = decodeRelay(relay)
   const event = deriveEvent(id, [url])
   const filters = [{kinds: [COMMENT], "#E": [id]}]
   const replies = deriveEventsAsc(deriveEventsById({filters, repository}))
+  const relayTitle = displayRelayUrl(url)
+  const eventTitle = $derived.by(() => getTagValue("title", $event?.tags || []) || "Event")
+  const pageTitle = $derived.by(() => makeTitle(eventTitle, relayTitle))
 
   const back = () => history.back()
 
@@ -60,6 +64,10 @@
     }
   })
 </script>
+
+<svelte:head>
+  <title>{pageTitle}</title>
+</svelte:head>
 
 <PageBar>
   {#snippet icon()}

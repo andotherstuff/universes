@@ -10,6 +10,7 @@
   import {resolve} from "$app/paths"
   import Spinner from "@lib/components/Spinner.svelte"
   import {goToEvent} from "@app/util/routes"
+  import {makeTitle} from "@app/util/title"
 
   const {bech32} = $page.params as MakeNonOptional<typeof $page.params>
 
@@ -45,5 +46,9 @@
     }
   })
 </script>
+
+<svelte:head>
+  <title>{makeTitle("Opening Link")}</title>
+</svelte:head>
 
 <Spinner />

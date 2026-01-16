@@ -26,6 +26,7 @@
   import {PLATFORM_NAME} from "@app/core/state"
   import {pushModal} from "@app/util/modal"
   import {clip} from "@app/util/toast"
+  import {makeTitle} from "@app/util/title"
 
   const npub = nip19.npubEncode($pubkey!)
   const profile = deriveProfile($pubkey!)
@@ -45,6 +46,10 @@
 
   let showAdvanced = false
 </script>
+
+<svelte:head>
+  <title>{makeTitle("Settings", "Profile")}</title>
+</svelte:head>
 
 <div class="content column gap-4">
   <div class="card2 bg-alt shadow-md">
