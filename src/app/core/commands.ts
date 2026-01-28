@@ -62,6 +62,7 @@ import {
   repository,
   publishThunk,
   tagEvent,
+  tagPubkey,
   tagEventForReaction,
   nip44EncryptToSelf,
   tagEventForComment,
@@ -106,7 +107,7 @@ export const prependParent = (parent: TrustedEvent | undefined, {content, tags}:
       relays: Router.get().Event(parent).limit(3).getUrls(),
     })
 
-    tags = [...tags, tagEventForQuote(parent)]
+    tags = [...tags, tagEventForQuote(parent), tagPubkey(parent.pubkey)]
     content = toNostrURI(nevent) + "\n\n" + content
   }
 

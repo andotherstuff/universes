@@ -1,5 +1,9 @@
 # Changelog
 
+# Current
+
+* Tag event author when tagging parent event
+
 # 1.6.3
 
 * Fix scroll down button z index
