@@ -45,7 +45,7 @@
   let windowHeight = $state(0)
 
   const itemHeight = 56
-  const navPadding = 6 * itemHeight
+  const navPadding = 8 * itemHeight
   const itemLimit = $derived((windowHeight - navPadding) / itemHeight)
   const [primarySpaceUrls, secondarySpaceUrls] = $derived(splitAt(itemLimit, $userSpaceUrls))
   const anySpaceNotifications = $derived($userSpaceUrls.some(hasNotification))

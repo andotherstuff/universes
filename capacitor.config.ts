@@ -19,7 +19,7 @@ const config: CapacitorConfig = {
     },
     Keyboard: {
       style: "DARK",
-      // resizeOnFullScreen: true,
+      resizeOnFullScreen: true,
     },
     Badge: {
       persist: true,

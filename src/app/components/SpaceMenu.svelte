@@ -239,8 +239,8 @@
       {/if}
     </div>
   </SecondaryNavSection>
-  <div class="flex flex-col gap-2 p-4 pt-0">
-    <Button class="btn btn-neutral btn-sm" onclick={showDetail}>
+  <div class="flex flex-col gap-2 pb-2 p-4 pt-0">
+    <Button class="btn btn-neutral btn-sm h-10" onclick={showDetail}>
       <SocketStatusIndicator {url} />
     </Button>
   </div>
