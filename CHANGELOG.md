@@ -3,6 +3,7 @@
 # Current
 
 * Tag event author when tagging parent event
+* Disable macos build
 
 # 1.6.3
 
