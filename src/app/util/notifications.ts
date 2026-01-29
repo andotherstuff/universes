@@ -7,10 +7,10 @@ import type {ActionPerformed, RegistrationError, Token} from "@capacitor/push-no
 import {synced, throttled} from "@welshman/store"
 import {
   pubkey,
+  signer,
   tracker,
   repository,
   relaysByUrl,
-  signer,
   publishThunk,
   loadRelay,
   waitForThunkError,
@@ -578,10 +578,12 @@ class CapacitorNotifications implements IPushAdapter {
       PushNotifications.addListener(
         "pushNotificationActionPerformed",
         async (action: ActionPerformed) => {
-          const event = parseJson(action.notification.data.event)
-          const relays = [action.notification.data.relay]
+          const {relay, pubkey, payload} = action.notification.data
+          const event = parseJson(await signer.get().nip44.decrypt(pubkey, payload))
 
-          goto(await getEventPath(event, relays))
+          if (event) {
+            goto(await getEventPath(event, [relay]))
+          }
         },
       )
 
