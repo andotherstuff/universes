@@ -970,19 +970,26 @@ export const stripPrefix = (m: string) => m.replace(/^\w+: /, "")
 
 export type InviteData = {url: string; claim: string}
 
-export const parseInviteLink = (invite: string): InviteData | undefined =>
-  tryCatch(() => {
-    const {r: relay = "", c: claim = ""} = fromPairs(Array.from(new URL(invite).searchParams))
-    const url = normalizeRelayUrl(relay)
+export const parseInviteLink = (invite: string): InviteData | undefined => {
+  if (invite.length < 3 || !invite.includes(".")) {
+    return
+  }
 
-    if (isRelayUrl(url)) {
-      return {url, claim}
-    }
-  }) ||
-  tryCatch(() => {
-    const url = normalizeRelayUrl(invite)
+  return (
+    tryCatch(() => {
+      const {r: relay = "", c: claim = ""} = fromPairs(Array.from(new URL(invite).searchParams))
+      const url = normalizeRelayUrl(relay)
 
-    if (isRelayUrl(url)) {
-      return {url, claim: ""}
-    }
-  })
+      if (isRelayUrl(url)) {
+        return {url, claim}
+      }
+    }) ||
+    tryCatch(() => {
+      const url = normalizeRelayUrl(invite)
+
+      if (isRelayUrl(url)) {
+        return {url, claim: ""}
+      }
+    })
+  )
+}

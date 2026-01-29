@@ -1,14 +1,12 @@
 <script lang="ts">
   import {onMount} from "svelte"
+  import {derived as _derived} from "svelte/store"
   import {debounce} from "throttle-debounce"
-  import {dec} from "@welshman/lib"
+  import {dec, sleep} from "@welshman/lib"
   import type {RelayProfile} from "@welshman/util"
-  import {ROOMS} from "@welshman/util"
-  import {Router} from "@welshman/router"
-  import {load} from "@welshman/net"
-  import {relays, createSearch, loadRelay} from "@welshman/app"
+  import {throttled} from "@welshman/store"
+  import {relays, createSearch} from "@welshman/app"
   import {createScroller} from "@lib/html"
-  import {fly} from "@lib/transition"
   import QrCode from "@assets/icons/qr-code.svg?dataurl"
   import AddCircle from "@assets/icons/add-circle.svg?dataurl"
   import Magnifier from "@assets/icons/magnifier.svg?dataurl"
@@ -23,13 +21,7 @@
   import SpaceInviteAccept from "@app/components/SpaceInviteAccept.svelte"
   import RelaySummary from "@app/components/RelaySummary.svelte"
   import SpaceCheck from "@app/components/SpaceCheck.svelte"
-  import {
-    bootstrapPubkeys,
-    loadGroupList,
-    getSpaceUrlsFromGroupList,
-    groupListPubkeysByUrl,
-    parseInviteLink,
-  } from "@app/core/state"
+  import {groupListPubkeysByUrl, parseInviteLink} from "@app/core/state"
   import {pushModal} from "@app/util/modal"
 
   const openMenu = () => pushModal(SpaceAdd, {hideDiscover: true})
@@ -43,39 +35,26 @@
     pushModal(SpaceInviteAccept, {invite: data})
   })
 
-  const discoverRelays = () =>
-    Promise.all([
-      load({
-        filters: [{kinds: [ROOMS]}],
-        relays: Router.get().Index().getUrls(),
-      }),
-      ...$bootstrapPubkeys.map(async pubkey => {
-        const list = await loadGroupList(pubkey)
-        const urls = getSpaceUrlsFromGroupList(list)
+  const relaySearch = _derived(throttled(1000, relays), $relays => {
+    const options = $relays.filter(
+      r => $groupListPubkeysByUrl.has(r.url) && r.url !== inviteData?.url,
+    )
 
-        await Promise.all(urls.map(url => loadRelay(url)))
-      }),
-    ])
+    return createSearch(options, {
+      getValue: (relay: RelayProfile) => relay.url,
+      sortFn: ({score, item}) => {
+        if (score && score > 0.1) return -score!
 
-  const relaySearch = $derived(
-    createSearch(
-      $relays.filter(r => $groupListPubkeysByUrl.has(r.url) && r.url !== inviteData?.url),
-      {
-        getValue: (relay: RelayProfile) => relay.url,
-        sortFn: ({score, item}) => {
-          if (score && score > 0.1) return -score!
+        const wotScore = $groupListPubkeysByUrl.get(item.url)!.size
 
-          const wotScore = $groupListPubkeysByUrl.get(item.url)!.size
-
-          return score ? dec(score) * wotScore : -wotScore
-        },
-        fuseOptions: {
-          keys: ["url", "name", {name: "description", weight: 0.3}],
-          shouldSort: false,
-        },
+        return score ? dec(score) * wotScore : -wotScore
       },
-    ),
-  )
+      fuseOptions: {
+        keys: ["url", "name", {name: "description", weight: 0.3}],
+        shouldSort: false,
+      },
+    })
+  })
 
   const openSpace = (url: string, claim = "") => {
     if (claim) {
@@ -90,6 +69,7 @@
   let showScanner = $state(false)
   let element: Element
 
+  const options = $derived($relaySearch.searchOptions(term))
   const inviteData = $derived(parseInviteLink(term))
 
   onMount(() => {
@@ -151,18 +131,22 @@
             </Button>
           {/key}
         {/if}
-        {#each relaySearch.searchOptions(term).slice(0, limit) as relay (relay.url)}
+        {#each options.slice(0, limit) as relay (relay.url)}
           <Button
             class="card2 bg-alt shadow-md transition-all hover:shadow-lg hover:dark:brightness-[1.1]"
             onclick={() => openSpace(relay.url)}>
             <RelaySummary url={relay.url} />
           </Button>
         {/each}
-        {#await discoverRelays()}
-          <div class="flex justify-center py-20" out:fly>
+        <div class="flex justify-center py-20">
+          {#await sleep(5000)}
             <Spinner loading>Looking for spaces...</Spinner>
-          </div>
-        {/await}
+          {:then}
+            {#if options.length === 0}
+              <Spinner>No spaces found.</Spinner>
+            {/if}
+          {/await}
+        </div>
       </div>
     {/snippet}
   </ContentSearch>
