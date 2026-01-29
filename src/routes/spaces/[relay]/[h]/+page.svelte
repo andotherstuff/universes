@@ -365,7 +365,7 @@
   {/snippet}
   {#snippet action()}
     <div class="row-2">
-      {#if !hasAlerts}
+      {#if !$hasAlerts}
         <Link
           href="/settings/alerts"
           class="center btn btn-neutral btn-sm tooltip tooltip-left"
