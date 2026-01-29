@@ -9,7 +9,7 @@
   const {...props}: Props = $props()
 </script>
 
-<div class="grid grid-cols-1 gap-6 lg:grid-cols-3 {props.class}">
+<div class="grid grid-cols-1 gap-2 lg:gap-6 lg:grid-cols-3 {props.class}">
   <label class="flex items-center gap-2 font-bold">
     {@render props.label?.()}
   </label>

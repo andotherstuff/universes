@@ -43,21 +43,20 @@
   }
 </script>
 
-<div class="w-96 rounded-box bg-base-100 p-4 shadow-2xl">
-  <label class="input input-bordered flex w-full items-center gap-2">
-    <Icon icon={Magnifier} />
-    <input bind:value={searchTerm} class="grow" type="text" placeholder="Search icons..." />
-  </label>
-  <div class="mt-2 max-h-80 overflow-y-auto">
-    <div class="grid grid-cols-8 gap-2 p-2">
-      {#each filteredIcons as icon}
-        <button
-          class="flex aspect-square items-center justify-center rounded-box transition-colors hover:bg-primary hover:text-primary-content"
-          onclick={() => handleSelect(icon.url)}
-          title={icon.name}>
-          <Icon icon={icon.url} class="h-6 w-6" />
-        </button>
-      {/each}
-    </div>
+<label class="input input-bordered flex w-full items-center gap-2">
+  <Icon icon={Magnifier} />
+  <input bind:value={searchTerm} class="grow" type="text" placeholder="Search icons..." />
+</label>
+<div class="mt-2 max-h-80 overflow-y-auto">
+  <div class="grid grid-cols-8 gap-2 p-2">
+    {#each filteredIcons as icon}
+      <button
+        type="button"
+        title={icon.name}
+        class="flex aspect-square items-center justify-center rounded-box transition-colors hover:bg-primary hover:text-primary-content"
+        onclick={() => handleSelect(icon.url)}>
+        <Icon icon={icon.url} class="h-6 w-6" />
+      </button>
+    {/each}
   </div>
 </div>

@@ -31,6 +31,7 @@
 
 <div class="center fixed inset-0 z-modal">
   <button
+    type="button"
     aria-label="Close dialog"
     class="absolute inset-0 cursor-pointer bg-[#ccc] opacity-75 dark:bg-black"
     transition:fade={{duration: 300}}
