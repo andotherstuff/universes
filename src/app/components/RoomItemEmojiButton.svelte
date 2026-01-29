@@ -18,6 +18,6 @@
     })
 </script>
 
-<EmojiButton {onEmoji} class="btn join-item btn-xs">
+<EmojiButton {onEmoji} class="btn join-item btn-xs" tippyParams={{placement: "bottom-end"}}>
   <Icon icon={SmileCircle} size={4} />
 </EmojiButton>

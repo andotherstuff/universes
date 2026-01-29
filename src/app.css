@@ -362,6 +362,12 @@
   @apply !h-full !w-full !rounded-lg !border-none !bg-inherit !px-4 !text-inherit;
 }
 
+/* tippy popover */
+
+.tippy-box {
+  @apply shadow-xl;
+}
+
 /* emoji picker */
 
 emoji-picker {

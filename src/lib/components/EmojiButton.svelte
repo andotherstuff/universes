@@ -6,7 +6,7 @@
   import Tippy from "@lib/components/Tippy.svelte"
   import EmojiPicker from "@lib/components/EmojiPicker.svelte"
 
-  const {...props} = $props()
+  const {tippyParams = {}, ...props} = $props()
 
   const open = () => popover?.show()
 
@@ -34,7 +34,7 @@
   bind:popover
   component={EmojiPicker}
   props={{onClick}}
-  params={{trigger: "manual", interactive: true}}>
+  params={{trigger: "manual", interactive: true, ...tippyParams}}>
   <Button onclick={open} class={props.class}>
     {@render props.children?.()}
   </Button>
