@@ -10,6 +10,8 @@
   import Key from "@assets/icons/key.svg?dataurl"
   import Icon from "@lib/components/Icon.svelte"
   import Link from "@lib/components/Link.svelte"
+  import Modal from "@lib/components/Modal.svelte"
+  import ModalBody from "@lib/components/ModalBody.svelte"
   import Button from "@lib/components/Button.svelte"
   import SignUp from "@app/components/SignUp.svelte"
   import InfoNostr from "@app/components/InfoNostr.svelte"
@@ -91,70 +93,72 @@
   })
 </script>
 
-<div class="column gap-4">
-  <h1 class="heading">Log in with Nostr</h1>
-  <p class="m-auto max-w-sm text-center">
-    {PLATFORM_NAME} is built using the
-    <Button class="link" onclick={() => pushModal(InfoNostr)}>nostr protocol</Button>, which allows
-    you to own your social identity.
-  </p>
-  {#if getNip07()}
-    <Button {disabled} onclick={loginWithNip07} class="btn btn-primary">
-      {#if loading === "nip07"}
-        <span class="loading loading-spinner mr-3"></span>
-      {:else}
-        <Icon icon={Widget} />
-      {/if}
-      Log in with Extension
-    </Button>
-  {/if}
-  {#each signers as app}
-    <Button {disabled} class="btn btn-primary" onclick={() => loginWithNip55(app)}>
-      {#if loading === "nip55"}
-        <span class="loading loading-spinner mr-3"></span>
-      {:else}
-        <img src={app.iconUrl} alt={app.name} width="20" height="20" />
-      {/if}
-      Log in with {app.name}
-    </Button>
-  {/each}
-  {#if hasPomade && !hasSigner}
-    <Button {disabled} onclick={loginWithEmail} class="btn btn-primary">
-      <Icon icon={Letter} />
-      Log in with Email
-    </Button>
-  {/if}
-  <Button
-    onclick={loginWithBunker}
-    {disabled}
-    class="btn {hasSigner || hasPomade ? 'btn-neutral' : 'btn-primary'}">
-    <Icon icon={Cpu} />
-    Log in with Remote Signer
-  </Button>
-  {#if hasPomade && hasSigner}
-    <Button {disabled} onclick={loginWithEmail} class="btn">
-      <Icon icon={Letter} />
-      Log in with Email
-    </Button>
-  {/if}
-  {#if !hasSigner}
-    <Button {disabled} onclick={loginWithKey} class="btn btn-neutral">
-      <Icon icon={Key} />
-      Log in with Key
-    </Button>
-  {/if}
-  {#if !hasSigner || !hasPomade}
-    <Link
-      external
+<Modal>
+  <ModalBody>
+    <h1 class="heading">Log in with Nostr</h1>
+    <p class="m-auto max-w-sm text-center">
+      {PLATFORM_NAME} is built using the
+      <Button class="link" onclick={() => pushModal(InfoNostr)}>nostr protocol</Button>, which
+      allows you to own your social identity.
+    </p>
+    {#if getNip07()}
+      <Button {disabled} onclick={loginWithNip07} class="btn btn-primary">
+        {#if loading === "nip07"}
+          <span class="loading loading-spinner mr-3"></span>
+        {:else}
+          <Icon icon={Widget} />
+        {/if}
+        Log in with Extension
+      </Button>
+    {/if}
+    {#each signers as app}
+      <Button {disabled} class="btn btn-primary" onclick={() => loginWithNip55(app)}>
+        {#if loading === "nip55"}
+          <span class="loading loading-spinner mr-3"></span>
+        {:else}
+          <img src={app.iconUrl} alt={app.name} width="20" height="20" />
+        {/if}
+        Log in with {app.name}
+      </Button>
+    {/each}
+    {#if hasPomade && !hasSigner}
+      <Button {disabled} onclick={loginWithEmail} class="btn btn-primary">
+        <Icon icon={Letter} />
+        Log in with Email
+      </Button>
+    {/if}
+    <Button
+      onclick={loginWithBunker}
       {disabled}
-      href="https://nostrapps.com#signers"
-      class="btn {hasSigner || hasPomade ? '' : 'btn-neutral'}">
-      <Icon icon={Compass} />
-      Browse Signer Apps
-    </Link>
-  {/if}
-  <div class="text-sm">
-    Need an account?
-    <Button class="link" onclick={signUp}>Register instead</Button>
-  </div>
-</div>
+      class="btn {hasSigner || hasPomade ? 'btn-neutral' : 'btn-primary'}">
+      <Icon icon={Cpu} />
+      Log in with Remote Signer
+    </Button>
+    {#if hasPomade && hasSigner}
+      <Button {disabled} onclick={loginWithEmail} class="btn">
+        <Icon icon={Letter} />
+        Log in with Email
+      </Button>
+    {/if}
+    {#if !hasSigner}
+      <Button {disabled} onclick={loginWithKey} class="btn btn-neutral">
+        <Icon icon={Key} />
+        Log in with Key
+      </Button>
+    {/if}
+    {#if !hasSigner || !hasPomade}
+      <Link
+        external
+        {disabled}
+        href="https://nostrapps.com#signers"
+        class="btn {hasSigner || hasPomade ? '' : 'btn-neutral'}">
+        <Icon icon={Compass} />
+        Browse Signer Apps
+      </Link>
+    {/if}
+    <div class="text-sm">
+      Need an account?
+      <Button class="link" onclick={signUp}>Register instead</Button>
+    </div>
+  </ModalBody>
+</Modal>

@@ -35,14 +35,7 @@
           props: {
             onClose: closeModals,
             fullscreen: options.fullscreen,
-            children: createRawSnippet(() => ({
-              render: () => "<div></div>",
-              setup: (target: Element) => {
-                const child = mount(component, {target, props})
-
-                return () => unmount(child)
-              },
-            })),
+            children: {component, props},
           },
         })
       }

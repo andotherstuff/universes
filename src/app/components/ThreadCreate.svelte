@@ -10,6 +10,8 @@
   import Button from "@lib/components/Button.svelte"
   import ModalHeader from "@lib/components/ModalHeader.svelte"
   import ModalFooter from "@lib/components/ModalFooter.svelte"
+  import Modal from "@lib/components/Modal.svelte"
+  import ModalBody from "@lib/components/ModalBody.svelte"
   import EditorContent from "@app/editor/EditorContent.svelte"
   import {pushToast} from "@app/util/toast"
   import {PROTECTED} from "@app/core/state"
@@ -74,53 +76,55 @@
   let title: string = $state("")
 </script>
 
-<form class="column gap-4" onsubmit={preventDefault(submit)}>
-  <ModalHeader>
-    {#snippet title()}
-      <div>Create a Thread</div>
-    {/snippet}
-    {#snippet info()}
-      <div>Share a link, or start a discussion.</div>
-    {/snippet}
-  </ModalHeader>
-  <div class="col-8 relative">
-    <Field>
-      {#snippet label()}
-        <p>Title*</p>
+<Modal tag="form" onsubmit={preventDefault(submit)}>
+  <ModalBody>
+    <ModalHeader>
+      {#snippet title()}
+        <div>Create a Thread</div>
       {/snippet}
-      {#snippet input()}
-        <label class="input input-bordered flex w-full items-center gap-2">
-          <!-- svelte-ignore a11y_autofocus -->
-          <input
-            autofocus={!isMobile}
-            bind:value={title}
-            class="grow"
-            type="text"
-            placeholder="What is this thread about?" />
-        </label>
+      {#snippet info()}
+        <div>Share a link, or start a discussion.</div>
       {/snippet}
-    </Field>
-    <Field>
-      {#snippet label()}
-        <p>Message*</p>
-      {/snippet}
-      {#snippet input()}
-        <div class="note-editor flex-grow overflow-hidden">
-          <EditorContent {editor} />
-        </div>
-      {/snippet}
-    </Field>
-    <Button
-      data-tip="Add an image"
-      class="tooltip tooltip-left absolute bottom-1 right-2"
-      onclick={selectFiles}>
-      {#if $uploading}
-        <span class="loading loading-spinner loading-xs"></span>
-      {:else}
-        <Icon icon={Paperclip} size={3} />
-      {/if}
-    </Button>
-  </div>
+    </ModalHeader>
+    <div class="col-8 relative">
+      <Field>
+        {#snippet label()}
+          <p>Title*</p>
+        {/snippet}
+        {#snippet input()}
+          <label class="input input-bordered flex w-full items-center gap-2">
+            <!-- svelte-ignore a11y_autofocus -->
+            <input
+              autofocus={!isMobile}
+              bind:value={title}
+              class="grow"
+              type="text"
+              placeholder="What is this thread about?" />
+          </label>
+        {/snippet}
+      </Field>
+      <Field>
+        {#snippet label()}
+          <p>Message*</p>
+        {/snippet}
+        {#snippet input()}
+          <div class="note-editor flex-grow overflow-hidden">
+            <EditorContent {editor} />
+          </div>
+        {/snippet}
+      </Field>
+      <Button
+        data-tip="Add an image"
+        class="tooltip tooltip-left absolute bottom-1 right-2"
+        onclick={selectFiles}>
+        {#if $uploading}
+          <span class="loading loading-spinner loading-xs"></span>
+        {:else}
+          <Icon icon={Paperclip} size={3} />
+        {/if}
+      </Button>
+    </div>
+  </ModalBody>
   <ModalFooter>
     <Button class="btn btn-link" onclick={back}>
       <Icon icon={AltArrowLeft} />
@@ -128,4 +132,4 @@
     </Button>
     <Button type="submit" class="btn btn-primary">Create Thread</Button>
   </ModalFooter>
-</form>
+</Modal>

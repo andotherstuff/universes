@@ -6,6 +6,8 @@
   import Button from "@lib/components/Button.svelte"
   import AltArrowLeft from "@assets/icons/alt-arrow-left.svg?dataurl"
   import Icon from "@lib/components/Icon.svelte"
+  import Modal from "@lib/components/Modal.svelte"
+  import ModalBody from "@lib/components/ModalBody.svelte"
   import ModalHeader from "@lib/components/ModalHeader.svelte"
   import ModalFooter from "@lib/components/ModalFooter.svelte"
   import {removeSpaceMembership, publishLeaveRequest, removeTrustedRelay} from "@app/core/commands"
@@ -31,15 +33,17 @@
   let loading = $state(false)
 </script>
 
-<form class="column gap-4" onsubmit={preventDefault(exit)}>
-  <ModalHeader>
-    {#snippet title()}
-      <div>
-        You are leaving<br /><span class="text-primary">{displayRelayUrl(url)}</span>
-      </div>
-    {/snippet}
-  </ModalHeader>
-  <p class="text-center">Are you sure you want to leave?</p>
+<Modal tag="form" onsubmit={preventDefault(exit)}>
+  <ModalBody>
+    <ModalHeader>
+      {#snippet title()}
+        <div>
+          You are leaving<br /><span class="text-primary">{displayRelayUrl(url)}</span>
+        </div>
+      {/snippet}
+    </ModalHeader>
+    <p class="text-center">Are you sure you want to leave?</p>
+  </ModalBody>
   <ModalFooter>
     <Button class="btn btn-link" onclick={back}>
       <Icon icon={AltArrowLeft} />
@@ -49,4 +53,4 @@
       <Spinner {loading}>Confirm</Spinner>
     </Button>
   </ModalFooter>
-</form>
+</Modal>

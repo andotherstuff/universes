@@ -8,6 +8,8 @@
   import Icon from "@lib/components/Icon.svelte"
   import Button from "@lib/components/Button.svelte"
   import Spinner from "@lib/components/Spinner.svelte"
+  import Modal from "@lib/components/Modal.svelte"
+  import ModalBody from "@lib/components/ModalBody.svelte"
   import ModalHeader from "@lib/components/ModalHeader.svelte"
   import ModalFooter from "@lib/components/ModalFooter.svelte"
   import {pushModal} from "@app/util/modal"
@@ -39,23 +41,25 @@
   let loading = $state(false)
 </script>
 
-<form class="column gap-4" onsubmit={preventDefault(submit)}>
-  <ModalHeader>
-    {#snippet title()}
-      Recover your Key
-    {/snippet}
-    {#snippet info()}
-      Take control over your cryptographic identity
-    {/snippet}
-  </ModalHeader>
-  <p>
-    When you signed up, your Nostr secret key was split into multiple pieces and stored on separate
-    third-party servers to keep it safe.
-  </p>
-  <p>
-    If you're ready to take control of your cryptographic identity, click below. We'll confirm your
-    email by sending you some recovery codes.
-  </p>
+<Modal tag="form" onsubmit={preventDefault(submit)}>
+  <ModalBody>
+    <ModalHeader>
+      {#snippet title()}
+        Recover your Key
+      {/snippet}
+      {#snippet info()}
+        Take control over your cryptographic identity
+      {/snippet}
+    </ModalHeader>
+    <p>
+      When you signed up, your Nostr secret key was split into multiple pieces and stored on
+      separate third-party servers to keep it safe.
+    </p>
+    <p>
+      If you're ready to take control of your cryptographic identity, click below. We'll confirm
+      your email by sending you some recovery codes.
+    </p>
+  </ModalBody>
   <ModalFooter>
     <Button class="btn btn-link" onclick={back}>
       <Icon icon={AltArrowLeft} />
@@ -66,4 +70,4 @@
       <Icon icon={AltArrowRight} />
     </Button>
   </ModalFooter>
-</form>
+</Modal>

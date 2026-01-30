@@ -389,11 +389,11 @@ export const toggleRoomNotifications = async (url: string, h: string) => {
   } else {
     // Toggle exception status
     const hasException = existing.exceptions.includes(h)
-    const exceptions = hasException ? remove(h, existing.exceptions) : append(h, existing.exceptions)
+    const exceptions = hasException
+      ? remove(h, existing.exceptions)
+      : append(h, existing.exceptions)
 
-    updated = alerts.map((s: SpaceNotificationSettings) =>
-      s.url === url ? {...s, exceptions} : s,
-    )
+    updated = alerts.map((s: SpaceNotificationSettings) => (s.url === url ? {...s, exceptions} : s))
   }
 
   return publishSettings({alerts: updated})

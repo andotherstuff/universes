@@ -11,6 +11,8 @@
   import FieldInline from "@lib/components/FieldInline.svelte"
   import Spinner from "@lib/components/Spinner.svelte"
   import Button from "@lib/components/Button.svelte"
+  import Modal from "@lib/components/Modal.svelte"
+  import ModalBody from "@lib/components/ModalBody.svelte"
   import ModalHeader from "@lib/components/ModalHeader.svelte"
   import ModalFooter from "@lib/components/ModalFooter.svelte"
   import SignUpEmailConfirm from "@app/components/SignUpEmailConfirm.svelte"
@@ -92,45 +94,47 @@
   let loading = $state(false)
 </script>
 
-<form class="column gap-4" onsubmit={preventDefault(onSubmit)}>
-  <ModalHeader>
-    {#snippet title()}
-      <div>Sign up with Email</div>
-    {/snippet}
-    {#snippet info()}
-      <div>Keep your keys safe using multi-signer key sharing</div>
-    {/snippet}
-  </ModalHeader>
-  <p>
-    Under the hood, nostr uses "cryptographic keypairs" to help you prove that your identity is
-    actually you.
-  </p>
-  <p>
-    If you you're not ready to take control of your keys though, that's ok! We'll keep them safe
-    until you are.
-  </p>
-  <FieldInline>
-    {#snippet label()}
-      <p>Email*</p>
-    {/snippet}
-    {#snippet input()}
-      <label class="input input-bordered flex w-full items-center gap-2">
-        <Icon icon={Letter} />
-        <input bind:value={email} />
-      </label>
-    {/snippet}
-  </FieldInline>
-  <FieldInline>
-    {#snippet label()}
-      <p>Password*</p>
-    {/snippet}
-    {#snippet input()}
-      <label class="input input-bordered flex w-full items-center gap-2">
-        <Icon icon={Key} />
-        <input type="password" bind:value={password} />
-      </label>
-    {/snippet}
-  </FieldInline>
+<Modal tag="form" onsubmit={preventDefault(onSubmit)}>
+  <ModalBody>
+    <ModalHeader>
+      {#snippet title()}
+        <div>Sign up with Email</div>
+      {/snippet}
+      {#snippet info()}
+        <div>Keep your keys safe using multi-signer key sharing</div>
+      {/snippet}
+    </ModalHeader>
+    <p>
+      Under the hood, nostr uses "cryptographic keypairs" to help you prove that your identity is
+      actually you.
+    </p>
+    <p>
+      If you you're not ready to take control of your keys though, that's ok! We'll keep them safe
+      until you are.
+    </p>
+    <FieldInline>
+      {#snippet label()}
+        <p>Email*</p>
+      {/snippet}
+      {#snippet input()}
+        <label class="input input-bordered flex w-full items-center gap-2">
+          <Icon icon={Letter} />
+          <input bind:value={email} />
+        </label>
+      {/snippet}
+    </FieldInline>
+    <FieldInline>
+      {#snippet label()}
+        <p>Password*</p>
+      {/snippet}
+      {#snippet input()}
+        <label class="input input-bordered flex w-full items-center gap-2">
+          <Icon icon={Key} />
+          <input type="password" bind:value={password} />
+        </label>
+      {/snippet}
+    </FieldInline>
+  </ModalBody>
   <ModalFooter>
     <Button class="btn btn-link" onclick={back}>
       <Icon icon={AltArrowLeft} />
@@ -141,4 +145,4 @@
       <Icon icon={AltArrowRight} />
     </Button>
   </ModalFooter>
-</form>
+</Modal>

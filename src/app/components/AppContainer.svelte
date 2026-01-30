@@ -2,6 +2,7 @@
   import type {Snippet} from "svelte"
   import {page} from "$app/stores"
   import {pubkey} from "@welshman/app"
+  import Dialog from "@lib/components/Dialog.svelte"
   import Landing from "@app/components/Landing.svelte"
   import Toast from "@app/components/Toast.svelte"
   import PrimaryNav from "@app/components/PrimaryNav.svelte"
@@ -20,7 +21,7 @@
       {@render children?.()}
     </PrimaryNav>
   {:else if !$modals[$page.url.hash.slice(1)]}
-    <Landing />
+    <Dialog children={{component: Landing, props: {}}} />
   {/if}
 </div>
 <Toast />

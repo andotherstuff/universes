@@ -533,9 +533,7 @@ class CapacitorNotifications implements IPushAdapter {
               } else {
                 // notify=false: exceptions are opt-in (only include those rooms)
                 if (exceptions.length > 0) {
-                  filters.push(
-                    ...baseFilters.map(f => ({...f, "#h": exceptions})),
-                  )
+                  filters.push(...baseFilters.map(f => ({...f, "#h": exceptions})))
                 }
               }
             }
@@ -625,9 +623,7 @@ class CapacitorNotifications implements IPushAdapter {
     await Promise.all(get(userSpaceUrls).map(url => this._unsyncRelay(url, "spaces")))
 
     await Promise.all(
-      getRelaysFromList(get(userMessagingRelayList)).map(url =>
-        this._unsyncRelay(url, "messages"),
-      ),
+      getRelaysFromList(get(userMessagingRelayList)).map(url => this._unsyncRelay(url, "messages")),
     )
   }
 }

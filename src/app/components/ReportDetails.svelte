@@ -4,7 +4,10 @@
   import {deriveEventsById} from "@welshman/store"
   import {repository} from "@welshman/app"
   import ModalHeader from "@lib/components/ModalHeader.svelte"
+  import Modal from "@lib/components/Modal.svelte"
+  import ModalBody from "@lib/components/ModalBody.svelte"
   import Button from "@lib/components/Button.svelte"
+  import ModalFooter from "@lib/components/ModalFooter.svelte"
   import ReportItem from "@app/components/ReportItem.svelte"
 
   type Props = {
@@ -28,19 +31,23 @@
   }
 </script>
 
-<div class="column gap-4">
-  <ModalHeader>
-    {#snippet title()}
-      <div>Report Details</div>
-    {/snippet}
-    {#snippet info()}
-      <div>All reports for this event are shown below.</div>
-    {/snippet}
-  </ModalHeader>
-  {#each $reports.values() as report (report.id)}
-    <div class="card2 card2-sm bg-alt">
-      <ReportItem {url} event={report} {onDelete} />
-    </div>
-  {/each}
-  <Button class="btn btn-primary" onclick={back}>Got it</Button>
-</div>
+<Modal>
+  <ModalBody>
+    <ModalHeader>
+      {#snippet title()}
+        <div>Report Details</div>
+      {/snippet}
+      {#snippet info()}
+        <div>All reports for this event are shown below.</div>
+      {/snippet}
+    </ModalHeader>
+    {#each $reports.values() as report (report.id)}
+      <div class="card2 card2-sm bg-alt">
+        <ReportItem {url} event={report} {onDelete} />
+      </div>
+    {/each}
+  </ModalBody>
+  <ModalFooter>
+    <Button class="btn btn-primary" onclick={back}>Got it</Button>
+  </ModalFooter>
+</Modal>

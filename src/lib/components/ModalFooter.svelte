@@ -8,6 +8,9 @@
   const {children}: Props = $props()
 </script>
 
-<div class="row-4 mt-4 items-center justify-between">
-  {@render children?.()}
+<div class="h-20 flex-shrink-0"></div>
+<div class="flex absolute bottom-0 left-0 right-0 p-6 pt-2 rounded-b-box bg-base-100">
+  <div class="flex flex-grow gap-4 items-center justify-between">
+    {@render children?.()}
+  </div>
 </div>

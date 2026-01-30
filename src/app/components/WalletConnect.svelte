@@ -15,6 +15,8 @@
   import Scanner from "@lib/components/Scanner.svelte"
   import Spinner from "@lib/components/Spinner.svelte"
   import Field from "@lib/components/Field.svelte"
+  import Modal from "@lib/components/Modal.svelte"
+  import ModalBody from "@lib/components/ModalBody.svelte"
   import ModalHeader from "@lib/components/ModalHeader.svelte"
   import ModalFooter from "@lib/components/ModalFooter.svelte"
   import {getWebLn} from "@app/core/commands"
@@ -109,61 +111,63 @@
   let loading = $state(false)
 </script>
 
-<div class="column gap-4">
-  <ModalHeader>
-    {#snippet title()}
-      <div>Connect a Wallet</div>
-    {/snippet}
-    {#snippet info()}
-      Use Nostr Wallet Connect to send Bitcoin payments over lightning.
-    {/snippet}
-  </ModalHeader>
-  {#if getWebLn()}
-    <Button
-      class="btn btn-primary"
-      disabled={Boolean(nostrWalletConnectUrl || loading)}
-      onclick={connectWithWebLn}>
-      <Spinner loading={!nostrWalletConnectUrl && loading}>
-        {#if !nostrWalletConnectUrl && loading}
-          Connecting...
-        {:else}
-          <div class="flex items-center gap-2">
-            <Icon icon={Cpu} />
-            Connect with WebLN
-          </div>
-        {/if}
-      </Spinner>
-    </Button>
-    <Divider>Or</Divider>
-  {/if}
-  <Field>
-    {#snippet label()}
-      Connection Secret*
-    {/snippet}
-    {#snippet input()}
-      <label class="input input-bordered flex w-full items-center gap-2">
-        <Icon icon={Lock} />
-        <input
-          bind:value={nostrWalletConnectUrl}
-          autocomplete="off"
-          name="flotilla-nwc"
-          class="grow"
-          type="password" />
-        <Button onclick={toggleScanner}>
-          <Icon icon={QrCode} />
-        </Button>
-      </label>
-    {/snippet}
-    {#snippet info()}
-      You can find this in any wallet that supports
-      <Link external href="https://nwc.getalby.com/about" class="text-primary"
-        >Nostr Wallet Connect</Link
-      >.
-    {/snippet}
-  </Field>
-  {#if showScanner}
-    <Scanner onscan={onScan} />
-  {/if}
+<Modal>
+  <ModalBody>
+    <ModalHeader>
+      {#snippet title()}
+        <div>Connect a Wallet</div>
+      {/snippet}
+      {#snippet info()}
+        Use Nostr Wallet Connect to send Bitcoin payments over lightning.
+      {/snippet}
+    </ModalHeader>
+    {#if getWebLn()}
+      <Button
+        class="btn btn-primary"
+        disabled={Boolean(nostrWalletConnectUrl || loading)}
+        onclick={connectWithWebLn}>
+        <Spinner loading={!nostrWalletConnectUrl && loading}>
+          {#if !nostrWalletConnectUrl && loading}
+            Connecting...
+          {:else}
+            <div class="flex items-center gap-2">
+              <Icon icon={Cpu} />
+              Connect with WebLN
+            </div>
+          {/if}
+        </Spinner>
+      </Button>
+      <Divider>Or</Divider>
+    {/if}
+    <Field>
+      {#snippet label()}
+        Connection Secret*
+      {/snippet}
+      {#snippet input()}
+        <label class="input input-bordered flex w-full items-center gap-2">
+          <Icon icon={Lock} />
+          <input
+            bind:value={nostrWalletConnectUrl}
+            autocomplete="off"
+            name="flotilla-nwc"
+            class="grow"
+            type="password" />
+          <Button onclick={toggleScanner}>
+            <Icon icon={QrCode} />
+          </Button>
+        </label>
+      {/snippet}
+      {#snippet info()}
+        You can find this in any wallet that supports
+        <Link external href="https://nwc.getalby.com/about" class="text-primary"
+          >Nostr Wallet Connect</Link
+        >.
+      {/snippet}
+    </Field>
+    {#if showScanner}
+      <Scanner onscan={onScan} />
+    {/if}
+  </ModalBody>
   <ModalFooter>
     <Button class="btn btn-link" onclick={back}>
       <Icon icon={AltArrowLeft} />
@@ -185,4 +189,4 @@
       </Spinner>
     </Button>
   </ModalFooter>
-</div>
+</Modal>

@@ -7,6 +7,8 @@
   import Icon from "@lib/components/Icon.svelte"
   import ModalHeader from "@lib/components/ModalHeader.svelte"
   import ModalFooter from "@lib/components/ModalFooter.svelte"
+  import Modal from "@lib/components/Modal.svelte"
+  import ModalBody from "@lib/components/ModalBody.svelte"
   import RoomName from "@app/components/RoomName.svelte"
   import ProfileMultiSelect from "@app/components/ProfileMultiSelect.svelte"
   import {pushToast} from "@app/util/toast"
@@ -48,23 +50,25 @@
   let pubkeys: string[] = $state([])
 </script>
 
-<div class="column gap-4">
-  <ModalHeader>
-    {#snippet title()}
-      <div>Add Members</div>
-    {/snippet}
-    {#snippet info()}
-      <div>to <RoomName {url} {h} /></div>
-    {/snippet}
-  </ModalHeader>
-  <Field>
-    {#snippet label()}
-      <p>Search for People</p>
-    {/snippet}
-    {#snippet input()}
-      <ProfileMultiSelect bind:value={pubkeys} />
-    {/snippet}
-  </Field>
+<Modal>
+  <ModalBody>
+    <ModalHeader>
+      {#snippet title()}
+        <div>Add Members</div>
+      {/snippet}
+      {#snippet info()}
+        <div>to <RoomName {url} {h} /></div>
+      {/snippet}
+    </ModalHeader>
+    <Field>
+      {#snippet label()}
+        <p>Search for People</p>
+      {/snippet}
+      {#snippet input()}
+        <ProfileMultiSelect bind:value={pubkeys} />
+      {/snippet}
+    </Field>
+  </ModalBody>
   <ModalFooter>
     <Button class="btn btn-link" onclick={back}>
       <Icon icon={AltArrowLeft} />
@@ -74,4 +78,4 @@
       <Spinner {loading}>Save changes</Spinner>
     </Button>
   </ModalFooter>
-</div>
+</Modal>

@@ -15,6 +15,8 @@
   import Confirm from "@lib/components/Confirm.svelte"
   import Button from "@lib/components/Button.svelte"
   import Popover from "@lib/components/Popover.svelte"
+  import Modal from "@lib/components/Modal.svelte"
+  import ModalBody from "@lib/components/ModalBody.svelte"
   import ModalFooter from "@lib/components/ModalFooter.svelte"
   import Profile from "@app/components/Profile.svelte"
   import ProfileInfo from "@app/components/ProfileInfo.svelte"
@@ -75,43 +77,47 @@
   let showMenu = $state(false)
 </script>
 
-<div class="flex flex-col gap-4">
-  <div class="flex justify-between">
-    <Profile showPubkey avatarSize={14} {pubkey} {url} />
-    {#if $profile || $userIsAdmin}
-      <div class="relative">
-        <Button class="btn btn-circle btn-ghost btn-sm" onclick={() => toggleMenu(pubkey)}>
-          <Icon icon={MenuDots} />
-        </Button>
-        {#if showMenu}
-          <Popover hideOnClick onClose={closeMenu}>
-            <ul
-              transition:fly
-              class="bg-alt menu absolute right-0 z-popover w-48 gap-1 rounded-box p-2 shadow-md">
-              {#if $profile}
-                <li>
-                  <Button onclick={showInfo}>
-                    <Icon icon={Code2} />
-                    User Details
-                  </Button>
-                </li>
-              {/if}
-              {#if $userIsAdmin}
-                <li>
-                  <Button class="text-error" onclick={banMember}>
-                    <Icon icon={MinusCircle} />
-                    Ban User
-                  </Button>
-                </li>
-              {/if}
-            </ul>
-          </Popover>
+<Modal>
+  <ModalBody>
+    <div class="flex flex-col gap-4">
+      <div class="flex justify-between">
+        <Profile showPubkey avatarSize={14} {pubkey} {url} />
+        {#if $profile || $userIsAdmin}
+          <div class="relative">
+            <Button class="btn btn-circle btn-ghost btn-sm" onclick={() => toggleMenu(pubkey)}>
+              <Icon icon={MenuDots} />
+            </Button>
+            {#if showMenu}
+              <Popover hideOnClick onClose={closeMenu}>
+                <ul
+                  transition:fly
+                  class="bg-alt menu absolute right-0 z-popover w-48 gap-1 rounded-box p-2 shadow-md">
+                  {#if $profile}
+                    <li>
+                      <Button onclick={showInfo}>
+                        <Icon icon={Code2} />
+                        User Details
+                      </Button>
+                    </li>
+                  {/if}
+                  {#if $userIsAdmin}
+                    <li>
+                      <Button class="text-error" onclick={banMember}>
+                        <Icon icon={MinusCircle} />
+                        Ban User
+                      </Button>
+                    </li>
+                  {/if}
+                </ul>
+              </Popover>
+            {/if}
+          </div>
         {/if}
       </div>
-    {/if}
-  </div>
-  <ProfileInfo {pubkey} {url} />
-  <ProfileBadges {pubkey} {url} />
+      <ProfileInfo {pubkey} {url} />
+      <ProfileBadges {pubkey} {url} />
+    </div>
+  </ModalBody>
   <ModalFooter>
     <Button onclick={back} class="hidden md:btn md:btn-link">
       <Icon icon={AltArrowLeft} />
@@ -128,4 +134,4 @@
       </Button>
     </div>
   </ModalFooter>
-</div>
+</Modal>

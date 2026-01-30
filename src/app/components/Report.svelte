@@ -8,6 +8,8 @@
   import Icon from "@lib/components/Icon.svelte"
   import ModalHeader from "@lib/components/ModalHeader.svelte"
   import ModalFooter from "@lib/components/ModalFooter.svelte"
+  import Modal from "@lib/components/Modal.svelte"
+  import ModalBody from "@lib/components/ModalBody.svelte"
   import {pushToast} from "@app/util/toast"
   import {publishReport} from "@app/core/commands"
 
@@ -38,46 +40,48 @@
   let loading = $state(false)
 </script>
 
-<form class="column gap-4" onsubmit={preventDefault(confirm)}>
-  <ModalHeader>
-    {#snippet title()}
-      <div>Report Content</div>
-    {/snippet}
-    {#snippet info()}
-      <div>Flag inappropriate content.</div>
-    {/snippet}
-  </ModalHeader>
-  <Field>
-    {#snippet label()}
-      <p>Reason*</p>
-    {/snippet}
-    {#snippet input()}
-      <select class="select select-bordered" bind:value={reason}>
-        <option disabled selected>Choose a reason</option>
-        <option>Nudity</option>
-        <option>Malware</option>
-        <option>Profanity</option>
-        <option>Illegal</option>
-        <option>Spam</option>
-        <option>Impersonation</option>
-        <option>Other</option>
-      </select>
-    {/snippet}
-    {#snippet info()}
-      <p>Please select a reason for your report.</p>
-    {/snippet}
-  </Field>
-  <Field>
-    {#snippet label()}
-      <p>Details</p>
-    {/snippet}
-    {#snippet input()}
-      <textarea class="textarea textarea-bordered" bind:value={content}></textarea>
-    {/snippet}
-    {#snippet info()}
-      <p>Please provide any additional details relevant to your report.</p>
-    {/snippet}
-  </Field>
+<Modal tag="form" onsubmit={preventDefault(confirm)}>
+  <ModalBody>
+    <ModalHeader>
+      {#snippet title()}
+        <div>Report Content</div>
+      {/snippet}
+      {#snippet info()}
+        <div>Flag inappropriate content.</div>
+      {/snippet}
+    </ModalHeader>
+    <Field>
+      {#snippet label()}
+        <p>Reason*</p>
+      {/snippet}
+      {#snippet input()}
+        <select class="select select-bordered" bind:value={reason}>
+          <option disabled selected>Choose a reason</option>
+          <option>Nudity</option>
+          <option>Malware</option>
+          <option>Profanity</option>
+          <option>Illegal</option>
+          <option>Spam</option>
+          <option>Impersonation</option>
+          <option>Other</option>
+        </select>
+      {/snippet}
+      {#snippet info()}
+        <p>Please select a reason for your report.</p>
+      {/snippet}
+    </Field>
+    <Field>
+      {#snippet label()}
+        <p>Details</p>
+      {/snippet}
+      {#snippet input()}
+        <textarea class="textarea textarea-bordered" bind:value={content}></textarea>
+      {/snippet}
+      {#snippet info()}
+        <p>Please provide any additional details relevant to your report.</p>
+      {/snippet}
+    </Field>
+  </ModalBody>
   <ModalFooter>
     <Button class="btn btn-link" onclick={back}>
       <Icon icon={AltArrowLeft} />
@@ -88,4 +92,4 @@
       <Icon icon={AltArrowRight} />
     </Button>
   </ModalFooter>
-</form>
+</Modal>

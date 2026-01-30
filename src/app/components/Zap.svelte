@@ -10,6 +10,8 @@
   import Spinner from "@lib/components/Spinner.svelte"
   import Button from "@lib/components/Button.svelte"
   import FieldInline from "@lib/components/FieldInline.svelte"
+  import Modal from "@lib/components/Modal.svelte"
+  import ModalBody from "@lib/components/ModalBody.svelte"
   import ModalHeader from "@lib/components/ModalHeader.svelte"
   import ModalFooter from "@lib/components/ModalFooter.svelte"
   import EmojiButton from "@lib/components/EmojiButton.svelte"
@@ -109,46 +111,48 @@
   })
 </script>
 
-<div class="column gap-4">
-  <ModalHeader>
-    {#snippet title()}
-      <div>Send a Zap</div>
-    {/snippet}
-    {#snippet info()}
-      <div>To <ProfileLink {pubkey} class="!text-primary" /></div>
-    {/snippet}
-  </ModalHeader>
-  <FieldInline class="!grid-cols-3">
-    {#snippet label()}
-      Emoji Reaction
-    {/snippet}
-    {#snippet input()}
-      <div class="flex flex-grow items-center justify-end gap-4">
-        <EmojiButton {onEmoji} class="btn btn-neutral">
-          {content}
-        </EmojiButton>
-      </div>
-    {/snippet}
-  </FieldInline>
-  <FieldInline class="!grid-cols-3">
-    {#snippet label()}
-      Amount
-    {/snippet}
-    {#snippet input()}
-      <div class="flex flex-grow justify-end">
-        <label class="input input-bordered flex items-center gap-2">
-          <Icon icon={Bolt} />
-          <input bind:value={amount} type="number" class="w-24" />
-        </label>
-      </div>
-    {/snippet}
-  </FieldInline>
-  <input
-    class="range range-primary -mt-2"
-    type="range"
-    min={minPos}
-    max={maxPos}
-    bind:value={pos} />
+<Modal>
+  <ModalBody>
+    <ModalHeader>
+      {#snippet title()}
+        <div>Send a Zap</div>
+      {/snippet}
+      {#snippet info()}
+        <div>To <ProfileLink {pubkey} class="!text-primary" /></div>
+      {/snippet}
+    </ModalHeader>
+    <FieldInline class="!grid-cols-3">
+      {#snippet label()}
+        Emoji Reaction
+      {/snippet}
+      {#snippet input()}
+        <div class="flex flex-grow items-center justify-end gap-4">
+          <EmojiButton {onEmoji} class="btn btn-neutral">
+            {content}
+          </EmojiButton>
+        </div>
+      {/snippet}
+    </FieldInline>
+    <FieldInline class="!grid-cols-3">
+      {#snippet label()}
+        Amount
+      {/snippet}
+      {#snippet input()}
+        <div class="flex flex-grow justify-end">
+          <label class="input input-bordered flex items-center gap-2">
+            <Icon icon={Bolt} />
+            <input bind:value={amount} type="number" class="w-24" />
+          </label>
+        </div>
+      {/snippet}
+    </FieldInline>
+    <input
+      class="range range-primary -mt-2"
+      type="range"
+      min={minPos}
+      max={maxPos}
+      bind:value={pos} />
+  </ModalBody>
   <ModalFooter>
     <Button class="btn btn-link" onclick={back}>
       <Icon icon={AltArrowLeft} />
@@ -165,4 +169,4 @@
       </Spinner>
     </Button>
   </ModalFooter>
-</div>
+</Modal>

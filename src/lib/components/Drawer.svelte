@@ -1,7 +1,16 @@
 <script lang="ts">
+  import type {Component} from "svelte"
   import {fade, translate} from "@lib/transition"
 
-  const {onClose, children} = $props()
+  type Props = {
+    onClose?: any
+    children: {
+      component: Component
+      props: Record<string, any>
+    }
+  }
+
+  const {onClose, children}: Props = $props()
 </script>
 
 <div class="drawer fixed inset-0 z-modal">
@@ -14,6 +23,6 @@
   <div
     class="scroll-container py-sai pr-sair absolute bottom-0 right-0 top-0 w-72 overflow-auto bg-base-200 text-base-content lg:w-96"
     transition:translate={{axis: "x", duration: 300}}>
-    {@render children?.()}
+    <children.component {...children.props} />
   </div>
 </div>

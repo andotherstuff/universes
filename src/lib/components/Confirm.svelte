@@ -7,6 +7,8 @@
   import Spinner from "@lib/components/Spinner.svelte"
   import ModalHeader from "@lib/components/ModalHeader.svelte"
   import ModalFooter from "@lib/components/ModalFooter.svelte"
+  import Modal from "@lib/components/Modal.svelte"
+  import ModalBody from "@lib/components/ModalBody.svelte"
 
   interface Props {
     title?: string
@@ -32,16 +34,18 @@
   const back = () => history.back()
 </script>
 
-<form class="column gap-4" onsubmit={preventDefault(tryConfirm)}>
-  <ModalHeader>
-    {#snippet title()}
-      <div>{restProps.title || "Are you sure?"}</div>
-    {/snippet}
-    {#snippet info()}
-      <div>{subtitle}</div>
-    {/snippet}
-  </ModalHeader>
-  <p class="text-center">{message}</p>
+<Modal tag="form" onsubmit={preventDefault(tryConfirm)}>
+  <ModalBody>
+    <ModalHeader>
+      {#snippet title()}
+        <div>{restProps.title || "Are you sure?"}</div>
+      {/snippet}
+      {#snippet info()}
+        <div>{subtitle}</div>
+      {/snippet}
+    </ModalHeader>
+    <p class="text-center">{message}</p>
+  </ModalBody>
   <ModalFooter>
     <Button class="btn btn-link" onclick={back}>
       <Icon icon={AltArrowLeft} />
@@ -52,4 +56,4 @@
       <Icon icon={AltArrowRight} />
     </Button>
   </ModalFooter>
-</form>
+</Modal>

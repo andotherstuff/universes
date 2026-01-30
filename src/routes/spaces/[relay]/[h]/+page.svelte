@@ -47,11 +47,7 @@
     userSettingsValues,
   } from "@app/core/state"
   import {setChecked, checked} from "@app/util/notifications"
-  import {
-    canEnforceNip70,
-    prependParent,
-    publishDelete,
-  } from "@app/core/commands"
+  import {canEnforceNip70, prependParent, publishDelete} from "@app/core/commands"
   import {makeFeed} from "@app/core/requests"
   import {popKey} from "@lib/implicit"
   import {pushToast} from "@app/util/toast"

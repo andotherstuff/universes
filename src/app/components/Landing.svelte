@@ -4,7 +4,8 @@
   import Icon from "@lib/components/Icon.svelte"
   import Button from "@lib/components/Button.svelte"
   import Link from "@lib/components/Link.svelte"
-  import Dialog from "@lib/components/Dialog.svelte"
+  import Modal from "@lib/components/Modal.svelte"
+  import ModalBody from "@lib/components/ModalBody.svelte"
   import CardButton from "@lib/components/CardButton.svelte"
   import LogIn from "@app/components/LogIn.svelte"
   import SignUp from "@app/components/SignUp.svelte"
@@ -16,8 +17,8 @@
   const signUp = () => pushModal(SignUp)
 </script>
 
-<Dialog>
-  <div class="column gap-4">
+<Modal>
+  <ModalBody>
     <div class="py-2">
       <h1 class="heading">Welcome to {PLATFORM_NAME}!</h1>
       <p class="text-center">The chat app built for self-hosted communities.</p>
@@ -53,5 +54,5 @@
       <Link external class="link" href={PLATFORM_TERMS}>Terms of Service</Link> and
       <Link external class="link" href={PLATFORM_PRIVACY}>Privacy Policy</Link>.
     </p>
-  </div>
-</Dialog>
+  </ModalBody>
+</Modal>

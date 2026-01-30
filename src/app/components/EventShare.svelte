@@ -9,6 +9,8 @@
   import Button from "@lib/components/Button.svelte"
   import ModalHeader from "@lib/components/ModalHeader.svelte"
   import ModalFooter from "@lib/components/ModalFooter.svelte"
+  import Modal from "@lib/components/Modal.svelte"
+  import ModalBody from "@lib/components/ModalBody.svelte"
   import RoomName from "@app/components/RoomName.svelte"
   import {roomsByUrl} from "@app/core/state"
   import {makeRoomPath} from "@app/util/routes"
@@ -29,27 +31,29 @@
   let selection = $state("")
 </script>
 
-<form class="column gap-4" onsubmit={preventDefault(onSubmit)}>
-  <ModalHeader>
-    {#snippet title()}
-      <div>Share {noun}</div>
-    {/snippet}
-    {#snippet info()}
-      <div>Which room would you like to share this event to?</div>
-    {/snippet}
-  </ModalHeader>
-  <div class="grid grid-cols-3 gap-2">
-    {#each $roomsByUrl.get(url) || [] as room (room.h)}
-      <button
-        type="button"
-        class="btn"
-        class:btn-neutral={selection !== room.h}
-        class:btn-primary={selection === room.h}
-        onclick={() => toggleRoom(room.h)}>
-        #<RoomName {...room} />
-      </button>
-    {/each}
-  </div>
+<Modal tag="form" onsubmit={preventDefault(onSubmit)}>
+  <ModalBody>
+    <ModalHeader>
+      {#snippet title()}
+        <div>Share {noun}</div>
+      {/snippet}
+      {#snippet info()}
+        <div>Which room would you like to share this event to?</div>
+      {/snippet}
+    </ModalHeader>
+    <div class="grid grid-cols-3 gap-2">
+      {#each $roomsByUrl.get(url) || [] as room (room.h)}
+        <button
+          type="button"
+          class="btn"
+          class:btn-neutral={selection !== room.h}
+          class:btn-primary={selection === room.h}
+          onclick={() => toggleRoom(room.h)}>
+          #<RoomName {...room} />
+        </button>
+      {/each}
+    </div>
+  </ModalBody>
   <ModalFooter>
     <Button class="btn btn-link" onclick={back}>
       <Icon icon={AltArrowLeft} />
@@ -60,4 +64,4 @@
       <Icon icon={AltArrowRight} />
     </Button>
   </ModalFooter>
-</form>
+</Modal>

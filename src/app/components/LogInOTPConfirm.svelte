@@ -7,6 +7,8 @@
   import AltArrowLeft from "@assets/icons/alt-arrow-left.svg?dataurl"
   import AltArrowRight from "@assets/icons/alt-arrow-right.svg?dataurl"
   import Icon from "@lib/components/Icon.svelte"
+  import Modal from "@lib/components/Modal.svelte"
+  import ModalBody from "@lib/components/ModalBody.svelte"
   import ModalHeader from "@lib/components/ModalHeader.svelte"
   import ModalFooter from "@lib/components/ModalFooter.svelte"
   import {clearModals} from "@app/util/modal"
@@ -79,24 +81,26 @@
   let loading = $state(false)
 </script>
 
-<form class="column gap-4" onsubmit={preventDefault(onSubmit)}>
-  <ModalHeader>
-    {#snippet title()}
-      <div>Log In</div>
-    {/snippet}
-    {#snippet info()}
-      <div>Enter the login codes sent to your email</div>
-    {/snippet}
-  </ModalHeader>
-  <p>Your login codes have been sent!</p>
-  <p>
-    For security reasons, you may receive three or more emails with login codes in them. Please
-    paste <strong>all</strong> login codes into the text box below, on separate lines.
-  </p>
-  <textarea
-    rows={POMADE_SIGNERS.length + 1}
-    class="textarea textarea-bordered leading-4"
-    bind:value={input}></textarea>
+<Modal tag="form" onsubmit={preventDefault(onSubmit)}>
+  <ModalBody>
+    <ModalHeader>
+      {#snippet title()}
+        <div>Log In</div>
+      {/snippet}
+      {#snippet info()}
+        <div>Enter the login codes sent to your email</div>
+      {/snippet}
+    </ModalHeader>
+    <p>Your login codes have been sent!</p>
+    <p>
+      For security reasons, you may receive three or more emails with login codes in them. Please
+      paste <strong>all</strong> login codes into the text box below, on separate lines.
+    </p>
+    <textarea
+      rows={POMADE_SIGNERS.length + 1}
+      class="textarea textarea-bordered leading-4"
+      bind:value={input}></textarea>
+  </ModalBody>
   <ModalFooter>
     <Button class="btn btn-link" onclick={back} disabled={loading}>
       <Icon icon={AltArrowLeft} />
@@ -107,4 +111,4 @@
       <Icon icon={AltArrowRight} />
     </Button>
   </ModalFooter>
-</form>
+</Modal>

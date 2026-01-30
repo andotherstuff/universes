@@ -58,7 +58,12 @@
 </Tippy>
 
 {#if showIconPicker}
-  <Dialog onClose={close}>
-    <IconPicker onSelect={onClick} />
-  </Dialog>
+  <Dialog
+    onClose={close}
+    children={{
+      component: IconPicker,
+      props: {
+        onSelect: onClick,
+      },
+    }} />
 {/if}

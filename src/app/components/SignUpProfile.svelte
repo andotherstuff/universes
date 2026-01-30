@@ -5,6 +5,8 @@
   import {getKey, setKey} from "@lib/implicit"
   import Icon from "@lib/components/Icon.svelte"
   import Button from "@lib/components/Button.svelte"
+  import Modal from "@lib/components/Modal.svelte"
+  import ModalBody from "@lib/components/ModalBody.svelte"
   import ModalFooter from "@lib/components/ModalFooter.svelte"
   import ProfileEditForm from "@app/components/ProfileEditForm.svelte"
 
@@ -26,19 +28,21 @@
   }
 </script>
 
-<div class="flex flex-col gap-4">
-  <ProfileEditForm isSignup {initialValues} {onsubmit}>
-    {#snippet footer()}
-      <ModalFooter>
-        <Button class="btn btn-link" onclick={back}>
-          <Icon icon={AltArrowLeft} />
-          Go back
-        </Button>
-        <Button class="btn btn-primary" type="submit">
-          Create Account
-          <Icon icon={AltArrowRight} />
-        </Button>
-      </ModalFooter>
-    {/snippet}
-  </ProfileEditForm>
-</div>
+<Modal>
+  <ModalBody>
+    <ProfileEditForm isSignup {initialValues} {onsubmit}>
+      {#snippet footer()}
+        <ModalFooter>
+          <Button class="btn btn-link" onclick={back}>
+            <Icon icon={AltArrowLeft} />
+            Go back
+          </Button>
+          <Button class="btn btn-primary" type="submit">
+            Create Account
+            <Icon icon={AltArrowRight} />
+          </Button>
+        </ModalFooter>
+      {/snippet}
+    </ProfileEditForm>
+  </ModalBody>
+</Modal>

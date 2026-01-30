@@ -9,6 +9,8 @@
   import Icon from "@lib/components/Icon.svelte"
   import Button from "@lib/components/Button.svelte"
   import Spinner from "@lib/components/Spinner.svelte"
+  import Modal from "@lib/components/Modal.svelte"
+  import ModalBody from "@lib/components/ModalBody.svelte"
   import ModalHeader from "@lib/components/ModalHeader.svelte"
   import ModalFooter from "@lib/components/ModalFooter.svelte"
   import KeyDownload from "@app/components/KeyDownload.svelte"
@@ -81,24 +83,26 @@
   let input = $state("")
 </script>
 
-<form class="column gap-4" onsubmit={preventDefault(submit)}>
-  <ModalHeader>
-    {#snippet title()}
-      Recover your Key
-    {/snippet}
-    {#snippet info()}
-      Take control over your cryptographic identity
-    {/snippet}
-  </ModalHeader>
-  <p>Your recovery codes have been sent!</p>
-  <p>
-    For security reasons, you may receive three or more emails with recovery codes in them. Please
-    paste <strong>all</strong> recovery codes into the text box below, on separate lines.
-  </p>
-  <textarea
-    rows={POMADE_SIGNERS.length + 1}
-    class="textarea textarea-bordered leading-4"
-    bind:value={input}></textarea>
+<Modal tag="form" onsubmit={preventDefault(submit)}>
+  <ModalBody>
+    <ModalHeader>
+      {#snippet title()}
+        Recover your Key
+      {/snippet}
+      {#snippet info()}
+        Take control over your cryptographic identity
+      {/snippet}
+    </ModalHeader>
+    <p>Your recovery codes have been sent!</p>
+    <p>
+      For security reasons, you may receive three or more emails with recovery codes in them. Please
+      paste <strong>all</strong> recovery codes into the text box below, on separate lines.
+    </p>
+    <textarea
+      rows={POMADE_SIGNERS.length + 1}
+      class="textarea textarea-bordered leading-4"
+      bind:value={input}></textarea>
+  </ModalBody>
   <ModalFooter>
     <Button class="btn btn-link" onclick={back}>
       <Icon icon={AltArrowLeft} />
@@ -109,4 +113,4 @@
       <Icon icon={AltArrowRight} />
     </Button>
   </ModalFooter>
-</form>
+</Modal>

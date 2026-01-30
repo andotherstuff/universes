@@ -11,6 +11,8 @@
   import Icon from "@lib/components/Icon.svelte"
   import Spinner from "@lib/components/Spinner.svelte"
   import Button from "@lib/components/Button.svelte"
+  import Modal from "@lib/components/Modal.svelte"
+  import ModalBody from "@lib/components/ModalBody.svelte"
   import ModalHeader from "@lib/components/ModalHeader.svelte"
   import ModalFooter from "@lib/components/ModalFooter.svelte"
   import ImageIcon from "@lib/components/ImageIcon.svelte"
@@ -119,70 +121,72 @@
   }
 </script>
 
-<form class="column gap-4" onsubmit={preventDefault(trySubmit)}>
-  <ModalHeader>
-    {#snippet title()}
-      <div>Edit a Space</div>
-    {/snippet}
-    {#snippet info()}
-      <span class="text-primary">{displayRelayUrl(url)}</span>
-    {/snippet}
-  </ModalHeader>
-  <FieldInline>
-    {#snippet label()}
-      <p>Icon</p>
-    {/snippet}
-    {#snippet input()}
-      <div class="flex items-center justify-between">
-        <div class="flex items-center gap-4">
-          {#if imagePreview}
-            <div class="flex items-center gap-2">
-              <span class="text-sm opacity-75">Selected:</span>
-              <ImageIcon src={imagePreview} alt="" />
+<Modal tag="form" onsubmit={preventDefault(trySubmit)}>
+  <ModalBody>
+    <ModalHeader>
+      {#snippet title()}
+        <div>Edit a Space</div>
+      {/snippet}
+      {#snippet info()}
+        <span class="text-primary">{displayRelayUrl(url)}</span>
+      {/snippet}
+    </ModalHeader>
+    <FieldInline>
+      {#snippet label()}
+        <p>Icon</p>
+      {/snippet}
+      {#snippet input()}
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-4">
+            {#if imagePreview}
+              <div class="flex items-center gap-2">
+                <span class="text-sm opacity-75">Selected:</span>
+                <ImageIcon src={imagePreview} alt="" />
+              </div>
+            {:else}
+              <span class="text-sm opacity-75">No icon selected</span>
+            {/if}
+            <div class="flex gap-2">
+              <IconPickerButton onSelect={handleIconSelect} class="btn btn-primary btn-xs">
+                <Icon icon={StickerSmileSquare} size={4} />
+                Select
+              </IconPickerButton>
+              <label class="btn btn-neutral btn-xs cursor-pointer">
+                <Icon icon={UploadMinimalistic} size={4} />
+                Upload
+                <input type="file" accept="image/*" class="hidden" onchange={handleImageUpload} />
+              </label>
             </div>
-          {:else}
-            <span class="text-sm opacity-75">No icon selected</span>
-          {/if}
-          <div class="flex gap-2">
-            <IconPickerButton onSelect={handleIconSelect} class="btn btn-primary btn-xs">
-              <Icon icon={StickerSmileSquare} size={4} />
-              Select
-            </IconPickerButton>
-            <label class="btn btn-neutral btn-xs cursor-pointer">
-              <Icon icon={UploadMinimalistic} size={4} />
-              Upload
-              <input type="file" accept="image/*" class="hidden" onchange={handleImageUpload} />
-            </label>
           </div>
         </div>
-      </div>
-    {/snippet}
-  </FieldInline>
-  <FieldInline>
-    {#snippet label()}
-      <p>Name</p>
-    {/snippet}
-    {#snippet input()}
-      <label class="input input-bordered flex w-full items-center gap-2">
-        {#if imagePreview}
-          <ImageIcon src={imagePreview} alt="" />
-        {:else}
-          <Icon icon={SettingsMinimalistic} />
-        {/if}
-        <input bind:value={values.name} class="grow" type="text" />
-      </label>
-    {/snippet}
-  </FieldInline>
-  <FieldInline>
-    {#snippet label()}
-      <p>Description</p>
-    {/snippet}
-    {#snippet input()}
-      <label class="input input-bordered flex w-full items-center gap-2">
-        <input bind:value={values.description} class="grow" type="text" />
-      </label>
-    {/snippet}
-  </FieldInline>
+      {/snippet}
+    </FieldInline>
+    <FieldInline>
+      {#snippet label()}
+        <p>Name</p>
+      {/snippet}
+      {#snippet input()}
+        <label class="input input-bordered flex w-full items-center gap-2">
+          {#if imagePreview}
+            <ImageIcon src={imagePreview} alt="" />
+          {:else}
+            <Icon icon={SettingsMinimalistic} />
+          {/if}
+          <input bind:value={values.name} class="grow" type="text" />
+        </label>
+      {/snippet}
+    </FieldInline>
+    <FieldInline>
+      {#snippet label()}
+        <p>Description</p>
+      {/snippet}
+      {#snippet input()}
+        <label class="input input-bordered flex w-full items-center gap-2">
+          <input bind:value={values.description} class="grow" type="text" />
+        </label>
+      {/snippet}
+    </FieldInline>
+  </ModalBody>
   <ModalFooter>
     <Button class="btn btn-link" onclick={back}>
       <Icon icon={AltArrowLeft} />
@@ -192,4 +196,4 @@
       <Spinner {loading}>Save Changes</Spinner>
     </Button>
   </ModalFooter>
-</form>
+</Modal>

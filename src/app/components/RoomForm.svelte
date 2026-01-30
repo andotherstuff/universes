@@ -11,6 +11,8 @@
   import Icon from "@lib/components/Icon.svelte"
   import ImageIcon from "@lib/components/ImageIcon.svelte"
   import IconPickerButton from "@lib/components/IconPickerButton.svelte"
+  import Modal from "@lib/components/Modal.svelte"
+  import ModalBody from "@lib/components/ModalBody.svelte"
   import {pushToast} from "@app/util/toast"
   import {uploadFile} from "@app/core/commands"
 
@@ -105,77 +107,79 @@
   }
 </script>
 
-<form class="column gap-4" onsubmit={preventDefault(trySubmit)}>
-  {@render header()}
-  <FieldInline>
-    {#snippet label()}
-      <p>Icon</p>
-    {/snippet}
-    {#snippet input()}
-      <div class="flex flex-grow items-center justify-between gap-4">
-        {#if imagePreview}
-          <div class="flex items-center gap-2">
-            <span class="text-sm opacity-75">Selected:</span>
-            <ImageIcon src={imagePreview} alt="" class="rounded-lg" />
+<Modal tag="form" onsubmit={preventDefault(trySubmit)}>
+  <ModalBody>
+    {@render header()}
+    <FieldInline>
+      {#snippet label()}
+        <p>Icon</p>
+      {/snippet}
+      {#snippet input()}
+        <div class="flex flex-grow items-center justify-between gap-4">
+          {#if imagePreview}
+            <div class="flex items-center gap-2">
+              <span class="text-sm opacity-75">Selected:</span>
+              <ImageIcon src={imagePreview} alt="" class="rounded-lg" />
+            </div>
+          {:else}
+            <span class="text-sm opacity-75">No icon selected</span>
+          {/if}
+          <div class="flex gap-2">
+            <IconPickerButton onSelect={handleIconSelect} class="btn btn-primary btn-xs">
+              <Icon icon={StickerSmileSquare} size={4} />
+              <span class="hidden sm:inline">Select</span>
+            </IconPickerButton>
+            <label class="btn btn-neutral btn-xs cursor-pointer">
+              <Icon icon={UploadMinimalistic} size={4} />
+              <span class="hidden sm:inline">Upload</span>
+              <input type="file" accept="image/*" class="hidden" onchange={handleImageUpload} />
+            </label>
           </div>
-        {:else}
-          <span class="text-sm opacity-75">No icon selected</span>
-        {/if}
-        <div class="flex gap-2">
-          <IconPickerButton onSelect={handleIconSelect} class="btn btn-primary btn-xs">
-            <Icon icon={StickerSmileSquare} size={4} />
-            <span class="hidden sm:inline">Select</span>
-          </IconPickerButton>
-          <label class="btn btn-neutral btn-xs cursor-pointer">
-            <Icon icon={UploadMinimalistic} size={4} />
-            <span class="hidden sm:inline">Upload</span>
-            <input type="file" accept="image/*" class="hidden" onchange={handleImageUpload} />
-          </label>
         </div>
-      </div>
-    {/snippet}
-  </FieldInline>
-  <FieldInline>
-    {#snippet label()}
-      <p>Name</p>
-    {/snippet}
-    {#snippet input()}
-      <label class="input input-bordered flex w-full items-center gap-2">
-        {#if imagePreview}
-          <ImageIcon src={imagePreview} alt="" class="rounded-lg" />
-        {:else}
-          <Icon icon={Hashtag} />
-        {/if}
-        <input bind:value={values.name} class="grow" type="text" />
-      </label>
-    {/snippet}
-  </FieldInline>
-  <FieldInline>
-    {#snippet label()}
-      <p>Description</p>
-    {/snippet}
-    {#snippet input()}
-      <label class="input input-bordered flex w-full items-center gap-2">
-        <input bind:value={values.about} class="grow" type="text" />
-      </label>
-    {/snippet}
-  </FieldInline>
-  <strong class="md:hidden">Permissions</strong>
-  <div class="flex items-center gap-2">
-    <input type="checkbox" class="checkbox" bind:checked={values.isRestricted} />
-    <span class="text-sm opacity-75">Only allow members to send messages</span>
-  </div>
-  <div class="flex items-center gap-2">
-    <input type="checkbox" class="checkbox" bind:checked={values.isPrivate} />
-    <span class="text-sm opacity-75">Only allow members to read messages</span>
-  </div>
-  <div class="flex items-center gap-2">
-    <input type="checkbox" class="checkbox" bind:checked={values.isHidden} />
-    <span class="text-sm opacity-75">Hide this group from non-members</span>
-  </div>
-  <div class="flex items-center gap-2">
-    <input type="checkbox" class="checkbox" bind:checked={values.isClosed} />
-    <span class="text-sm opacity-75">Ignore requests to join</span>
-  </div>
+      {/snippet}
+    </FieldInline>
+    <FieldInline>
+      {#snippet label()}
+        <p>Name</p>
+      {/snippet}
+      {#snippet input()}
+        <label class="input input-bordered flex w-full items-center gap-2">
+          {#if imagePreview}
+            <ImageIcon src={imagePreview} alt="" class="rounded-lg" />
+          {:else}
+            <Icon icon={Hashtag} />
+          {/if}
+          <input bind:value={values.name} class="grow" type="text" />
+        </label>
+      {/snippet}
+    </FieldInline>
+    <FieldInline>
+      {#snippet label()}
+        <p>Description</p>
+      {/snippet}
+      {#snippet input()}
+        <label class="input input-bordered flex w-full items-center gap-2">
+          <input bind:value={values.about} class="grow" type="text" />
+        </label>
+      {/snippet}
+    </FieldInline>
+    <strong class="md:hidden">Permissions</strong>
+    <div class="flex items-center gap-2">
+      <input type="checkbox" class="checkbox" bind:checked={values.isRestricted} />
+      <span class="text-sm opacity-75">Only allow members to send messages</span>
+    </div>
+    <div class="flex items-center gap-2">
+      <input type="checkbox" class="checkbox" bind:checked={values.isPrivate} />
+      <span class="text-sm opacity-75">Only allow members to read messages</span>
+    </div>
+    <div class="flex items-center gap-2">
+      <input type="checkbox" class="checkbox" bind:checked={values.isHidden} />
+      <span class="text-sm opacity-75">Hide this group from non-members</span>
+    </div>
+    <div class="flex items-center gap-2">
+      <input type="checkbox" class="checkbox" bind:checked={values.isClosed} />
+      <span class="text-sm opacity-75">Ignore requests to join</span>
+    </div>
+  </ModalBody>
   {@render footer({loading})}
-</form>
+</Modal>

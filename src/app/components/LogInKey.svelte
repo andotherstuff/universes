@@ -13,6 +13,8 @@
   import AltArrowLeft from "@assets/icons/alt-arrow-left.svg?dataurl"
   import AltArrowRight from "@assets/icons/alt-arrow-right.svg?dataurl"
   import Icon from "@lib/components/Icon.svelte"
+  import Modal from "@lib/components/Modal.svelte"
+  import ModalBody from "@lib/components/ModalBody.svelte"
   import ModalHeader from "@lib/components/ModalHeader.svelte"
   import ModalFooter from "@lib/components/ModalFooter.svelte"
   import {clearModals} from "@app/util/modal"
@@ -71,50 +73,52 @@
   }
 </script>
 
-<form class="column gap-4" onsubmit={preventDefault(onSubmit)}>
-  <ModalHeader>
-    {#snippet title()}
-      <div>Log In with Key</div>
-    {/snippet}
-    {#snippet info()}
-      <div>Enter your nostr private key to log in.</div>
-    {/snippet}
-  </ModalHeader>
-  <FieldInline>
-    {#snippet label()}
-      <p>Your Key*</p>
-    {/snippet}
-    {#snippet input()}
-      <label class="input input-bordered flex w-full items-center gap-2">
-        <Icon icon={Key} />
-        <input type="password" bind:value={keyInput} placeholder="nsec1..." />
-      </label>
-    {/snippet}
-  </FieldInline>
-  {#if isNcryptsec}
+<Modal tag="form" onsubmit={preventDefault(onSubmit)}>
+  <ModalBody>
+    <ModalHeader>
+      {#snippet title()}
+        <div>Log In with Key</div>
+      {/snippet}
+      {#snippet info()}
+        <div>Enter your nostr private key to log in.</div>
+      {/snippet}
+    </ModalHeader>
     <FieldInline>
       {#snippet label()}
-        <p>Password*</p>
+        <p>Your Key*</p>
       {/snippet}
       {#snippet input()}
         <label class="input input-bordered flex w-full items-center gap-2">
           <Icon icon={Key} />
-          <input type="password" bind:value={password} placeholder="Your password" />
+          <input type="password" bind:value={keyInput} placeholder="nsec1..." />
         </label>
       {/snippet}
     </FieldInline>
-  {/if}
-  <div class="card2 card2-sm bg-alt flex flex-col gap-2 text-sm">
-    <strong class="flex items-center gap-2">
-      <Icon icon={Danger} />
-      Please note!
-    </strong>
-    <p>
-      Logging in this way is not a best practice. For better security, please consider using a
-      <Link external href="https://nostrapps.com#signers" class="link">signer app</Link>
-      to keep your keys safe.
-    </p>
-  </div>
+    {#if isNcryptsec}
+      <FieldInline>
+        {#snippet label()}
+          <p>Password*</p>
+        {/snippet}
+        {#snippet input()}
+          <label class="input input-bordered flex w-full items-center gap-2">
+            <Icon icon={Key} />
+            <input type="password" bind:value={password} placeholder="Your password" />
+          </label>
+        {/snippet}
+      </FieldInline>
+    {/if}
+    <div class="card2 card2-sm bg-alt flex flex-col gap-2 text-sm">
+      <strong class="flex items-center gap-2">
+        <Icon icon={Danger} />
+        Please note!
+      </strong>
+      <p>
+        Logging in this way is not a best practice. For better security, please consider using a
+        <Link external href="https://nostrapps.com#signers" class="link">signer app</Link>
+        to keep your keys safe.
+      </p>
+    </div>
+  </ModalBody>
   <ModalFooter>
     <Button class="btn btn-link" onclick={back} disabled={loading}>
       <Icon icon={AltArrowLeft} />
@@ -125,4 +129,4 @@
       <Icon icon={AltArrowRight} />
     </Button>
   </ModalFooter>
-</form>
+</Modal>

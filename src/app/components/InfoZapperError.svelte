@@ -5,6 +5,8 @@
   import Button from "@lib/components/Button.svelte"
   import ModalHeader from "@lib/components/ModalHeader.svelte"
   import ModalFooter from "@lib/components/ModalFooter.svelte"
+  import Modal from "@lib/components/Modal.svelte"
+  import ModalBody from "@lib/components/ModalBody.svelte"
   import ProfileLink from "@app/components/ProfileLink.svelte"
 
   const {pubkey} = $props()
@@ -14,24 +16,26 @@
   const back = () => history.back()
 </script>
 
-<div class="column gap-4">
-  <ModalHeader>
-    {#snippet title()}
-      <div>Unable to Zap</div>
-    {/snippet}
-  </ModalHeader>
-  <p>
-    Zapping <ProfileLink {pubkey} class="!text-primary" /> isn't possible right now because
-    {#if $zapper}
-      their zap receiver isn't correctly set up.
-    {:else}
-      they don't currently have a zap receiver set up.
-    {/if}
-  </p>
+<Modal>
+  <ModalBody>
+    <ModalHeader>
+      {#snippet title()}
+        <div>Unable to Zap</div>
+      {/snippet}
+    </ModalHeader>
+    <p>
+      Zapping <ProfileLink {pubkey} class="!text-primary" /> isn't possible right now because
+      {#if $zapper}
+        their zap receiver isn't correctly set up.
+      {:else}
+        they don't currently have a zap receiver set up.
+      {/if}
+    </p>
+  </ModalBody>
   <ModalFooter>
     <Button class="btn btn-link" onclick={back}>
       <Icon icon={AltArrowLeft} />
       Go back
     </Button>
   </ModalFooter>
-</div>
+</Modal>

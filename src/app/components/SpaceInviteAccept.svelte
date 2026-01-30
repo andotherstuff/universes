@@ -12,6 +12,8 @@
   import AltArrowLeft from "@assets/icons/alt-arrow-left.svg?dataurl"
   import AltArrowRight from "@assets/icons/alt-arrow-right.svg?dataurl"
   import Icon from "@lib/components/Icon.svelte"
+  import Modal from "@lib/components/Modal.svelte"
+  import ModalBody from "@lib/components/ModalBody.svelte"
   import ModalHeader from "@lib/components/ModalHeader.svelte"
   import ModalFooter from "@lib/components/ModalFooter.svelte"
   import RelaySummary from "@app/components/RelaySummary.svelte"
@@ -24,12 +26,10 @@
 
   type Props = {
     invite: string
-    abortAction?: Snippet
+    back?: () => void
   }
 
-  let {invite = "", abortAction}: Props = $props()
-
-  const back = () => history.back()
+  let {invite = "", back = () => history.back()}: Props = $props()
 
   const joinRelay = async () => {
     const {url, claim} = inviteData!
@@ -63,48 +63,46 @@
   const inviteData = $derived(parseInviteLink(invite))
 </script>
 
-<form class="column gap-4" onsubmit={preventDefault(join)}>
-  <ModalHeader>
-    {#snippet title()}
-      <div>Join a Space</div>
-    {/snippet}
-    {#snippet info()}
-      <div>Enter a relay URL or invite link below to join an existing space.</div>
-    {/snippet}
-  </ModalHeader>
-  <Field>
-    {#snippet label()}
-      <p>Invite Link*</p>
-    {/snippet}
-    {#snippet input()}
-      <label class="input input-bordered flex w-full items-center gap-2">
-        <Icon icon={LinkRound} />
-        <input bind:value={invite} class="grow" type="text" />
-      </label>
-    {/snippet}
-  </Field>
-  <div class="-my-4">
+<Modal tag="form" onsubmit={preventDefault(join)}>
+  <ModalBody>
+    <ModalHeader>
+      {#snippet title()}
+        <div>Join a Space</div>
+      {/snippet}
+      {#snippet info()}
+        <div>Enter a relay URL or invite link below to join an existing space.</div>
+      {/snippet}
+    </ModalHeader>
+    <Field>
+      {#snippet label()}
+        <p>Invite Link*</p>
+      {/snippet}
+      {#snippet input()}
+        <label class="input input-bordered flex w-full items-center gap-2">
+          <Icon icon={LinkRound} />
+          <input bind:value={invite} class="grow" type="text" />
+        </label>
+      {/snippet}
+    </Field>
     {#if inviteData}
-      <div transition:slideAndFade class="flex flex-col gap-4 py-4">
-        <div class="card2 bg-alt flex flex-col gap-4">
-          <p class="opacity-75">You're about to join:</p>
-          <RelaySummary url={inviteData.url} />
+      <div class="-my-4">
+        <div transition:slideAndFade class="flex flex-col gap-4 py-4">
+          <div class="card2 bg-alt flex flex-col gap-4">
+            <p class="opacity-75">You're about to join:</p>
+            <RelaySummary url={inviteData.url} />
+          </div>
         </div>
       </div>
     {/if}
-  </div>
+  </ModalBody>
   <ModalFooter>
-    {#if abortAction}
-      {@render abortAction?.()}
-    {:else}
-      <Button class="btn btn-link" onclick={back}>
-        <Icon icon={AltArrowLeft} />
-        Go back
-      </Button>
-    {/if}
+    <Button class="btn btn-link" onclick={back}>
+      <Icon icon={AltArrowLeft} />
+      Go back
+    </Button>
     <Button type="submit" class="btn btn-primary" disabled={!inviteData || loading}>
       <Spinner {loading}>Join Space</Spinner>
       <Icon icon={AltArrowRight} />
     </Button>
   </ModalFooter>
-</form>
+</Modal>

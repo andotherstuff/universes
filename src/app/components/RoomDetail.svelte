@@ -20,6 +20,8 @@
   import Icon from "@lib/components/Icon.svelte"
   import Button from "@lib/components/Button.svelte"
   import Confirm from "@lib/components/Confirm.svelte"
+  import Modal from "@lib/components/Modal.svelte"
+  import ModalBody from "@lib/components/ModalBody.svelte"
   import ModalFooter from "@lib/components/ModalFooter.svelte"
   import ProfileCircles from "@app/components/ProfileCircles.svelte"
   import RoomMembers from "@app/components/RoomMembers.svelte"
@@ -36,7 +38,11 @@
     deriveIsMuted,
     MembershipStatus,
   } from "@app/core/state"
-  import {addRoomMembership, removeRoomMembership, toggleRoomNotifications} from "@app/core/commands"
+  import {
+    addRoomMembership,
+    removeRoomMembership,
+    toggleRoomNotifications,
+  } from "@app/core/commands"
   import {makeSpacePath} from "@app/util/routes"
   import {pushModal} from "@app/util/modal"
   import {pushToast} from "@app/util/toast"
@@ -114,85 +120,87 @@
   let loading = $state(false)
 </script>
 
-<div class="flex flex-col gap-3">
-  <div class="flex justify-between">
-    <div class="flex gap-3">
-      <div class="pt-0.5">
-        <RoomImage {url} {h} size={8} />
+<Modal>
+  <ModalBody>
+    <div class="flex justify-between">
+      <div class="flex gap-3">
+        <div class="pt-0.5">
+          <RoomImage {url} {h} size={8} />
+        </div>
+        <div class="flex min-w-0 flex-col">
+          <RoomName {url} {h} class="text-2xl" />
+          <span class="text-primary">{displayRelayUrl(url)}</span>
+        </div>
       </div>
-      <div class="flex min-w-0 flex-col">
-        <RoomName {url} {h} class="text-2xl" />
-        <span class="text-primary">{displayRelayUrl(url)}</span>
+      <div class="grid grid-cols-2 gap-2">
+        {#if $room?.isRestricted}
+          <Button
+            class="btn btn-neutral btn-sm tooltip tooltip-left"
+            data-tip="Only members can send messages.">
+            <Icon size={4} icon={Microphone} />
+          </Button>
+        {/if}
+        {#if $room?.isPrivate}
+          <Button
+            class="btn btn-neutral btn-sm tooltip tooltip-left"
+            data-tip="Only members can view messages.">
+            <Icon size={4} icon={Lock} />
+          </Button>
+        {/if}
+        {#if $room?.isHidden}
+          <Button
+            class="btn btn-neutral btn-sm tooltip tooltip-left"
+            data-tip="This room is not visible to non-members.">
+            <Icon size={4} icon={EyeClosed} />
+          </Button>
+        {/if}
+        {#if $room?.isClosed}
+          <Button
+            class="btn btn-neutral btn-sm tooltip tooltip-left"
+            data-tip="Requests to join this room will be ignored.">
+            <Icon size={4} icon={MinusCircle} />
+          </Button>
+        {/if}
       </div>
     </div>
-    <div class="grid grid-cols-2 gap-2">
-      {#if $room?.isRestricted}
-        <Button
-          class="btn btn-neutral btn-sm tooltip tooltip-left"
-          data-tip="Only members can send messages.">
-          <Icon size={4} icon={Microphone} />
-        </Button>
-      {/if}
-      {#if $room?.isPrivate}
-        <Button
-          class="btn btn-neutral btn-sm tooltip tooltip-left"
-          data-tip="Only members can view messages.">
-          <Icon size={4} icon={Lock} />
-        </Button>
-      {/if}
-      {#if $room?.isHidden}
-        <Button
-          class="btn btn-neutral btn-sm tooltip tooltip-left"
-          data-tip="This room is not visible to non-members.">
-          <Icon size={4} icon={EyeClosed} />
-        </Button>
-      {/if}
-      {#if $room?.isClosed}
-        <Button
-          class="btn btn-neutral btn-sm tooltip tooltip-left"
-          data-tip="Requests to join this room will be ignored.">
-          <Icon size={4} icon={MinusCircle} />
-        </Button>
-      {/if}
-    </div>
-  </div>
-  {#if $room?.about}
-    <p>{$room.about}</p>
-  {/if}
-  {#if $members.length > 0}
-    <div class="card2 card2-sm bg-alt flex items-center justify-between gap-4">
-      <div class="flex items-center gap-4">
-        <span>Members:</span>
-        <ProfileCircles pubkeys={$members} />
+    {#if $room?.about}
+      <p>{$room.about}</p>
+    {/if}
+    {#if $members.length > 0}
+      <div class="card2 card2-sm bg-alt flex items-center justify-between gap-4">
+        <div class="flex items-center gap-4">
+          <span>Members:</span>
+          <ProfileCircles pubkeys={$members} />
+        </div>
+        <Button class="btn btn-neutral btn-sm" onclick={showMembers}>View All</Button>
       </div>
-      <Button class="btn btn-neutral btn-sm" onclick={showMembers}>View All</Button>
-    </div>
-  {/if}
-  <div class="card2 card2-sm bg-alt col-4">
-    <strong class="text-lg">Room Settings</strong>
-    <div class="flex items-center justify-between">
-      <div class="flex items-center gap-2">
-        <Icon icon={VolumeLoud} />
-        <span>Notifications</span>
+    {/if}
+    <div class="card2 card2-sm bg-alt col-4">
+      <strong class="text-lg">Room Settings</strong>
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <Icon icon={VolumeLoud} />
+          <span>Notifications</span>
+        </div>
+        <input
+          type="checkbox"
+          class="toggle toggle-primary"
+          checked={!isMuted}
+          onchange={toggleMute} />
       </div>
-      <Button
-        class={cx("btn btn-sm", {"btn-primary": !isMuted, "btn-neutral": isMuted})}
-        onclick={toggleMute}>
-        {isMuted ? "Off" : "On"}
-      </Button>
-    </div>
-    <div class="flex items-center justify-between">
-      <div class="flex items-center gap-2">
-        <Icon icon={Bookmark} />
-        <span>Favorite</span>
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <Icon icon={Bookmark} />
+          <span>Favorite</span>
+        </div>
+        <input
+          type="checkbox"
+          class="toggle toggle-primary"
+          checked={isFavorite}
+          onchange={toggleFavorite} />
       </div>
-      <Button
-        class={cx("btn btn-sm", {"btn-primary": isFavorite, "btn-neutral": !isFavorite})}
-        onclick={toggleFavorite}>
-        {isFavorite ? "On" : "Off"}
-      </Button>
     </div>
-  </div>
+  </ModalBody>
   <ModalFooter>
     <Button class="btn btn-link" onclick={back}>
       <Icon icon={AltArrowLeft} />
@@ -234,4 +242,4 @@
       {/if}
     </div>
   </ModalFooter>
-</div>
+</Modal>

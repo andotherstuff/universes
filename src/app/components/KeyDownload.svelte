@@ -10,6 +10,8 @@
   import Icon from "@lib/components/Icon.svelte"
   import Field from "@lib/components/Field.svelte"
   import Button from "@lib/components/Button.svelte"
+  import Modal from "@lib/components/Modal.svelte"
+  import ModalBody from "@lib/components/ModalBody.svelte"
   import ModalHeader from "@lib/components/ModalHeader.svelte"
   import ModalFooter from "@lib/components/ModalFooter.svelte"
   import {pushToast} from "@app/util/toast"
@@ -104,49 +106,51 @@
   let didDownload = $state(false)
 </script>
 
-<form class="column gap-4" onsubmit={preventDefault(next)}>
-  <ModalHeader>
-    {#snippet title()}
-      <div>Your Keys are Ready!</div>
-    {/snippet}
-  </ModalHeader>
-  <p>
-    A cryptographic key pair has two parts: your <strong>public key</strong> identifies your
-    account, while your <strong>private key</strong> acts sort of like a master password.
-  </p>
-  <p>
-    Securing your private key is very important, so make sure to take the time to save your key in a
-    secure place (like a password manager).
-  </p>
-  {#if usePassword}
-    <Field>
-      {#snippet label()}
-        Password*
+<Modal tag="form" onsubmit={preventDefault(next)}>
+  <ModalBody>
+    <ModalHeader>
+      {#snippet title()}
+        <div>Your Keys are Ready!</div>
       {/snippet}
-      {#snippet input()}
-        <label class="input input-bordered flex w-full items-center gap-2">
-          <Icon icon={Key} />
-          <input bind:value={password} onchange={onPasswordChange} class="grow" type="password" />
-        </label>
-      {/snippet}
-      {#snippet info()}
-        <p>Passwords should be at least 12 characters long. Write this down!</p>
-      {/snippet}
-    </Field>
-  {/if}
-  <div class="flex flex-col">
-    <Button class="btn {didDownload ? 'btn-neutral' : 'btn-primary'}" onclick={downloadKey}>
-      Download my key
-      <Icon icon={ArrowDown} />
-    </Button>
-    <Button class="btn btn-link no-underline" onclick={toggleUsePassword}>
-      {#if usePassword}
-        Nevermind, I want to download the plain version
-      {:else}
-        I want to download an encrypted version
-      {/if}
-    </Button>
-  </div>
+    </ModalHeader>
+    <p>
+      A cryptographic key pair has two parts: your <strong>public key</strong> identifies your
+      account, while your <strong>private key</strong> acts sort of like a master password.
+    </p>
+    <p>
+      Securing your private key is very important, so make sure to take the time to save your key in
+      a secure place (like a password manager).
+    </p>
+    {#if usePassword}
+      <Field>
+        {#snippet label()}
+          Password*
+        {/snippet}
+        {#snippet input()}
+          <label class="input input-bordered flex w-full items-center gap-2">
+            <Icon icon={Key} />
+            <input bind:value={password} onchange={onPasswordChange} class="grow" type="password" />
+          </label>
+        {/snippet}
+        {#snippet info()}
+          <p>Passwords should be at least 12 characters long. Write this down!</p>
+        {/snippet}
+      </Field>
+    {/if}
+    <div class="flex flex-col">
+      <Button class="btn {didDownload ? 'btn-neutral' : 'btn-primary'}" onclick={downloadKey}>
+        Download my key
+        <Icon icon={ArrowDown} />
+      </Button>
+      <Button class="btn btn-link no-underline" onclick={toggleUsePassword}>
+        {#if usePassword}
+          Nevermind, I want to download the plain version
+        {:else}
+          I want to download an encrypted version
+        {/if}
+      </Button>
+    </div>
+  </ModalBody>
   <ModalFooter>
     <Button class="btn btn-link" onclick={back}>
       <Icon icon={AltArrowLeft} />
@@ -157,4 +161,4 @@
       <Icon icon={AltArrowRight} />
     </Button>
   </ModalFooter>
-</form>
+</Modal>

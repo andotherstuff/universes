@@ -1,12 +1,17 @@
 <script lang="ts">
+  import type {Component} from "svelte"
   import cx from "classnames"
+  import {onMount} from "svelte"
   import {noop} from "@welshman/lib"
   import {fade, fly} from "@lib/transition"
 
-  interface Props {
+  type Props = {
     onClose?: any
     fullscreen?: boolean
-    children?: import("svelte").Snippet
+    children: {
+      component: Component<any>
+      props: Record<string, any>
+    }
   }
 
   const {onClose = noop, fullscreen = false, children}: Props = $props()
@@ -21,9 +26,9 @@
   const innerClass = $derived(
     cx(
       "relative text-base-content text-base-content flex-grow pointer-events-auto",
-      "px-4 py-6 rounded-t-box sm:p-6 sm:rounded-box sm:mt-0",
+      "rounded-t-box sm:rounded-box",
       {
-        "bg-alt shadow-m max-h-[90vh] scroll-container overflow-auto": !fullscreen,
+        "bg-alt shadow-m max-h-[90vh] flex flex-col": !fullscreen,
       },
     ),
   )
@@ -39,7 +44,7 @@
   </button>
   <div class={wrapperClass}>
     <div class={innerClass} transition:fly={{duration: 300}}>
-      {@render children?.()}
+      <children.component {...children.props} />
     </div>
   </div>
 </div>

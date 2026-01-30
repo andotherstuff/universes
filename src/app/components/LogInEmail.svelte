@@ -10,6 +10,8 @@
   import AltArrowLeft from "@assets/icons/alt-arrow-left.svg?dataurl"
   import AltArrowRight from "@assets/icons/alt-arrow-right.svg?dataurl"
   import Icon from "@lib/components/Icon.svelte"
+  import Modal from "@lib/components/Modal.svelte"
+  import ModalBody from "@lib/components/ModalBody.svelte"
   import ModalHeader from "@lib/components/ModalHeader.svelte"
   import ModalFooter from "@lib/components/ModalFooter.svelte"
   import LogInOTP from "@app/components/LogInOTP.svelte"
@@ -67,42 +69,44 @@
   let password = $state("")
 </script>
 
-<form class="column gap-4" onsubmit={preventDefault(onSubmit)}>
-  <ModalHeader>
-    {#snippet title()}
-      <div>Log In</div>
-    {/snippet}
-    {#snippet info()}
-      <div>Log in using your email and password</div>
-    {/snippet}
-  </ModalHeader>
-  <FieldInline>
-    {#snippet label()}
-      <p>Email*</p>
-    {/snippet}
-    {#snippet input()}
-      <label class="input input-bordered flex w-full items-center gap-2">
-        <Icon icon={Letter} />
-        <input bind:value={email} />
-      </label>
-    {/snippet}
-  </FieldInline>
-  <FieldInline>
-    {#snippet label()}
-      <p>Password*</p>
-    {/snippet}
-    {#snippet input()}
-      <label class="input input-bordered flex w-full items-center gap-2">
-        <Icon icon={Key} />
-        <input type="password" bind:value={password} />
-      </label>
-    {/snippet}
-  </FieldInline>
-  <p class="text-sm">
-    Forgot your password? <Button class="link" onclick={loginWithOTP}
-      >Log in with a one-time access code</Button
-    >.
-  </p>
+<Modal tag="form" onsubmit={preventDefault(onSubmit)}>
+  <ModalBody>
+    <ModalHeader>
+      {#snippet title()}
+        <div>Log In</div>
+      {/snippet}
+      {#snippet info()}
+        <div>Log in using your email and password</div>
+      {/snippet}
+    </ModalHeader>
+    <FieldInline>
+      {#snippet label()}
+        <p>Email*</p>
+      {/snippet}
+      {#snippet input()}
+        <label class="input input-bordered flex w-full items-center gap-2">
+          <Icon icon={Letter} />
+          <input bind:value={email} />
+        </label>
+      {/snippet}
+    </FieldInline>
+    <FieldInline>
+      {#snippet label()}
+        <p>Password*</p>
+      {/snippet}
+      {#snippet input()}
+        <label class="input input-bordered flex w-full items-center gap-2">
+          <Icon icon={Key} />
+          <input type="password" bind:value={password} />
+        </label>
+      {/snippet}
+    </FieldInline>
+    <p class="text-sm">
+      Forgot your password? <Button class="link" onclick={loginWithOTP}
+        >Log in with a one-time access code</Button
+      >.
+    </p>
+  </ModalBody>
   <ModalFooter>
     <Button class="btn btn-link" onclick={back} disabled={loading}>
       <Icon icon={AltArrowLeft} />
@@ -113,4 +117,4 @@
       <Icon icon={AltArrowRight} />
     </Button>
   </ModalFooter>
-</form>
+</Modal>

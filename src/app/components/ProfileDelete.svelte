@@ -18,6 +18,8 @@
   import Spinner from "@lib/components/Spinner.svelte"
   import ModalHeader from "@lib/components/ModalHeader.svelte"
   import ModalFooter from "@lib/components/ModalFooter.svelte"
+  import Modal from "@lib/components/Modal.svelte"
+  import ModalBody from "@lib/components/ModalBody.svelte"
   import {INDEXER_RELAYS, PLATFORM_NAME, userSpaceUrls} from "@app/core/state"
   import {kv, db} from "@app/core/storage"
   import {pushToast} from "@app/util/toast"
@@ -108,36 +110,40 @@
   const back = () => history.back()
 </script>
 
-<form class="column gap-4" onsubmit={preventDefault(confirm)}>
-  <ModalHeader>
-    {#snippet title()}
-      Delete your account
-    {/snippet}
-    {#snippet info()}
-      From the Nostr network
-    {/snippet}
-  </ModalHeader>
-  {#if showProgress}
-    <p>
-      We are currently sending deletion requests to your relay selections and space hosts. Please
-      wait while we complete this process. Once we're done, you'll be automatically logged out.
-    </p>
-    <progress class="progress progress-primary w-full" value={progress! * 100} max="100"></progress>
-  {:else}
-    <p>
-      This will delete your nostr account everywhere, not just on {PLATFORM_NAME}.
-    </p>
-    <p>
-      To confirm, please type "{CONFIRM_TEXT}" into the text box below. This action can't be undone.
-    </p>
-    <label class="input input-bordered flex w-full items-center gap-2">
-      <input bind:value={confirmText} class="grow" type="text" />
-    </label>
-    <p>
-      <strong>Note:</strong> not all relays may honor your request for deletion. If you find that your
-      content continues to be available, please contact the offending relays directly.
-    </p>
-  {/if}
+<Modal tag="form" onsubmit={preventDefault(confirm)}>
+  <ModalBody>
+    <ModalHeader>
+      {#snippet title()}
+        Delete your account
+      {/snippet}
+      {#snippet info()}
+        From the Nostr network
+      {/snippet}
+    </ModalHeader>
+    {#if showProgress}
+      <p>
+        We are currently sending deletion requests to your relay selections and space hosts. Please
+        wait while we complete this process. Once we're done, you'll be automatically logged out.
+      </p>
+      <progress class="progress progress-primary w-full" value={progress! * 100} max="100"
+      ></progress>
+    {:else}
+      <p>
+        This will delete your nostr account everywhere, not just on {PLATFORM_NAME}.
+      </p>
+      <p>
+        To confirm, please type "{CONFIRM_TEXT}" into the text box below. This action can't be
+        undone.
+      </p>
+      <label class="input input-bordered flex w-full items-center gap-2">
+        <input bind:value={confirmText} class="grow" type="text" />
+      </label>
+      <p>
+        <strong>Note:</strong> not all relays may honor your request for deletion. If you find that your
+        content continues to be available, please contact the offending relays directly.
+      </p>
+    {/if}
+  </ModalBody>
   <ModalFooter>
     <Button class="btn btn-link" onclick={back}>
       <Icon icon={AltArrowLeft} />
@@ -148,4 +154,4 @@
       <Icon icon={AltArrowRight} />
     </Button>
   </ModalFooter>
-</form>
+</Modal>

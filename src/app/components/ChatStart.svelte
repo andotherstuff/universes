@@ -11,6 +11,8 @@
   import AltArrowLeft from "@assets/icons/alt-arrow-left.svg?dataurl"
   import AltArrowRight from "@assets/icons/alt-arrow-right.svg?dataurl"
   import Icon from "@lib/components/Icon.svelte"
+  import Modal from "@lib/components/Modal.svelte"
+  import ModalBody from "@lib/components/ModalBody.svelte"
   import ModalHeader from "@lib/components/ModalHeader.svelte"
   import ModalFooter from "@lib/components/ModalFooter.svelte"
   import ProfileMultiSelect from "@app/components/ProfileMultiSelect.svelte"
@@ -52,20 +54,22 @@
   })
 </script>
 
-<form class="column gap-4" onsubmit={preventDefault(onSubmit)}>
-  <ModalHeader>
-    {#snippet title()}
-      <div>Start a Chat</div>
-    {/snippet}
-    {#snippet info()}
-      <div>Create an encrypted chat room for private conversations.</div>
-    {/snippet}
-  </ModalHeader>
-  <Field>
-    {#snippet input()}
-      <ProfileMultiSelect autofocus bind:value={pubkeys} {term} />
-    {/snippet}
-  </Field>
+<Modal tag="form" onsubmit={preventDefault(onSubmit)}>
+  <ModalBody>
+    <ModalHeader>
+      {#snippet title()}
+        <div>Start a Chat</div>
+      {/snippet}
+      {#snippet info()}
+        <div>Create an encrypted chat room for private conversations.</div>
+      {/snippet}
+    </ModalHeader>
+    <Field>
+      {#snippet input()}
+        <ProfileMultiSelect autofocus bind:value={pubkeys} {term} />
+      {/snippet}
+    </Field>
+  </ModalBody>
   <ModalFooter>
     <Button class="btn btn-link" onclick={back}>
       <Icon icon={AltArrowLeft} />
@@ -76,4 +80,4 @@
       <Icon icon={AltArrowRight} />
     </Button>
   </ModalFooter>
-</form>
+</Modal>

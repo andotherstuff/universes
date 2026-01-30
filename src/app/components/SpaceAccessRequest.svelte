@@ -9,6 +9,8 @@
   import AltArrowLeft from "@assets/icons/alt-arrow-left.svg?dataurl"
   import AltArrowRight from "@assets/icons/alt-arrow-right.svg?dataurl"
   import Icon from "@lib/components/Icon.svelte"
+  import Modal from "@lib/components/Modal.svelte"
+  import ModalBody from "@lib/components/ModalBody.svelte"
   import ModalHeader from "@lib/components/ModalHeader.svelte"
   import ModalFooter from "@lib/components/ModalFooter.svelte"
   import {pushToast} from "@app/util/toast"
@@ -48,26 +50,28 @@
   let loading = $state(false)
 </script>
 
-<form class="column gap-4" onsubmit={preventDefault(join)}>
-  <ModalHeader>
-    {#snippet title()}
-      <div>Request Access</div>
-    {/snippet}
-    {#snippet info()}
-      <div>Enter an invite code below to request access to {displayUrl(url)}.</div>
-    {/snippet}
-  </ModalHeader>
-  <Field>
-    {#snippet label()}
-      <p>Invite code*</p>
-    {/snippet}
-    {#snippet input()}
-      <label class="input input-bordered flex w-full items-center gap-2">
-        <Icon icon={LinkRound} />
-        <input bind:value class="grow" type="text" />
-      </label>
-    {/snippet}
-  </Field>
+<Modal tag="form" onsubmit={preventDefault(join)}>
+  <ModalBody>
+    <ModalHeader>
+      {#snippet title()}
+        <div>Request Access</div>
+      {/snippet}
+      {#snippet info()}
+        <div>Enter an invite code below to request access to {displayUrl(url)}.</div>
+      {/snippet}
+    </ModalHeader>
+    <Field>
+      {#snippet label()}
+        <p>Invite code*</p>
+      {/snippet}
+      {#snippet input()}
+        <label class="input input-bordered flex w-full items-center gap-2">
+          <Icon icon={LinkRound} />
+          <input bind:value class="grow" type="text" />
+        </label>
+      {/snippet}
+    </Field>
+  </ModalBody>
   <ModalFooter>
     <Button class="btn btn-link" onclick={back}>
       <Icon icon={AltArrowLeft} />
@@ -78,4 +82,4 @@
       <Icon icon={AltArrowRight} />
     </Button>
   </ModalFooter>
-</form>
+</Modal>

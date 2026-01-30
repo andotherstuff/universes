@@ -11,6 +11,8 @@
   import Icon from "@lib/components/Icon.svelte"
   import FieldInline from "@lib/components/FieldInline.svelte"
   import Button from "@lib/components/Button.svelte"
+  import Modal from "@lib/components/Modal.svelte"
+  import ModalBody from "@lib/components/ModalBody.svelte"
   import ModalHeader from "@lib/components/ModalHeader.svelte"
   import {clip} from "@app/util/toast"
 
@@ -36,74 +38,76 @@
   })
 </script>
 
-<div class="column gap-4">
-  <ModalHeader>
-    {#snippet title()}
-      <div>Event Details</div>
-    {/snippet}
-    {#snippet info()}
-      <div>The full details of this event are shown below.</div>
-    {/snippet}
-  </ModalHeader>
-  <FieldInline>
-    {#snippet label()}
-      <p>Created At</p>
-    {/snippet}
-    {#snippet input()}
-      <p>{formatter.format(secondsToDate(event.created_at))}</p>
-    {/snippet}
-  </FieldInline>
-  <FieldInline>
-    {#snippet label()}
-      <p>Event Link</p>
-    {/snippet}
-    {#snippet input()}
-      <label class="input input-bordered flex w-full items-center gap-2">
-        <Icon icon={FileText} />
-        <input type="text" class="ellipsize min-w-0 grow" value={nevent1} />
-        <Button onclick={copyLink} class="flex items-center">
-          <Icon icon={Copy} />
-        </Button>
-      </label>
-    {/snippet}
-  </FieldInline>
-  <FieldInline>
-    {#snippet label()}
-      <p>Author Pubkey</p>
-    {/snippet}
-    {#snippet input()}
-      <label class="input input-bordered flex w-full items-center gap-2">
-        <Icon icon={UserCircle} />
-        <input type="text" class="ellipsize min-w-0 grow" value={npub1} />
-        <Button onclick={copyPubkey} class="flex items-center">
-          <Icon icon={Copy} />
-        </Button>
-      </label>
-    {/snippet}
-  </FieldInline>
-  {#if !url && seenOn.size > 0}
+<Modal>
+  <ModalBody>
+    <ModalHeader>
+      {#snippet title()}
+        <div>Event Details</div>
+      {/snippet}
+      {#snippet info()}
+        <div>The full details of this event are shown below.</div>
+      {/snippet}
+    </ModalHeader>
     <FieldInline>
       {#snippet label()}
-        <p>Seen On</p>
+        <p>Created At</p>
       {/snippet}
       {#snippet input()}
-        <div class="flex flex-wrap gap-2">
-          {#each seenOn as url, i (url)}
-            <span class="bg-alt badge flex gap-1">
-              {displayRelayUrl(url)}
-            </span>
-          {/each}
-        </div>
+        <p>{formatter.format(secondsToDate(event.created_at))}</p>
       {/snippet}
     </FieldInline>
-  {/if}
-  <div class="relative">
-    <pre class="card2 card2-sm bg-alt overflow-auto text-xs"><code>{json}</code></pre>
-    <p class="absolute right-2 top-2 flex flex-grow items-center justify-between">
-      <Button onclick={copyJson} class="btn btn-neutral btn-sm flex items-center">
-        <Icon icon={Copy} /> Copy
-      </Button>
-    </p>
-  </div>
-  <Button class="btn btn-primary" onclick={() => history.back()}>Got it</Button>
-</div>
+    <FieldInline>
+      {#snippet label()}
+        <p>Event Link</p>
+      {/snippet}
+      {#snippet input()}
+        <label class="input input-bordered flex w-full items-center gap-2">
+          <Icon icon={FileText} />
+          <input type="text" class="ellipsize min-w-0 grow" value={nevent1} />
+          <Button onclick={copyLink} class="flex items-center">
+            <Icon icon={Copy} />
+          </Button>
+        </label>
+      {/snippet}
+    </FieldInline>
+    <FieldInline>
+      {#snippet label()}
+        <p>Author Pubkey</p>
+      {/snippet}
+      {#snippet input()}
+        <label class="input input-bordered flex w-full items-center gap-2">
+          <Icon icon={UserCircle} />
+          <input type="text" class="ellipsize min-w-0 grow" value={npub1} />
+          <Button onclick={copyPubkey} class="flex items-center">
+            <Icon icon={Copy} />
+          </Button>
+        </label>
+      {/snippet}
+    </FieldInline>
+    {#if !url && seenOn.size > 0}
+      <FieldInline>
+        {#snippet label()}
+          <p>Seen On</p>
+        {/snippet}
+        {#snippet input()}
+          <div class="flex flex-wrap gap-2">
+            {#each seenOn as url, i (url)}
+              <span class="bg-alt badge flex gap-1">
+                {displayRelayUrl(url)}
+              </span>
+            {/each}
+          </div>
+        {/snippet}
+      </FieldInline>
+    {/if}
+    <div class="relative">
+      <pre class="card2 card2-sm bg-alt overflow-auto text-xs"><code>{json}</code></pre>
+      <p class="absolute right-2 top-2 flex flex-grow items-center justify-between">
+        <Button onclick={copyJson} class="btn btn-neutral btn-sm flex items-center">
+          <Icon icon={Copy} /> Copy
+        </Button>
+      </p>
+    </div>
+    <Button class="btn btn-primary" onclick={() => history.back()}>Got it</Button>
+  </ModalBody>
+</Modal>
