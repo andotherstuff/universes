@@ -11,14 +11,14 @@
   import ModalHeader from "@lib/components/ModalHeader.svelte"
   import ModalFooter from "@lib/components/ModalFooter.svelte"
   import SpaceAccessRequest from "@app/components/SpaceAccessRequest.svelte"
-  import {pushModal} from "@app/util/modal"
+  import {pushModal, clearModals} from "@app/util/modal"
   import {removeSpaceMembership, publishLeaveRequest, removeTrustedRelay} from "@app/core/commands"
 
   const {url, error} = $props()
 
   const back = () => goto("/home")
 
-  const requestAccess = () => pushModal(SpaceAccessRequest, {url})
+  const requestAccess = () => pushModal(SpaceAccessRequest, {url, callback: clearModals})
 
   const leaveSpace = async () => {
     loading = true

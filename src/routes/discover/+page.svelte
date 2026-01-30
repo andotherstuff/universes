@@ -20,7 +20,7 @@
   import SpaceAdd from "@app/components/SpaceAdd.svelte"
   import SpaceInviteAccept from "@app/components/SpaceInviteAccept.svelte"
   import RelaySummary from "@app/components/RelaySummary.svelte"
-  import SpaceCheck from "@app/components/SpaceCheck.svelte"
+  import SpaceJoin from "@app/components/SpaceJoin.svelte"
   import {groupListPubkeysByUrl, parseInviteLink} from "@app/core/state"
   import {pushModal} from "@app/util/modal"
 
@@ -36,9 +36,7 @@
   })
 
   const relaySearch = _derived(throttled(1000, relays), $relays => {
-    const options = $relays.filter(
-      r => $groupListPubkeysByUrl.has(r.url) && r.url !== inviteData?.url,
-    )
+    const options = $relays.filter(r => $groupListPubkeysByUrl.has(r.url))
 
     return createSearch(options, {
       getValue: (relay: RelayProfile) => relay.url,
@@ -60,7 +58,7 @@
     if (claim) {
       pushModal(SpaceInviteAccept, {invite: term})
     } else {
-      pushModal(SpaceCheck, {url})
+      pushModal(SpaceJoin, {url})
     }
   }
 
@@ -69,7 +67,7 @@
   let showScanner = $state(false)
   let element: Element
 
-  const options = $derived($relaySearch.searchOptions(term))
+  const options = $derived($relaySearch.searchOptions(term).filter(r => r.url !== inviteData?.url))
   const inviteData = $derived(parseInviteLink(term))
 
   onMount(() => {

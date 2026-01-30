@@ -1,4 +1,5 @@
 <script lang="ts">
+  import cx from "classnames"
   import {goto} from "$app/navigation"
   import type {RoomMeta} from "@welshman/util"
   import {displayRelayUrl, makeRoomMeta} from "@welshman/util"
@@ -13,6 +14,9 @@
   import MinusCircle from "@assets/icons/minus-circle.svg?dataurl"
   import Lock from "@assets/icons/lock.svg?dataurl"
   import Microphone from "@assets/icons/microphone.svg?dataurl"
+  import Bookmark from "@assets/icons/bookmark.svg?dataurl"
+  import VolumeLoud from "@assets/icons/volume-loud.svg?dataurl"
+  import VolumeCross from "@assets/icons/volume-cross.svg?dataurl"
   import Icon from "@lib/components/Icon.svelte"
   import Button from "@lib/components/Button.svelte"
   import Confirm from "@lib/components/Confirm.svelte"
@@ -27,8 +31,12 @@
     deriveRoomMembers,
     deriveUserIsRoomAdmin,
     deriveUserRoomMembershipStatus,
+    deriveUserRooms,
+    userSettingsValues,
+    deriveIsMuted,
     MembershipStatus,
   } from "@app/core/state"
+  import {addRoomMembership, removeRoomMembership, toggleRoomNotifications} from "@app/core/commands"
   import {makeSpacePath} from "@app/util/routes"
   import {pushModal} from "@app/util/modal"
   import {pushToast} from "@app/util/toast"
@@ -44,6 +52,10 @@
   const members = deriveRoomMembers(url, h)
   const userIsAdmin = deriveUserIsRoomAdmin(url, h)
   const membershipStatus = deriveUserRoomMembershipStatus(url, h)
+  const userRooms = deriveUserRooms(url)
+
+  const isFavorite = $derived($userRooms.includes(h))
+  const isMuted = deriveIsMuted(url, h)
 
   const back = () => history.back()
 
@@ -69,6 +81,18 @@
 
   const showMembers = () => pushModal(RoomMembers, {url, h})
 
+  const toggleFavorite = () => {
+    if (isFavorite) {
+      removeRoomMembership(url, h)
+    } else {
+      addRoomMembership(url, h)
+    }
+  }
+
+  const toggleMute = () => {
+    toggleRoomNotifications(url, h)
+  }
+
   const startDelete = () =>
     pushModal(Confirm, {
       title: "Are you sure you want to delete this room?",
@@ -93,7 +117,9 @@
 <div class="flex flex-col gap-3">
   <div class="flex justify-between">
     <div class="flex gap-3">
-      <RoomImage {url} {h} size={8} />
+      <div class="pt-0.5">
+        <RoomImage {url} {h} size={8} />
+      </div>
       <div class="flex min-w-0 flex-col">
         <RoomName {url} {h} class="text-2xl" />
         <span class="text-primary">{displayRelayUrl(url)}</span>
@@ -142,6 +168,31 @@
       <Button class="btn btn-neutral btn-sm" onclick={showMembers}>View All</Button>
     </div>
   {/if}
+  <div class="card2 card2-sm bg-alt col-4">
+    <strong class="text-lg">Room Settings</strong>
+    <div class="flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <Icon icon={VolumeLoud} />
+        <span>Notifications</span>
+      </div>
+      <Button
+        class={cx("btn btn-sm", {"btn-primary": !isMuted, "btn-neutral": isMuted})}
+        onclick={toggleMute}>
+        {isMuted ? "Off" : "On"}
+      </Button>
+    </div>
+    <div class="flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <Icon icon={Bookmark} />
+        <span>Favorite</span>
+      </div>
+      <Button
+        class={cx("btn btn-sm", {"btn-primary": isFavorite, "btn-neutral": !isFavorite})}
+        onclick={toggleFavorite}>
+        {isFavorite ? "On" : "Off"}
+      </Button>
+    </div>
+  </div>
   <ModalFooter>
     <Button class="btn btn-link" onclick={back}>
       <Icon icon={AltArrowLeft} />

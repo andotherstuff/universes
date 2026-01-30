@@ -18,6 +18,8 @@
   import CalendarMinimalistic from "@assets/icons/calendar-minimalistic.svg?dataurl"
   import AddCircle from "@assets/icons/add-circle.svg?dataurl"
   import ChatRound from "@assets/icons/chat-round.svg?dataurl"
+  import VolumeLoud from "@assets/icons/volume-loud.svg?dataurl"
+  import VolumeCross from "@assets/icons/volume-cross.svg?dataurl"
   import Icon from "@lib/components/Icon.svelte"
   import Link from "@lib/components/Link.svelte"
   import Button from "@lib/components/Button.svelte"
@@ -46,7 +48,11 @@
     deriveUserCanCreateRoom,
     deriveUserIsSpaceAdmin,
     deriveEventsForUrl,
+    userSettingsValues,
+    notificationSettings,
+    deriveIsMuted,
   } from "@app/core/state"
+  import {setSpaceNotifications} from "@app/core/commands"
   import {notifications} from "@app/util/notifications"
   import {pushModal} from "@app/util/modal"
   import {makeSpacePath, makeChatPath} from "@app/util/routes"
@@ -93,6 +99,12 @@
 
   const addRoom = () => pushModal(RoomCreate, {url}, {replaceState})
 
+  const isMuted = deriveIsMuted(url)
+
+  const toggleSpaceNotifications = () => {
+    setSpaceNotifications(url, !isMuted)
+  }
+
   let showMenu = $state(false)
   let replaceState = $state(false)
   let element: Element | undefined = $state()
@@ -111,6 +123,9 @@
         <div class="flex items-center justify-between">
           <strong class="ellipsize flex items-center gap-1">
             <RelayName {url} />
+            {#if isMuted}
+              <Icon icon={VolumeCross} size={3} class="opacity-50" />
+            {/if}
           </strong>
           <Icon icon={AltArrowDown} />
         </div>
@@ -155,6 +170,19 @@
                 </Link>
               </li>
             {/if}
+            <li>
+              {#if $notificationSettings.push}
+                <Button onclick={toggleSpaceNotifications}>
+                  <Icon icon={isMuted ? VolumeCross : VolumeLoud} />
+                  {isMuted ? "Turn on" : "Turn off"} notifications
+                </Button>
+              {:else}
+                <Link href="/settings/alerts">
+                  <Icon icon={VolumeLoud} />
+                  Enable notifications
+                </Link>
+              {/if}
+            </li>
             <li>
               {#if $userSpaceUrls.includes(url)}
                 <Button onclick={leaveSpace} class="text-error">

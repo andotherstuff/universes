@@ -105,23 +105,6 @@
       <input type="checkbox" class="toggle toggle-primary" bind:checked={settings.messages} />
     </div>
   </div>
-  <div
-    class={cx("card2 bg-alt col-4 shadow-md", {
-      "pointer-events-none opacity-50": !settings.badge && !settings.sound && !settings.push,
-    })}>
-    <strong class="text-lg">Muted Rooms</strong>
-    {#each muted_rooms as id (id)}
-      {@const [url, h] = splitRoomId(id)}
-      <div class="flex-inline badge badge-neutral mr-1 gap-1">
-        <Button class="flex items-center" onclick={() => removeMutedRoom(id)}>
-          <Icon icon={CloseCircle} size={4} class="-ml-1 mt-px" />
-        </Button>
-        Room "<RoomName {url} {h} />" on {displayRelayUrl(url)}
-      </div>
-    {:else}
-      <p class="flex items-center justify-center text-sm py-4 opacity-70">No muted rooms found.</p>
-    {/each}
-  </div>
   <div class="mt-4 flex flex-row items-center justify-between gap-4">
     <Button class="btn btn-neutral" onclick={reset} disabled={loading}>Discard Changes</Button>
     <Button type="submit" class="btn btn-primary" disabled={loading}>

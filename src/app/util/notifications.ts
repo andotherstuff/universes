@@ -64,6 +64,7 @@ import {
   getEventPath,
   goToEvent,
 } from "@app/util/routes"
+import type {SpaceNotificationSettings} from "@app/core/state"
 import {
   DM_KINDS,
   CONTENT_KINDS,
@@ -83,6 +84,7 @@ import {
   userSpaceUrls,
   splitRoomId,
   makeRoomId,
+  isMuted,
   device,
 } from "@app/core/state"
 import {kv} from "@app/core/storage"
@@ -282,7 +284,7 @@ export const onNotification = call(() => {
     if (!unsubscribe) {
       unsubscribe = on(repository, "update", ({added}) => {
         const $pubkey = pubkey.get()
-        const {muted_rooms} = getSettings()
+        const {alerts} = getSettings()
 
         for (const event of added) {
           if (event.pubkey == $pubkey) {
@@ -290,11 +292,8 @@ export const onNotification = call(() => {
           }
 
           const h = getTagValue("h", event.tags)
-          const muted = Array.from(tracker.getRelays(event.id)).every(
-            url => h && muted_rooms.includes(makeRoomId(url, h)),
-          )
 
-          if (muted) {
+          if (Array.from(tracker.getRelays(event.id)).every(url => isMuted(url, h))) {
             continue
           }
 
@@ -491,7 +490,7 @@ class CapacitorNotifications implements IPushAdapter {
     }
   }
 
-  _unsyncRelay = async (relay: string, keys: string[]) => {
+  _unsyncRelay = async (relay: string, key: string) => {
     const stuff = await this._getPushStuff(relay)
 
     if (!stuff) {
@@ -499,18 +498,11 @@ class CapacitorNotifications implements IPushAdapter {
       return
     }
 
-    const {url} = stuff
-    const tags: string[][] = []
-    for (const key of keys) {
-      const identifier = this._getSubscriptionIdentifier(relay, key)
-      const address = new Address(30390, pubkey.get()!, identifier).toString()
-
-      tags.push(["a", address])
-    }
-
-    const thunk = publishThunk({relays: [url], event: makeEvent(DELETE, {tags})})
-
-    const error = await waitForThunkError(thunk)
+    const relays = [stuff.url]
+    const identifier = this._getSubscriptionIdentifier(relay, key)
+    const address = new Address(30390, pubkey.get()!, identifier).toString()
+    const event = makeEvent(DELETE, {tags: [["a", address]]})
+    const error = await waitForThunkError(publishThunk({relays, event}))
 
     if (error) {
       console.warn(`Failed to unsubscribe ${relay} from notifications:`, error)
@@ -521,32 +513,43 @@ class CapacitorNotifications implements IPushAdapter {
     signal.addEventListener(
       "abort",
       merged([userSpaceUrls, notificationSettings, userSettingsValues]).subscribe(
-        throttle(3000, ([$userSpaceUrls, {spaces, mentions}, {muted_rooms}]) => {
-          const filters = [{kinds: MESSAGE_KINDS}, makeCommentFilter(CONTENT_KINDS)]
+        throttle(3000, ([$userSpaceUrls, {spaces, mentions}, {alerts}]) => {
+          const baseFilters = [{kinds: MESSAGE_KINDS}, makeCommentFilter(CONTENT_KINDS)]
 
           for (const url of $userSpaceUrls) {
-            if (!spaces && !mentions) {
-              this._unsyncRelay(url, ["spaces", "mentions"])
-            } else if (!spaces) {
-              this._unsyncRelay(url, ["spaces"])
-            } else if (!mentions) {
-              this._unsyncRelay(url, ["mentions"])
-            }
+            const {notify = true, exceptions = []} = alerts.find(spec({url})) || {}
+            const filters: Filter[] = []
+            const ignore: Filter[] = []
 
-            const mutedRooms = muted_rooms.map(splitRoomId).filter(nthEq(0, url)).map(nth(1))
-
+            // Build filters based on spaces setting
             if (spaces) {
-              this._syncRelay(url, "spaces", filters, [{"#h": [mutedRooms]}])
+              if (notify) {
+                // notify=true: exceptions are opt-out (exclude those rooms)
+                if (exceptions.length > 0) {
+                  ignore.push({"#h": exceptions})
+                }
+                // Include all other content
+                filters.push(...baseFilters)
+              } else {
+                // notify=false: exceptions are opt-in (only include those rooms)
+                if (exceptions.length > 0) {
+                  filters.push(
+                    ...baseFilters.map(f => ({...f, "#h": exceptions})),
+                  )
+                }
+              }
             }
 
+            // Build filters for mentions - always notify for p-tagged content
             if (mentions) {
-              const mentionFilters = filters.map(assoc("#p", [pubkey.get()!]))
+              filters.push(...baseFilters.map(f => ({...f, "#p": [pubkey.get()!]})))
+            }
 
-              if (!spaces) {
-                this._syncRelay(url, "mentions", mentionFilters)
-              } else if (mutedRooms.length > 0) {
-                this._syncRelay(url, "mentions", mentionFilters.map(assoc("#h", [mutedRooms])))
-              }
+            // Sync or unsync based on whether we have filters
+            if (filters.length > 0) {
+              this._syncRelay(url, "spaces", filters, ignore)
+            } else {
+              this._unsyncRelay(url, "spaces")
             }
           }
         }),
@@ -563,7 +566,7 @@ class CapacitorNotifications implements IPushAdapter {
             if (messages) {
               this._syncRelay(url, "messages", [{kinds: DM_KINDS, "#p": [pubkey.get()!]}])
             } else {
-              this._unsyncRelay(url, ["messages"])
+              this._unsyncRelay(url, "messages")
             }
           }
         }),
@@ -619,11 +622,11 @@ class CapacitorNotifications implements IPushAdapter {
 
     notificationState.set({})
 
-    await Promise.all(get(userSpaceUrls).map(url => this._unsyncRelay(url, ["spaces", "mentions"])))
+    await Promise.all(get(userSpaceUrls).map(url => this._unsyncRelay(url, "spaces")))
 
     await Promise.all(
       getRelaysFromList(get(userMessagingRelayList)).map(url =>
-        this._unsyncRelay(url, ["messages"]),
+        this._unsyncRelay(url, "messages"),
       ),
     )
   }

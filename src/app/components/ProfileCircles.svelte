@@ -9,7 +9,7 @@
   }
 
   const {pubkeys, size = 7}: Props = $props()
-  const limit = isMobile ? 7 : 15
+  const limit = isMobile ? 7 : 10
 
   for (const pubkey of pubkeys) {
     loadProfile(pubkey)

@@ -1,6 +1,8 @@
 <script lang="ts">
   import type {Snippet} from "svelte"
+  import {dissoc} from "@welshman/lib"
   import {Pool, AuthStatus} from "@welshman/net"
+  import {goto} from "$app/navigation"
   import {preventDefault} from "@lib/html"
   import {slideAndFade} from "@lib/transition"
   import Spinner from "@lib/components/Spinner.svelte"
@@ -13,11 +15,12 @@
   import ModalHeader from "@lib/components/ModalHeader.svelte"
   import ModalFooter from "@lib/components/ModalFooter.svelte"
   import RelaySummary from "@app/components/RelaySummary.svelte"
-  import SpaceJoinConfirm, {confirmSpaceJoin} from "@app/components/SpaceJoinConfirm.svelte"
+  import SpaceJoin from "@app/components/SpaceJoin.svelte"
   import {pushToast} from "@app/util/toast"
   import {pushModal} from "@app/util/modal"
-  import {attemptRelayAccess} from "@app/core/commands"
-  import {parseInviteLink} from "@app/core/state"
+  import {makeSpacePath} from "@app/util/routes"
+  import {relaysMostlyRestricted, parseInviteLink} from "@app/core/state"
+  import {attemptRelayAccess, addSpaceMembership, broadcastUserData} from "@app/core/commands"
 
   type Props = {
     invite: string
@@ -37,11 +40,12 @@
       return pushToast({theme: "error", message: error, timeout: 30_000})
     }
 
-    if (Pool.get().get(url).auth.status === AuthStatus.None) {
-      pushModal(SpaceJoinConfirm, {url}, {replaceState: true})
-    } else {
-      await confirmSpaceJoin(url)
-    }
+    await addSpaceMembership(url)
+    await goto(makeSpacePath(url), {replaceState: true})
+
+    broadcastUserData([url])
+    relaysMostlyRestricted.update(dissoc(url))
+    pushToast({message: "Welcome to the space!"})
   }
 
   const join = async () => {

@@ -271,6 +271,12 @@ export enum RelayAuthMode {
   Conservative = "conservative",
 }
 
+export type SpaceNotificationSettings = {
+  url: string
+  notify: boolean
+  exceptions: string[]
+}
+
 export type SettingsValues = {
   show_media: boolean
   hide_sensitive: boolean
@@ -280,7 +286,7 @@ export type SettingsValues = {
   relay_auth: RelayAuthMode
   send_delay: number
   font_size: number
-  muted_rooms: string[]
+  alerts: SpaceNotificationSettings[]
 }
 
 export type Settings = {
@@ -297,7 +303,7 @@ export const defaultSettings: SettingsValues = {
   relay_auth: RelayAuthMode.Conservative,
   send_delay: 0,
   font_size: 1.1,
-  muted_rooms: [],
+  alerts: [],
 }
 
 export const settingsByPubkey = deriveItemsByKey({
@@ -993,3 +999,18 @@ export const parseInviteLink = (invite: string): InviteData | undefined => {
     })
   )
 }
+
+// Hierarchical notification helpers
+
+export const isMuted = (url: string, h?: string) => {
+  const {alerts} = getSettings()
+  const pref = alerts.find(spec({url}))
+
+  if (!pref) return true
+  if (!h) return pref.notify
+  if (pref.notify) return !pref.exceptions.includes(h)
+  if (!pref.notify) return pref.exceptions.includes(h)
+}
+
+export const deriveIsMuted = (url: string, h?: string) =>
+  derived(userSettingsValues, () => isMuted(url, h))

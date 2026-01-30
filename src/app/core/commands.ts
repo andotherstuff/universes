@@ -73,7 +73,7 @@ import {
   getThunkError,
 } from "@welshman/app"
 import {compressFile} from "@lib/html"
-import type {SettingsValues} from "@app/core/state"
+import type {SettingsValues, SpaceNotificationSettings} from "@app/core/state"
 import {
   SETTINGS,
   PROTECTED,
@@ -82,6 +82,7 @@ import {
   userSpaceUrls,
   userSettingsValues,
   getSetting,
+  getSettings,
   userGroupList,
   shouldIgnoreError,
   stripPrefix,
@@ -355,6 +356,48 @@ export const addTrustedRelay = async (url: string) =>
 
 export const removeTrustedRelay = async (url: string) =>
   publishSettings({trusted_relays: remove(url, getSetting<string[]>("trusted_relays"))})
+
+// Space and room notification settings
+
+export const setSpaceNotifications = async (url: string, notify: boolean) => {
+  const {alerts} = getSettings()
+  const existing = alerts.find((s: SpaceNotificationSettings) => s.url === url)
+
+  let updated: typeof alerts
+
+  if (existing) {
+    // Clear exceptions when changing the space notification setting
+    updated = alerts.map((s: SpaceNotificationSettings) =>
+      s.url === url ? {...s, notify, exceptions: []} : s,
+    )
+  } else {
+    updated = [...alerts, {url, notify, exceptions: []}]
+  }
+
+  return publishSettings({alerts: updated})
+}
+
+export const toggleRoomNotifications = async (url: string, h: string) => {
+  const {alerts} = getSettings()
+  const existing = alerts.find((s: SpaceNotificationSettings) => s.url === url)
+
+  let updated: typeof alerts
+
+  if (!existing) {
+    // No space settings yet, create one with this room as an exception (default is notify: true)
+    updated = [...alerts, {url, notify: true, exceptions: [h]}]
+  } else {
+    // Toggle exception status
+    const hasException = existing.exceptions.includes(h)
+    const exceptions = hasException ? remove(h, existing.exceptions) : append(h, existing.exceptions)
+
+    updated = alerts.map((s: SpaceNotificationSettings) =>
+      s.url === url ? {...s, exceptions} : s,
+    )
+  }
+
+  return publishSettings({alerts: updated})
+}
 
 // Join request
 

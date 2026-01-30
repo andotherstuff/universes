@@ -165,6 +165,8 @@ src/
 - Only add comments for really weird stuff
 - Do not call functions in components unless a parameter is reactive. Instead, use a svelte store or rune to make it reactive.
 - Do not use `any`. If there are type errors related to `unknown`, they are likely because the upstream definition of the data is incorrect.
+- When dynamically building classes, use `cx` from `classnames` rather than embedded ternaries or svelte 4's old `class:` syntax.
+- When creating forms, use `FieldInline` or `Field` instead of custom elements/tailwindcss
 
 ## Common Tasks
 
