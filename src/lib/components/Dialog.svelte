@@ -1,7 +1,6 @@
 <script lang="ts">
   import type {Component} from "svelte"
   import cx from "classnames"
-  import {onMount} from "svelte"
   import {noop} from "@welshman/lib"
   import {fade, fly} from "@lib/transition"
 

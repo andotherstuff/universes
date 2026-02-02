@@ -1,5 +1,4 @@
 <script lang="ts">
-  import cx from "classnames"
   import {goto} from "$app/navigation"
   import type {RoomMeta} from "@welshman/util"
   import {displayRelayUrl, makeRoomMeta} from "@welshman/util"
@@ -16,7 +15,6 @@
   import Microphone from "@assets/icons/microphone.svg?dataurl"
   import Bookmark from "@assets/icons/bookmark.svg?dataurl"
   import VolumeLoud from "@assets/icons/volume-loud.svg?dataurl"
-  import VolumeCross from "@assets/icons/volume-cross.svg?dataurl"
   import Icon from "@lib/components/Icon.svelte"
   import Button from "@lib/components/Button.svelte"
   import Confirm from "@lib/components/Confirm.svelte"
@@ -34,7 +32,6 @@
     deriveUserIsRoomAdmin,
     deriveUserRoomMembershipStatus,
     deriveUserRooms,
-    userSettingsValues,
     deriveIsMuted,
     MembershipStatus,
   } from "@app/core/state"

@@ -31,8 +31,6 @@ import {
   identity,
   now,
   groupBy,
-  nth,
-  nthEq,
   maybe,
   throttle,
 } from "@welshman/lib"
@@ -64,7 +62,6 @@ import {
   getEventPath,
   goToEvent,
 } from "@app/util/routes"
-import type {SpaceNotificationSettings} from "@app/core/state"
 import {
   DM_KINDS,
   CONTENT_KINDS,
@@ -75,15 +72,12 @@ import {
   notificationState,
   chatsById,
   hasNip29,
-  getSettings,
   userSettingsValues,
   userGroupList,
   getSpaceUrlsFromGroupList,
   getSpaceRoomsFromGroupList,
   makeCommentFilter,
   userSpaceUrls,
-  splitRoomId,
-  makeRoomId,
   isMuted,
   device,
 } from "@app/core/state"
@@ -284,7 +278,6 @@ export const onNotification = call(() => {
     if (!unsubscribe) {
       unsubscribe = on(repository, "update", ({added}) => {
         const $pubkey = pubkey.get()
-        const {alerts} = getSettings()
 
         for (const event of added) {
           if (event.pubkey == $pubkey) {

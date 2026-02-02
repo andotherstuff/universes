@@ -1,7 +1,5 @@
 <script lang="ts">
-  import type {Snippet} from "svelte"
   import {dissoc} from "@welshman/lib"
-  import {Pool, AuthStatus} from "@welshman/net"
   import {goto} from "$app/navigation"
   import {preventDefault} from "@lib/html"
   import {slideAndFade} from "@lib/transition"
@@ -17,9 +15,7 @@
   import ModalHeader from "@lib/components/ModalHeader.svelte"
   import ModalFooter from "@lib/components/ModalFooter.svelte"
   import RelaySummary from "@app/components/RelaySummary.svelte"
-  import SpaceJoin from "@app/components/SpaceJoin.svelte"
   import {pushToast} from "@app/util/toast"
-  import {pushModal} from "@app/util/modal"
   import {makeSpacePath} from "@app/util/routes"
   import {relaysMostlyRestricted, parseInviteLink} from "@app/core/state"
   import {attemptRelayAccess, addSpaceMembership, broadcastUserData} from "@app/core/commands"

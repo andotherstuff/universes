@@ -1,5 +1,5 @@
 <script lang="ts">
-  import {onMount, mount, unmount, createRawSnippet} from "svelte"
+  import {onMount, mount, unmount} from "svelte"
   import Drawer from "@lib/components/Drawer.svelte"
   import Dialog from "@lib/components/Dialog.svelte"
   import {modal, clearModals} from "@app/util/modal"

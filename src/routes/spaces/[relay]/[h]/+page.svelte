@@ -1,12 +1,11 @@
 <script lang="ts">
-  import {readable, derived as _derived} from "svelte/store"
+  import {readable} from "svelte/store"
   import {onMount, onDestroy} from "svelte"
   import {page} from "$app/stores"
   import type {Readable} from "svelte/store"
   import type {MakeNonOptional} from "@welshman/lib"
-  import {now, int, append, remove, formatTimestampAsDate, ago, MINUTE} from "@welshman/lib"
+  import {now, int, formatTimestampAsDate, ago, MINUTE} from "@welshman/lib"
   import type {TrustedEvent, EventContent} from "@welshman/util"
-  import {throttled} from "@welshman/store"
   import {
     makeEvent,
     makeRoomMeta,

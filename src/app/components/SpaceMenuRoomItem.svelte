@@ -6,7 +6,7 @@
   import RoomNameWithImage from "@app/components/RoomNameWithImage.svelte"
   import {makeRoomPath} from "@app/util/routes"
   import {notifications} from "@app/util/notifications"
-  import {userSettingsValues, deriveIsMuted} from "@app/core/state"
+  import {deriveIsMuted} from "@app/core/state"
 
   interface Props {
     url: any

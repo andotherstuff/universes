@@ -1,10 +1,7 @@
 <script lang="ts">
   import {onMount} from "svelte"
   import {goto} from "$app/navigation"
-  import {sleep, dissoc} from "@welshman/lib"
-  import {Pool, AuthStatus, SocketStatus} from "@welshman/net"
-  import {deriveRelay} from "@welshman/app"
-  import {displayRelayUrl} from "@welshman/util"
+  import {dissoc} from "@welshman/lib"
   import {preventDefault} from "@lib/html"
   import AltArrowLeft from "@assets/icons/alt-arrow-left.svg?dataurl"
   import AltArrowRight from "@assets/icons/alt-arrow-right.svg?dataurl"
@@ -15,7 +12,6 @@
   import Modal from "@lib/components/Modal.svelte"
   import ModalBody from "@lib/components/ModalBody.svelte"
   import ModalFooter from "@lib/components/ModalFooter.svelte"
-  import FieldInline from "@lib/components/FieldInline.svelte"
   import StatusIndicator from "@lib/components/StatusIndicator.svelte"
   import RelaySummary from "@app/components/RelaySummary.svelte"
   import SocketStatusIndicator from "@app/components/SocketStatusIndicator.svelte"
@@ -26,7 +22,7 @@
     broadcastUserData,
     setSpaceNotifications,
   } from "@app/core/commands"
-  import {relaysMostlyRestricted, deriveSpaceMembers, notificationSettings} from "@app/core/state"
+  import {relaysMostlyRestricted, notificationSettings} from "@app/core/state"
   import {pushModal} from "@app/util/modal"
   import {pushToast} from "@app/util/toast"
   import {makeSpacePath} from "@app/util/routes"
@@ -37,9 +33,6 @@
   }
 
   const {url}: Props = $props()
-
-  const relay = deriveRelay(url)
-  const members = deriveSpaceMembers(url)
 
   const back = () => history.back()
 

@@ -48,7 +48,6 @@
     deriveUserCanCreateRoom,
     deriveUserIsSpaceAdmin,
     deriveEventsForUrl,
-    userSettingsValues,
     notificationSettings,
     deriveIsMuted,
   } from "@app/core/state"

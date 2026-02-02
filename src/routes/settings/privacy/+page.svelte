@@ -50,9 +50,10 @@
         Allow {PLATFORM_NAME} to collect anonymous usage data.
       </p>
     </div>
-    <div class="mt-4 flex flex-row items-center justify-between gap-4">
-      <Button class="btn btn-neutral" onclick={reset}>Discard Changes</Button>
-      <Button type="submit" class="btn btn-primary">Save Changes</Button>
-    </div>
+  </div>
+  <div
+    class="card2 bg-alt sticky -bottom-3 shadow-md flex flex-row items-center justify-between gap-4">
+    <Button class="btn btn-neutral" onclick={reset}>Discard Changes</Button>
+    <Button type="submit" class="btn btn-primary">Save Changes</Button>
   </div>
 </form>

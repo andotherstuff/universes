@@ -1,6 +1,5 @@
 <script lang="ts">
   import {displayUrl} from "@welshman/lib"
-  import {AuthStatus} from "@welshman/net"
   import {preventDefault} from "@lib/html"
   import Spinner from "@lib/components/Spinner.svelte"
   import Button from "@lib/components/Button.svelte"
@@ -14,9 +13,8 @@
   import ModalHeader from "@lib/components/ModalHeader.svelte"
   import ModalFooter from "@lib/components/ModalFooter.svelte"
   import {pushToast} from "@app/util/toast"
-  import {pushModal} from "@app/util/modal"
   import {attemptRelayAccess} from "@app/core/commands"
-  import {deriveSocket, parseInviteLink} from "@app/core/state"
+  import {parseInviteLink} from "@app/core/state"
 
   type Props = {
     url: string
@@ -26,8 +24,6 @@
   const {url, callback}: Props = $props()
 
   const back = () => history.back()
-
-  const socket = deriveSocket(url)
 
   const join = async () => {
     loading = true

@@ -1,26 +1,17 @@
 <script lang="ts">
   import cx from "classnames"
-  import {sleep, equals, remove} from "@welshman/lib"
-  import {displayRelayUrl} from "@welshman/util"
+  import {sleep} from "@welshman/lib"
   import {Capacitor} from "@capacitor/core"
   import {Badge} from "@capawesome/capacitor-badge"
-  import CloseCircle from "@assets/icons/close-circle.svg?dataurl"
   import {preventDefault} from "@lib/html"
-  import Icon from "@lib/components/Icon.svelte"
   import Spinner from "@lib/components/Spinner.svelte"
   import Button from "@lib/components/Button.svelte"
-  import RoomName from "@app/components/RoomName.svelte"
   import {pushToast} from "@app/util/toast"
   import {Push, clearBadges} from "@app/util/notifications"
-  import {notificationSettings, userSettingsValues, splitRoomId} from "@app/core/state"
-  import {publishSettings} from "@app/core/commands"
+  import {notificationSettings} from "@app/core/state"
 
   const reset = () => {
     settings = {...notificationSettings.get()}
-  }
-
-  const removeMutedRoom = (id: string) => {
-    muted_rooms = remove(id, muted_rooms)
   }
 
   const onsubmit = preventDefault(async () => {
@@ -46,10 +37,6 @@
         }
       }
 
-      if (!equals(muted_rooms, $userSettingsValues.muted_rooms)) {
-        publishSettings($state.snapshot({...$userSettingsValues, muted_rooms}))
-      }
-
       notificationSettings.set(settings)
 
       pushToast({message: "Your settings have been saved!"})
@@ -60,7 +47,6 @@
 
   let loading = $state(false)
   let settings = $state({...notificationSettings.get()})
-  let muted_rooms = $state($userSettingsValues.muted_rooms)
 </script>
 
 <form class="content column gap-4" {onsubmit}>
@@ -105,7 +91,8 @@
       <input type="checkbox" class="toggle toggle-primary" bind:checked={settings.messages} />
     </div>
   </div>
-  <div class="mt-4 flex flex-row items-center justify-between gap-4">
+  <div
+    class="card2 bg-alt sticky -bottom-3 shadow-md flex flex-row items-center justify-between gap-4">
     <Button class="btn btn-neutral" onclick={reset} disabled={loading}>Discard Changes</Button>
     <Button type="submit" class="btn btn-primary" disabled={loading}>
       <Spinner {loading}>Save Changes</Spinner>
