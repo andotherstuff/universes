@@ -43,7 +43,6 @@ import {
   toNostrURI,
   RelayMode,
   getTagValues,
-  uploadBlob,
   canUploadBlob,
   encryptFile,
   makeBlossomAuthEvent,
@@ -51,6 +50,7 @@ import {
   editProfile,
   createProfile,
   uniqTags,
+  makeHttpAuthHeader,
 } from "@welshman/util"
 import {Pool, AuthStatus, SocketStatus} from "@welshman/net"
 import {Router} from "@welshman/router"
@@ -509,6 +509,8 @@ export const uploadFile = async (file: File, options: UploadFileOptions = {}) =>
   try {
     const {name, type} = file
 
+    console.log("======== 1", name, type, options.encrypt)
+
     if (!type.match("image/(webp|gif|svg)")) {
       file = await compressFile(file, options)
     }
@@ -530,13 +532,25 @@ export const uploadFile = async (file: File, options: UploadFileOptions = {}) =>
     }
 
     const ext = "." + type.split("/")[1]
+    console.log("======== 2", ext)
     const server = await getBlossomServer(options)
+    console.log("======== 3", server)
     const hashes = [await sha256(await file.arrayBuffer())]
     const $signer = signer.get() || Nip01Signer.ephemeral()
     const authTemplate = makeBlossomAuthEvent({action: "upload", server, hashes})
     const authEvent = await $signer.sign(authTemplate)
-    const res = await uploadBlob(server, file, {authEvent})
+    console.log("======== 4", authEvent.id)
+    // const res = await uploadBlob(server, file, {authEvent})
+
+    const res = await fetch(`${new URL(server).origin}/upload`, {
+      method: "PUT",
+      headers: {Authorization: makeHttpAuthHeader(authEvent)},
+      body: file instanceof Blob ? file : new Blob([file]),
+    })
+
+    console.log("======== 5", res.status)
     const text = await res.text()
+    console.log("======== 6", text)
 
     let {uploaded, url, ...task} = parseJson(text) || {}
 
@@ -555,6 +569,7 @@ export const uploadFile = async (file: File, options: UploadFileOptions = {}) =>
 
     return {result}
   } catch (e: any) {
+    console.log("========= error", String(e))
     console.error("Error caught when uploading file:", e)
 
     return {error: e.toString()}

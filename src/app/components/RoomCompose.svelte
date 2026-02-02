@@ -1,6 +1,7 @@
 <script lang="ts">
   import type {Instance} from "tippy.js"
   import {writable} from "svelte/store"
+  import {once} from "@welshman/lib"
   import type {EventContent} from "@welshman/util"
   import {isMobile, preventDefault} from "@lib/html"
   import GallerySend from "@assets/icons/gallery-send.svg?dataurl"
@@ -44,7 +45,55 @@
     }
   }
 
-  const uploadFiles = () => editor.then(ed => ed.chain().selectFiles().run())
+  const uploadFiles = () =>
+    // TODO: go back to the following command after PR is released
+    // https://github.com/cesardeazevedo/nostr-editor/pull/37
+    // editor.then(ed => ed.chain().selectFiles().run())
+    editor.then(ed => {
+      const input = document.createElement("input")
+
+      input.type = "file"
+      input.multiple = true
+      input.accept = "image/jpeg,image/png,image/gif,video/mp4,video/mpeg,video/webm"
+      input.style.display = "none"
+
+      const cleanup = () => {
+        input.removeEventListener("change", handleFiles)
+        input.removeEventListener("input", handleFiles)
+        input.removeEventListener("cancel", cleanup)
+
+        if (input.parentNode) {
+          input.parentNode.removeChild(input)
+        }
+      }
+
+      const handleFiles = once((event: Event) => {
+        const files = (event.target as HTMLInputElement).files
+
+        if (files) {
+          Array.from(files).forEach(file => {
+            if (file) {
+              ed.commands.addFile(file, ed.view.state.selection.from + 1)
+            }
+          })
+        }
+
+        cleanup()
+      })
+
+      // Add both change and input listeners for iOS compatibility
+      input.addEventListener("change", handleFiles)
+      input.addEventListener("input", handleFiles)
+      input.addEventListener("cancel", cleanup)
+
+      // Attach to DOM for iOS compatibility
+      document.body.appendChild(input)
+
+      // Small delay for iOS WebView
+      setTimeout(() => {
+        input.click()
+      }, 100)
+    })
 
   const showPopover = () => popover?.show()
 
