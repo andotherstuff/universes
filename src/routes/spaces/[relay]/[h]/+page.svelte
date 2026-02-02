@@ -121,7 +121,11 @@
     if (eventToEdit) {
       // Delete previous message, to be republished with same timestamp
       template.created_at = eventToEdit.created_at
-      publishDelete({relays: [url], event: eventToEdit, protect: await shouldProtect})
+      publishDelete({
+        relays: [url],
+        event: $state.snapshot(eventToEdit),
+        protect: await shouldProtect,
+      })
     }
 
     if (share) {
