@@ -9,6 +9,7 @@
   import Modal from "@lib/components/Modal.svelte"
   import ModalBody from "@lib/components/ModalBody.svelte"
   import ModalHeader from "@lib/components/ModalHeader.svelte"
+  import ModalTitle from "@lib/components/ModalTitle.svelte"
   import ModalFooter from "@lib/components/ModalFooter.svelte"
   import {removeSpaceMembership, publishLeaveRequest, removeTrustedRelay} from "@app/core/commands"
 
@@ -36,11 +37,9 @@
 <Modal tag="form" onsubmit={preventDefault(exit)}>
   <ModalBody>
     <ModalHeader>
-      {#snippet title()}
-        <div>
-          You are leaving<br /><span class="text-primary">{displayRelayUrl(url)}</span>
-        </div>
-      {/snippet}
+      <ModalTitle>
+        You are leaving<br /><span class="text-primary">{displayRelayUrl(url)}</span>
+      </ModalTitle>
     </ModalHeader>
     <p class="text-center">Are you sure you want to leave?</p>
   </ModalBody>

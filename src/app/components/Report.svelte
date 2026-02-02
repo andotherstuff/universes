@@ -7,6 +7,8 @@
   import AltArrowRight from "@assets/icons/alt-arrow-right.svg?dataurl"
   import Icon from "@lib/components/Icon.svelte"
   import ModalHeader from "@lib/components/ModalHeader.svelte"
+  import ModalTitle from "@lib/components/ModalTitle.svelte"
+  import ModalSubtitle from "@lib/components/ModalSubtitle.svelte"
   import ModalFooter from "@lib/components/ModalFooter.svelte"
   import Modal from "@lib/components/Modal.svelte"
   import ModalBody from "@lib/components/ModalBody.svelte"
@@ -43,12 +45,8 @@
 <Modal tag="form" onsubmit={preventDefault(confirm)}>
   <ModalBody>
     <ModalHeader>
-      {#snippet title()}
-        <div>Report Content</div>
-      {/snippet}
-      {#snippet info()}
-        <div>Flag inappropriate content.</div>
-      {/snippet}
+      <ModalTitle>Report Content</ModalTitle>
+      <ModalSubtitle>Flag inappropriate content.</ModalSubtitle>
     </ModalHeader>
     <Field>
       {#snippet label()}

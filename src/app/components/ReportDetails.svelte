@@ -4,6 +4,8 @@
   import {deriveEventsById} from "@welshman/store"
   import {repository} from "@welshman/app"
   import ModalHeader from "@lib/components/ModalHeader.svelte"
+  import ModalTitle from "@lib/components/ModalTitle.svelte"
+  import ModalSubtitle from "@lib/components/ModalSubtitle.svelte"
   import Modal from "@lib/components/Modal.svelte"
   import ModalBody from "@lib/components/ModalBody.svelte"
   import Button from "@lib/components/Button.svelte"
@@ -34,12 +36,8 @@
 <Modal>
   <ModalBody>
     <ModalHeader>
-      {#snippet title()}
-        <div>Report Details</div>
-      {/snippet}
-      {#snippet info()}
-        <div>All reports for this event are shown below.</div>
-      {/snippet}
+      <ModalTitle>Report Details</ModalTitle>
+      <ModalSubtitle>All reports for this event are shown below.</ModalSubtitle>
     </ModalHeader>
     {#each $reports.values() as report (report.id)}
       <div class="card2 card2-sm bg-alt">

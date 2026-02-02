@@ -14,6 +14,8 @@
   import Modal from "@lib/components/Modal.svelte"
   import ModalBody from "@lib/components/ModalBody.svelte"
   import ModalHeader from "@lib/components/ModalHeader.svelte"
+  import ModalTitle from "@lib/components/ModalTitle.svelte"
+  import ModalSubtitle from "@lib/components/ModalSubtitle.svelte"
   import ModalFooter from "@lib/components/ModalFooter.svelte"
   import SignUpEmailConfirm from "@app/components/SignUpEmailConfirm.svelte"
   import {pushToast} from "@app/util/toast"
@@ -97,12 +99,8 @@
 <Modal tag="form" onsubmit={preventDefault(onSubmit)}>
   <ModalBody>
     <ModalHeader>
-      {#snippet title()}
-        <div>Sign up with Email</div>
-      {/snippet}
-      {#snippet info()}
-        <div>Keep your keys safe using multi-signer key sharing</div>
-      {/snippet}
+      <ModalTitle>Sign up with Email</ModalTitle>
+      <ModalSubtitle>Keep your keys safe using multi-signer key sharing</ModalSubtitle>
     </ModalHeader>
     <p>
       Under the hood, nostr uses "cryptographic keypairs" to help you prove that your identity is

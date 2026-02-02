@@ -4,6 +4,7 @@
   import Icon from "@lib/components/Icon.svelte"
   import Button from "@lib/components/Button.svelte"
   import ModalHeader from "@lib/components/ModalHeader.svelte"
+  import ModalTitle from "@lib/components/ModalTitle.svelte"
   import ModalFooter from "@lib/components/ModalFooter.svelte"
   import Modal from "@lib/components/Modal.svelte"
   import ModalBody from "@lib/components/ModalBody.svelte"
@@ -19,9 +20,7 @@
 <Modal>
   <ModalBody>
     <ModalHeader>
-      {#snippet title()}
-        <div>Unable to Zap</div>
-      {/snippet}
+      <ModalTitle>Unable to Zap</ModalTitle>
     </ModalHeader>
     <p>
       Zapping <ProfileLink {pubkey} class="!text-primary" /> isn't possible right now because

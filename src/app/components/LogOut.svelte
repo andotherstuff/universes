@@ -7,6 +7,7 @@
   import Modal from "@lib/components/Modal.svelte"
   import ModalBody from "@lib/components/ModalBody.svelte"
   import ModalHeader from "@lib/components/ModalHeader.svelte"
+  import ModalTitle from "@lib/components/ModalTitle.svelte"
   import ModalFooter from "@lib/components/ModalFooter.svelte"
   import {Push} from "@app/util/notifications"
   import {kv, db} from "@app/core/storage"
@@ -36,9 +37,7 @@
 <Modal tag="form" onsubmit={preventDefault(doLogout)}>
   <ModalBody>
     <ModalHeader>
-      {#snippet title()}
-        <div>Are you sure you want<br />to log out?</div>
-      {/snippet}
+      <ModalTitle>Are you sure you want<br />to log out?</ModalTitle>
     </ModalHeader>
     <p class="text-center">Your local database will be cleared.</p>
   </ModalBody>

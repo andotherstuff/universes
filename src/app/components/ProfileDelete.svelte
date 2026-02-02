@@ -17,6 +17,8 @@
   import Button from "@lib/components/Button.svelte"
   import Spinner from "@lib/components/Spinner.svelte"
   import ModalHeader from "@lib/components/ModalHeader.svelte"
+  import ModalTitle from "@lib/components/ModalTitle.svelte"
+  import ModalSubtitle from "@lib/components/ModalSubtitle.svelte"
   import ModalFooter from "@lib/components/ModalFooter.svelte"
   import Modal from "@lib/components/Modal.svelte"
   import ModalBody from "@lib/components/ModalBody.svelte"
@@ -113,12 +115,8 @@
 <Modal tag="form" onsubmit={preventDefault(confirm)}>
   <ModalBody>
     <ModalHeader>
-      {#snippet title()}
-        Delete your account
-      {/snippet}
-      {#snippet info()}
-        From the Nostr network
-      {/snippet}
+      <ModalTitle>Delete your account</ModalTitle>
+      <ModalSubtitle>From the Nostr network</ModalSubtitle>
     </ModalHeader>
     {#if showProgress}
       <p>

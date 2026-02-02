@@ -5,6 +5,7 @@
   import Modal from "@lib/components/Modal.svelte"
   import ModalBody from "@lib/components/ModalBody.svelte"
   import ModalHeader from "@lib/components/ModalHeader.svelte"
+  import ModalTitle from "@lib/components/ModalTitle.svelte"
   import ModalFooter from "@lib/components/ModalFooter.svelte"
   import {updateProfile} from "@app/core/commands"
   import {clearModals} from "@app/util/modal"
@@ -37,9 +38,7 @@
 <Modal>
   <ModalBody>
     <ModalHeader>
-      {#snippet title()}
-        Set as Receiving Address?
-      {/snippet}
+      <ModalTitle>Set as Receiving Address?</ModalTitle>
     </ModalHeader>
     {#if $userProfile?.lud16}
       <p>

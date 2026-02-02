@@ -9,6 +9,8 @@
   import Field from "@lib/components/Field.svelte"
   import Button from "@lib/components/Button.svelte"
   import ModalHeader from "@lib/components/ModalHeader.svelte"
+  import ModalTitle from "@lib/components/ModalTitle.svelte"
+  import ModalSubtitle from "@lib/components/ModalSubtitle.svelte"
   import ModalFooter from "@lib/components/ModalFooter.svelte"
   import Modal from "@lib/components/Modal.svelte"
   import ModalBody from "@lib/components/ModalBody.svelte"
@@ -79,12 +81,8 @@
 <Modal tag="form" onsubmit={preventDefault(submit)}>
   <ModalBody>
     <ModalHeader>
-      {#snippet title()}
-        <div>Create a Thread</div>
-      {/snippet}
-      {#snippet info()}
-        <div>Share a link, or start a discussion.</div>
-      {/snippet}
+      <ModalTitle>Create a Thread</ModalTitle>
+      <ModalSubtitle>Share a link, or start a discussion.</ModalSubtitle>
     </ModalHeader>
     <div class="col-8 relative">
       <Field>

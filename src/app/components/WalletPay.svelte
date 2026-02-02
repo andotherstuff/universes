@@ -11,6 +11,8 @@
   import Modal from "@lib/components/Modal.svelte"
   import ModalBody from "@lib/components/ModalBody.svelte"
   import ModalHeader from "@lib/components/ModalHeader.svelte"
+  import ModalTitle from "@lib/components/ModalTitle.svelte"
+  import ModalSubtitle from "@lib/components/ModalSubtitle.svelte"
   import ModalFooter from "@lib/components/ModalFooter.svelte"
   import {payInvoice} from "@app/core/commands"
   import {pushToast} from "@app/util/toast"
@@ -53,12 +55,8 @@
 <Modal>
   <ModalBody>
     <ModalHeader>
-      {#snippet title()}
-        <div>Pay with Lightning</div>
-      {/snippet}
-      {#snippet info()}
-        Use your Nostr wallet to send Bitcoin payments over lightning.
-      {/snippet}
+      <ModalTitle>Pay with Lightning</ModalTitle>
+      <ModalSubtitle>Use your Nostr wallet to send Bitcoin payments over lightning.</ModalSubtitle>
     </ModalHeader>
     {#if invoice}
       <div class="card2 bg-alt flex flex-col gap-2">

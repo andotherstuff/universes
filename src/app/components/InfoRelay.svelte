@@ -2,6 +2,7 @@
   import Button from "@lib/components/Button.svelte"
   import Link from "@lib/components/Link.svelte"
   import ModalHeader from "@lib/components/ModalHeader.svelte"
+  import ModalTitle from "@lib/components/ModalTitle.svelte"
   import ModalFooter from "@lib/components/ModalFooter.svelte"
   import Modal from "@lib/components/Modal.svelte"
   import ModalBody from "@lib/components/ModalBody.svelte"
@@ -11,9 +12,7 @@
 <Modal>
   <ModalBody>
     <ModalHeader>
-      {#snippet title()}
-        <div>What is a relay?</div>
-      {/snippet}
+      <ModalTitle>What is a relay?</ModalTitle>
     </ModalHeader>
     <p>
       {PLATFORM_NAME} hosts spaces on the <Link external href="https://nostr.com/" class="underline"

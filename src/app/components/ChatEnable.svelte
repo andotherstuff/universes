@@ -10,6 +10,8 @@
   import Modal from "@lib/components/Modal.svelte"
   import ModalBody from "@lib/components/ModalBody.svelte"
   import ModalHeader from "@lib/components/ModalHeader.svelte"
+  import ModalTitle from "@lib/components/ModalTitle.svelte"
+  import ModalSubtitle from "@lib/components/ModalSubtitle.svelte"
   import ModalFooter from "@lib/components/ModalFooter.svelte"
   import {PLATFORM_NAME} from "@app/core/state"
   import {clearModals} from "@app/util/modal"
@@ -38,12 +40,8 @@
 <Modal tag="form" onsubmit={preventDefault(submit)}>
   <ModalBody>
     <ModalHeader>
-      {#snippet title()}
-        <div>Enable Messages</div>
-      {/snippet}
-      {#snippet info()}
-        <div>Do you want to enable direct messages?</div>
-      {/snippet}
+      <ModalTitle>Enable Messages</ModalTitle>
+      <ModalSubtitle>Do you want to enable direct messages?</ModalSubtitle>
     </ModalHeader>
     <p>
       By default, direct messages are disabled, since loading them requires

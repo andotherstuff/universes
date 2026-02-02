@@ -13,6 +13,8 @@
   import Modal from "@lib/components/Modal.svelte"
   import ModalBody from "@lib/components/ModalBody.svelte"
   import ModalHeader from "@lib/components/ModalHeader.svelte"
+  import ModalTitle from "@lib/components/ModalTitle.svelte"
+  import ModalSubtitle from "@lib/components/ModalSubtitle.svelte"
   import ModalFooter from "@lib/components/ModalFooter.svelte"
   import EmojiButton from "@lib/components/EmojiButton.svelte"
   import ProfileLink from "@app/components/ProfileLink.svelte"
@@ -114,12 +116,8 @@
 <Modal>
   <ModalBody>
     <ModalHeader>
-      {#snippet title()}
-        <div>Send a Zap</div>
-      {/snippet}
-      {#snippet info()}
-        <div>To <ProfileLink {pubkey} class="!text-primary" /></div>
-      {/snippet}
+      <ModalTitle>Send a Zap</ModalTitle>
+      <ModalSubtitle>To <ProfileLink {pubkey} class="!text-primary" /></ModalSubtitle>
     </ModalHeader>
     <FieldInline class="!grid-cols-3">
       {#snippet label()}

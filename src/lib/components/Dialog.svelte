@@ -37,12 +37,12 @@
   <button
     type="button"
     aria-label="Close dialog"
-    class="absolute inset-0 cursor-pointer bg-[#ccc] opacity-75 dark:bg-black"
-    transition:fade={{duration: 300}}
+    class="absolute inset-0 cursor-pointer bg-black opacity-50 dark:opacity-75"
+    transition:fade={{duration: 200}}
     onclick={onClose}>
   </button>
   <div class={wrapperClass}>
-    <div class={innerClass} transition:fly={{duration: 300}}>
+    <div class={innerClass} transition:fly>
       <children.component {...children.props} />
     </div>
   </div>

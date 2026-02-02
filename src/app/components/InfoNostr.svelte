@@ -4,14 +4,13 @@
   import Modal from "@lib/components/Modal.svelte"
   import ModalBody from "@lib/components/ModalBody.svelte"
   import ModalHeader from "@lib/components/ModalHeader.svelte"
+  import ModalTitle from "@lib/components/ModalTitle.svelte"
 </script>
 
 <Modal
   ><ModalBody>
     <ModalHeader>
-      {#snippet title()}
-        <div>What is nostr?</div>
-      {/snippet}
+      <ModalTitle>What is nostr?</ModalTitle>
     </ModalHeader>
     <p>
       <Link external href="https://nostr.com/" class="link">Nostr</Link> is way to build social apps that

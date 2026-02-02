@@ -11,6 +11,8 @@
   import FieldInline from "@lib/components/FieldInline.svelte"
   import Button from "@lib/components/Button.svelte"
   import ModalHeader from "@lib/components/ModalHeader.svelte"
+  import ModalTitle from "@lib/components/ModalTitle.svelte"
+  import ModalSubtitle from "@lib/components/ModalSubtitle.svelte"
   import ModalFooter from "@lib/components/ModalFooter.svelte"
   import Modal from "@lib/components/Modal.svelte"
   import ModalBody from "@lib/components/ModalBody.svelte"
@@ -87,12 +89,8 @@
 <Modal tag="form" onsubmit={preventDefault(submit)}>
   <ModalBody>
     <ModalHeader>
-      {#snippet title()}
-        <div>Create a Funding Goal</div>
-      {/snippet}
-      {#snippet info()}
-        <div>Request contributions for your fundraiser.</div>
-      {/snippet}
+      <ModalTitle>Create a Funding Goal</ModalTitle>
+      <ModalSubtitle>Request contributions for your fundraiser.</ModalSubtitle>
     </ModalHeader>
     <div class="col-8 relative">
       <Field>

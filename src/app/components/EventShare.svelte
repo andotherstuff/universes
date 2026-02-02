@@ -8,6 +8,8 @@
   import Icon from "@lib/components/Icon.svelte"
   import Button from "@lib/components/Button.svelte"
   import ModalHeader from "@lib/components/ModalHeader.svelte"
+  import ModalTitle from "@lib/components/ModalTitle.svelte"
+  import ModalSubtitle from "@lib/components/ModalSubtitle.svelte"
   import ModalFooter from "@lib/components/ModalFooter.svelte"
   import Modal from "@lib/components/Modal.svelte"
   import ModalBody from "@lib/components/ModalBody.svelte"
@@ -34,12 +36,8 @@
 <Modal tag="form" onsubmit={preventDefault(onSubmit)}>
   <ModalBody>
     <ModalHeader>
-      {#snippet title()}
-        <div>Share {noun}</div>
-      {/snippet}
-      {#snippet info()}
-        <div>Which room would you like to share this event to?</div>
-      {/snippet}
+      <ModalTitle>Share {noun}</ModalTitle>
+      <ModalSubtitle>Which room would you like to share this event to?</ModalSubtitle>
     </ModalHeader>
     <div class="grid grid-cols-3 gap-2">
       {#each $roomsByUrl.get(url) || [] as room (room.h)}

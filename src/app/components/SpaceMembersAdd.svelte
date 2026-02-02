@@ -9,6 +9,8 @@
   import Modal from "@lib/components/Modal.svelte"
   import ModalBody from "@lib/components/ModalBody.svelte"
   import ModalHeader from "@lib/components/ModalHeader.svelte"
+  import ModalTitle from "@lib/components/ModalTitle.svelte"
+  import ModalSubtitle from "@lib/components/ModalSubtitle.svelte"
   import ModalFooter from "@lib/components/ModalFooter.svelte"
   import ProfileMultiSelect from "@app/components/ProfileMultiSelect.svelte"
   import {pushToast} from "@app/util/toast"
@@ -54,12 +56,8 @@
 <Modal>
   <ModalBody>
     <ModalHeader>
-      {#snippet title()}
-        <div>Add Members</div>
-      {/snippet}
-      {#snippet info()}
-        <div>to {displayRelayUrl(url)}</div>
-      {/snippet}
+      <ModalTitle>Add Members</ModalTitle>
+      <ModalSubtitle>to {displayRelayUrl(url)}</ModalSubtitle>
     </ModalHeader>
     <Field>
       {#snippet label()}

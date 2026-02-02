@@ -12,6 +12,8 @@
   import Modal from "@lib/components/Modal.svelte"
   import ModalBody from "@lib/components/ModalBody.svelte"
   import ModalHeader from "@lib/components/ModalHeader.svelte"
+  import ModalTitle from "@lib/components/ModalTitle.svelte"
+  import ModalSubtitle from "@lib/components/ModalSubtitle.svelte"
   import ModalFooter from "@lib/components/ModalFooter.svelte"
   import QRCode from "@app/components/QRCode.svelte"
   import {clip} from "@app/util/toast"
@@ -57,15 +59,11 @@
 <Modal>
   <ModalBody>
     <ModalHeader>
-      {#snippet title()}
-        <div>Create an Invite</div>
-      {/snippet}
-      {#snippet info()}
-        <div>
-          Get a link that you can use to invite people to
-          <span class="text-primary">{displayRelayUrl(url)}</span>
-        </div>
-      {/snippet}
+      <ModalTitle>Create an Invite</ModalTitle>
+      <ModalSubtitle>
+        Get a link that you can use to invite people to
+        <span class="text-primary">{displayRelayUrl(url)}</span>
+      </ModalSubtitle>
     </ModalHeader>
     <div>
       {#if loading}

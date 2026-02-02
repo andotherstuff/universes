@@ -18,6 +18,8 @@
   import Modal from "@lib/components/Modal.svelte"
   import ModalBody from "@lib/components/ModalBody.svelte"
   import ModalHeader from "@lib/components/ModalHeader.svelte"
+  import ModalTitle from "@lib/components/ModalTitle.svelte"
+  import ModalSubtitle from "@lib/components/ModalSubtitle.svelte"
   import ModalFooter from "@lib/components/ModalFooter.svelte"
   import {getWebLn} from "@app/core/commands"
   import {pushToast} from "@app/util/toast"
@@ -114,12 +116,9 @@
 <Modal>
   <ModalBody>
     <ModalHeader>
-      {#snippet title()}
-        <div>Connect a Wallet</div>
-      {/snippet}
-      {#snippet info()}
-        Use Nostr Wallet Connect to send Bitcoin payments over lightning.
-      {/snippet}
+      <ModalTitle>Connect a Wallet</ModalTitle>
+      <ModalSubtitle
+        >Use Nostr Wallet Connect to send Bitcoin payments over lightning.</ModalSubtitle>
     </ModalHeader>
     {#if getWebLn()}
       <Button

@@ -6,6 +6,8 @@
   import Field from "@lib/components/Field.svelte"
   import Icon from "@lib/components/Icon.svelte"
   import ModalHeader from "@lib/components/ModalHeader.svelte"
+  import ModalTitle from "@lib/components/ModalTitle.svelte"
+  import ModalSubtitle from "@lib/components/ModalSubtitle.svelte"
   import ModalFooter from "@lib/components/ModalFooter.svelte"
   import Modal from "@lib/components/Modal.svelte"
   import ModalBody from "@lib/components/ModalBody.svelte"
@@ -53,12 +55,8 @@
 <Modal>
   <ModalBody>
     <ModalHeader>
-      {#snippet title()}
-        <div>Add Members</div>
-      {/snippet}
-      {#snippet info()}
-        <div>to <RoomName {url} {h} /></div>
-      {/snippet}
+      <ModalTitle>Add Members</ModalTitle>
+      <ModalSubtitle>to <RoomName {url} {h} /></ModalSubtitle>
     </ModalHeader>
     <Field>
       {#snippet label()}

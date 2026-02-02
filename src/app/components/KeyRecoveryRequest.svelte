@@ -11,6 +11,8 @@
   import Modal from "@lib/components/Modal.svelte"
   import ModalBody from "@lib/components/ModalBody.svelte"
   import ModalHeader from "@lib/components/ModalHeader.svelte"
+  import ModalTitle from "@lib/components/ModalTitle.svelte"
+  import ModalSubtitle from "@lib/components/ModalSubtitle.svelte"
   import ModalFooter from "@lib/components/ModalFooter.svelte"
   import {pushModal} from "@app/util/modal"
   import KeyRecoveryConfirm from "@app/components/KeyRecoveryConfirm.svelte"
@@ -44,12 +46,8 @@
 <Modal tag="form" onsubmit={preventDefault(submit)}>
   <ModalBody>
     <ModalHeader>
-      {#snippet title()}
-        Recover your Key
-      {/snippet}
-      {#snippet info()}
-        Take control over your cryptographic identity
-      {/snippet}
+      <ModalTitle>Recover your Key</ModalTitle>
+      <ModalSubtitle>Take control over your cryptographic identity</ModalSubtitle>
     </ModalHeader>
     <p>
       When you signed up, your Nostr secret key was split into multiple pieces and stored on

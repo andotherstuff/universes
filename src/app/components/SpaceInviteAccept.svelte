@@ -13,6 +13,8 @@
   import Modal from "@lib/components/Modal.svelte"
   import ModalBody from "@lib/components/ModalBody.svelte"
   import ModalHeader from "@lib/components/ModalHeader.svelte"
+  import ModalTitle from "@lib/components/ModalTitle.svelte"
+  import ModalSubtitle from "@lib/components/ModalSubtitle.svelte"
   import ModalFooter from "@lib/components/ModalFooter.svelte"
   import RelaySummary from "@app/components/RelaySummary.svelte"
   import {pushToast} from "@app/util/toast"
@@ -62,12 +64,9 @@
 <Modal tag="form" onsubmit={preventDefault(join)}>
   <ModalBody>
     <ModalHeader>
-      {#snippet title()}
-        <div>Join a Space</div>
-      {/snippet}
-      {#snippet info()}
-        <div>Enter a relay URL or invite link below to join an existing space.</div>
-      {/snippet}
+      <ModalTitle>Join a Space</ModalTitle>
+      <ModalSubtitle
+        >Enter a relay URL or invite link below to join an existing space.</ModalSubtitle>
     </ModalHeader>
     <Field>
       {#snippet label()}

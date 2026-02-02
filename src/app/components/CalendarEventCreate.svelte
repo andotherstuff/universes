@@ -1,5 +1,7 @@
 <script lang="ts">
   import ModalHeader from "@lib/components/ModalHeader.svelte"
+  import ModalTitle from "@lib/components/ModalTitle.svelte"
+  import ModalSubtitle from "@lib/components/ModalSubtitle.svelte"
   import CalendarEventForm from "@app/components/CalendarEventForm.svelte"
 
   type Props = {
@@ -13,12 +15,8 @@
 <CalendarEventForm {url} {h}>
   {#snippet header()}
     <ModalHeader>
-      {#snippet title()}
-        <div>Create an Event</div>
-      {/snippet}
-      {#snippet info()}
-        <div>Invite other group members to events online or in real life.</div>
-      {/snippet}
+      <ModalTitle>Create an Event</ModalTitle>
+      <ModalSubtitle>Invite other group members to events online or in real life.</ModalSubtitle>
     </ModalHeader>
   {/snippet}
 </CalendarEventForm>

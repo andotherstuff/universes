@@ -8,6 +8,7 @@
   import Modal from "@lib/components/Modal.svelte"
   import ModalBody from "@lib/components/ModalBody.svelte"
   import ModalHeader from "@lib/components/ModalHeader.svelte"
+  import ModalTitle from "@lib/components/ModalTitle.svelte"
   import ModalFooter from "@lib/components/ModalFooter.svelte"
   import KeyRecoveryRequest from "@app/components/KeyRecoveryRequest.svelte"
   import {PLATFORM_NAME} from "@app/core/state"
@@ -21,9 +22,7 @@
 <Modal>
   <ModalBody>
     <ModalHeader>
-      {#snippet title()}
-        <div>What is a private key?</div>
-      {/snippet}
+      <ModalTitle>What is a private key?</ModalTitle>
     </ModalHeader>
     <p>
       Most online services keep track of users by giving them a username and password. This gives

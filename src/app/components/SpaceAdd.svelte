@@ -9,6 +9,8 @@
   import Modal from "@lib/components/Modal.svelte"
   import ModalBody from "@lib/components/ModalBody.svelte"
   import ModalHeader from "@lib/components/ModalHeader.svelte"
+  import ModalTitle from "@lib/components/ModalTitle.svelte"
+  import ModalSubtitle from "@lib/components/ModalSubtitle.svelte"
   import SpaceInviteAccept from "@app/components/SpaceInviteAccept.svelte"
   import {pushModal} from "@app/util/modal"
 
@@ -24,12 +26,9 @@
 <Modal>
   <ModalBody>
     <ModalHeader>
-      {#snippet title()}
-        <div>Add a Space</div>
-      {/snippet}
-      {#snippet info()}
-        <div>Spaces are places where communities come together to work, play, and hang out.</div>
-      {/snippet}
+      <ModalTitle>Add a Space</ModalTitle>
+      <ModalSubtitle
+        >Spaces are places where communities come together to work, play, and hang out.</ModalSubtitle>
     </ModalHeader>
     {#if !hideDiscover}
       <Link href="/discover">

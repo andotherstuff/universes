@@ -4,15 +4,14 @@
   import Modal from "@lib/components/Modal.svelte"
   import ModalBody from "@lib/components/ModalBody.svelte"
   import ModalHeader from "@lib/components/ModalHeader.svelte"
+  import ModalTitle from "@lib/components/ModalTitle.svelte"
   import {PLATFORM_NAME} from "@app/core/state"
 </script>
 
 <Modal
   ><ModalBody>
     <ModalHeader>
-      {#snippet title()}
-        <div>What is a nostr address?</div>
-      {/snippet}
+      <ModalTitle>What is a nostr address?</ModalTitle>
     </ModalHeader>
     <p>
       {PLATFORM_NAME} hosts spaces on the <Link external href="https://nostr.com/" class="underline"

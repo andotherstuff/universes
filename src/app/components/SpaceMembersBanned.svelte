@@ -11,6 +11,8 @@
   import Modal from "@lib/components/Modal.svelte"
   import ModalBody from "@lib/components/ModalBody.svelte"
   import ModalHeader from "@lib/components/ModalHeader.svelte"
+  import ModalTitle from "@lib/components/ModalTitle.svelte"
+  import ModalSubtitle from "@lib/components/ModalSubtitle.svelte"
   import ModalFooter from "@lib/components/ModalFooter.svelte"
   import Profile from "@app/components/Profile.svelte"
   import {deriveSpaceBannedPubkeyItems} from "@app/core/state"
@@ -54,12 +56,8 @@
 <Modal>
   <ModalBody>
     <ModalHeader>
-      {#snippet title()}
-        <div>Banned users</div>
-      {/snippet}
-      {#snippet info()}
-        <div>on {displayRelayUrl(url)}</div>
-      {/snippet}
+      <ModalTitle>Banned users</ModalTitle>
+      <ModalSubtitle>on {displayRelayUrl(url)}</ModalSubtitle>
     </ModalHeader>
     {#each $bans as { pubkey, reason } (pubkey)}
       <div class="card2 bg-alt relative">

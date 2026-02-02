@@ -7,6 +7,7 @@
   import Modal from "@lib/components/Modal.svelte"
   import ModalBody from "@lib/components/ModalBody.svelte"
   import ModalHeader from "@lib/components/ModalHeader.svelte"
+  import ModalTitle from "@lib/components/ModalTitle.svelte"
   import ModalFooter from "@lib/components/ModalFooter.svelte"
 
   type Props = {
@@ -21,9 +22,7 @@
 <Modal tag="form" onsubmit={preventDefault(next)}>
   <ModalBody>
     <ModalHeader>
-      {#snippet title()}
-        <div>You're all set!</div>
-      {/snippet}
+      <ModalTitle>You're all set!</ModalTitle>
     </ModalHeader>
     <p>
       You've created your profile, saved your keys, and now you're ready to start chatting — all

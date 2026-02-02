@@ -1,6 +1,7 @@
 <script lang="ts">
   import Button from "@lib/components/Button.svelte"
   import ModalHeader from "@lib/components/ModalHeader.svelte"
+  import ModalTitle from "@lib/components/ModalTitle.svelte"
   import ModalFooter from "@lib/components/ModalFooter.svelte"
   import Modal from "@lib/components/Modal.svelte"
   import ModalBody from "@lib/components/ModalBody.svelte"
@@ -16,9 +17,7 @@
 <Modal>
   <ModalBody>
     <ModalHeader>
-      {#snippet title()}
-        <div>People in this conversation</div>
-      {/snippet}
+      <ModalTitle>People in this conversation</ModalTitle>
     </ModalHeader>
     {#each pubkeys as pubkey (pubkey)}
       <div class="card2 bg-alt">

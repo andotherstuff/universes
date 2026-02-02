@@ -14,6 +14,8 @@
   import Modal from "@lib/components/Modal.svelte"
   import ModalBody from "@lib/components/ModalBody.svelte"
   import ModalHeader from "@lib/components/ModalHeader.svelte"
+  import ModalTitle from "@lib/components/ModalTitle.svelte"
+  import ModalSubtitle from "@lib/components/ModalSubtitle.svelte"
   import ModalFooter from "@lib/components/ModalFooter.svelte"
   import ProfileMultiSelect from "@app/components/ProfileMultiSelect.svelte"
   import {makeChatPath} from "@app/util/routes"
@@ -57,12 +59,8 @@
 <Modal tag="form" onsubmit={preventDefault(onSubmit)}>
   <ModalBody>
     <ModalHeader>
-      {#snippet title()}
-        <div>Start a Chat</div>
-      {/snippet}
-      {#snippet info()}
-        <div>Create an encrypted chat room for private conversations.</div>
-      {/snippet}
+      <ModalTitle>Start a Chat</ModalTitle>
+      <ModalSubtitle>Create an encrypted chat room for private conversations.</ModalSubtitle>
     </ModalHeader>
     <Field>
       {#snippet input()}

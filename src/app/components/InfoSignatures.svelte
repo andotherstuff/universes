@@ -4,6 +4,7 @@
   import Modal from "@lib/components/Modal.svelte"
   import ModalBody from "@lib/components/ModalBody.svelte"
   import ModalHeader from "@lib/components/ModalHeader.svelte"
+  import ModalTitle from "@lib/components/ModalTitle.svelte"
 
   const back = () => history.back()
 </script>
@@ -11,9 +12,7 @@
 <Modal
   ><ModalBody>
     <ModalHeader>
-      {#snippet title()}
-        <div>What are digital signatures?</div>
-      {/snippet}
+      <ModalTitle>What are digital signatures?</ModalTitle>
     </ModalHeader>
     <p>
       Most online services ask their users to trust them that they're being honest, and they usually

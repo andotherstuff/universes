@@ -4,6 +4,8 @@
   import Icon from "@lib/components/Icon.svelte"
   import Button from "@lib/components/Button.svelte"
   import ModalHeader from "@lib/components/ModalHeader.svelte"
+  import ModalTitle from "@lib/components/ModalTitle.svelte"
+  import ModalSubtitle from "@lib/components/ModalSubtitle.svelte"
   import ModalFooter from "@lib/components/ModalFooter.svelte"
   import Modal from "@lib/components/Modal.svelte"
   import ModalBody from "@lib/components/ModalBody.svelte"
@@ -47,12 +49,8 @@
 <Modal>
   <ModalBody>
     <ModalHeader>
-      {#snippet title()}
-        Update Lightning Address
-      {/snippet}
-      {#snippet info()}
-        Update your lightning address for receiving payments.
-      {/snippet}
+      <ModalTitle>Update Lightning Address</ModalTitle>
+      <ModalSubtitle>Update your lightning address for receiving payments.</ModalSubtitle>
     </ModalHeader>
 
     <div class="column gap-4">

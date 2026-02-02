@@ -11,6 +11,8 @@
   import Modal from "@lib/components/Modal.svelte"
   import ModalBody from "@lib/components/ModalBody.svelte"
   import ModalHeader from "@lib/components/ModalHeader.svelte"
+  import ModalTitle from "@lib/components/ModalTitle.svelte"
+  import ModalSubtitle from "@lib/components/ModalSubtitle.svelte"
   import ModalFooter from "@lib/components/ModalFooter.svelte"
   import {pushToast} from "@app/util/toast"
   import {attemptRelayAccess} from "@app/core/commands"
@@ -49,12 +51,9 @@
 <Modal tag="form" onsubmit={preventDefault(join)}>
   <ModalBody>
     <ModalHeader>
-      {#snippet title()}
-        <div>Request Access</div>
-      {/snippet}
-      {#snippet info()}
-        <div>Enter an invite code below to request access to {displayUrl(url)}.</div>
-      {/snippet}
+      <ModalTitle>Request Access</ModalTitle>
+      <ModalSubtitle
+        >Enter an invite code below to request access to {displayUrl(url)}.</ModalSubtitle>
     </ModalHeader>
     <Field>
       {#snippet label()}

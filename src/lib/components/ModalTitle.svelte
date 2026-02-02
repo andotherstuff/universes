@@ -8,6 +8,4 @@
   const {children}: Props = $props()
 </script>
 
-<div class="flex flex-col m-auto max-w-xs gap-2 py-4">
-  {@render children()}
-</div>
+<h1 class="heading">{@render children()}</h1>

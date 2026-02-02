@@ -13,6 +13,7 @@
   import Modal from "@lib/components/Modal.svelte"
   import ModalBody from "@lib/components/ModalBody.svelte"
   import ModalHeader from "@lib/components/ModalHeader.svelte"
+  import ModalTitle from "@lib/components/ModalTitle.svelte"
   import ModalFooter from "@lib/components/ModalFooter.svelte"
   import {pushToast} from "@app/util/toast"
   import {PLATFORM_NAME} from "@app/core/state"
@@ -109,9 +110,7 @@
 <Modal tag="form" onsubmit={preventDefault(next)}>
   <ModalBody>
     <ModalHeader>
-      {#snippet title()}
-        <div>Your Keys are Ready!</div>
-      {/snippet}
+      <ModalTitle>Your Keys are Ready!</ModalTitle>
     </ModalHeader>
     <p>
       A cryptographic key pair has two parts: your <strong>public key</strong> identifies your

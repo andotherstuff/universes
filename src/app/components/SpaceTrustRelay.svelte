@@ -11,6 +11,8 @@
   import Modal from "@lib/components/Modal.svelte"
   import ModalBody from "@lib/components/ModalBody.svelte"
   import ModalHeader from "@lib/components/ModalHeader.svelte"
+  import ModalTitle from "@lib/components/ModalTitle.svelte"
+  import ModalSubtitle from "@lib/components/ModalSubtitle.svelte"
   import ModalFooter from "@lib/components/ModalFooter.svelte"
   import InfoSignatures from "@app/components/InfoSignatures.svelte"
   import {relaysPendingTrust} from "@app/core/state"
@@ -55,14 +57,10 @@
 <Modal tag="form" onsubmit={preventDefault(trustSpace)}>
   <ModalBody>
     <ModalHeader>
-      {#snippet title()}
-        Do you trust this space?
-      {/snippet}
-      {#snippet info()}
-        <div>
-          Only join <span class="text-primary">{displayRelayUrl(url)}</span> if you trust the adminstrator
-        </div>
-      {/snippet}
+      <ModalTitle>Do you trust this space?</ModalTitle>
+      <ModalSubtitle>
+        Only join <span class="text-primary">{displayRelayUrl(url)}</span> if you trust the adminstrator
+      </ModalSubtitle>
     </ModalHeader>
     <div class="m-auto flex flex-col gap-4">
       <p>

@@ -7,6 +7,8 @@
   import Button from "@lib/components/Button.svelte"
   import Icon from "@lib/components/Icon.svelte"
   import ModalHeader from "@lib/components/ModalHeader.svelte"
+  import ModalTitle from "@lib/components/ModalTitle.svelte"
+  import ModalSubtitle from "@lib/components/ModalSubtitle.svelte"
   import ModalFooter from "@lib/components/ModalFooter.svelte"
   import RoomForm from "@app/components/RoomForm.svelte"
   import {deriveRoom} from "@app/core/state"
@@ -29,14 +31,10 @@
 <RoomForm {url} {onsubmit} initialValues={$room}>
   {#snippet header()}
     <ModalHeader>
-      {#snippet title()}
-        <div>Edit a Room</div>
-      {/snippet}
-      {#snippet info()}
-        <div>
-          On <span class="text-primary">{displayRelayUrl(url)}</span>
-        </div>
-      {/snippet}
+      <ModalTitle>Edit a Room</ModalTitle>
+      <ModalSubtitle>
+        On <span class="text-primary">{displayRelayUrl(url)}</span>
+      </ModalSubtitle>
     </ModalHeader>
   {/snippet}
   {#snippet footer({loading})}

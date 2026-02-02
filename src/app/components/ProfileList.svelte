@@ -1,9 +1,11 @@
 <script lang="ts">
   import Button from "@lib/components/Button.svelte"
-  import ModalHeader from "@lib/components/ModalHeader.svelte"
   import ModalFooter from "@lib/components/ModalFooter.svelte"
   import Modal from "@lib/components/Modal.svelte"
   import ModalBody from "@lib/components/ModalBody.svelte"
+  import ModalHeader from "@lib/components/ModalHeader.svelte"
+  import ModalTitle from "@lib/components/ModalTitle.svelte"
+  import ModalSubtitle from "@lib/components/ModalSubtitle.svelte"
   import Profile from "@app/components/Profile.svelte"
 
   interface Props {
@@ -19,12 +21,8 @@
 <Modal>
   <ModalBody>
     <ModalHeader>
-      {#snippet title()}
-        <div>{restProps.title}</div>
-      {/snippet}
-      {#snippet info()}
-        <div>{subtitle}</div>
-      {/snippet}
+      <ModalTitle>{restProps.title}</ModalTitle>
+      <ModalSubtitle>{subtitle}</ModalSubtitle>
     </ModalHeader>
     {#each pubkeys as pubkey (pubkey)}
       <div class="card2 bg-alt">

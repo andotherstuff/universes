@@ -4,15 +4,14 @@
   import Modal from "@lib/components/Modal.svelte"
   import ModalBody from "@lib/components/ModalBody.svelte"
   import ModalHeader from "@lib/components/ModalHeader.svelte"
+  import ModalTitle from "@lib/components/ModalTitle.svelte"
   import {PLATFORM_NAME} from "@app/core/state"
 </script>
 
 <Modal
   ><ModalBody>
     <ModalHeader>
-      {#snippet title()}
-        <div>What is a bunker link?</div>
-      {/snippet}
+      <ModalTitle>What is a bunker link?</ModalTitle>
     </ModalHeader>
     <p>
       <Link external class="link" href="https://nostr.com/">Nostr</Link> uses "keys" instead of passwords

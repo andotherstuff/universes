@@ -12,6 +12,8 @@
   import Modal from "@lib/components/Modal.svelte"
   import ModalBody from "@lib/components/ModalBody.svelte"
   import ModalHeader from "@lib/components/ModalHeader.svelte"
+  import ModalTitle from "@lib/components/ModalTitle.svelte"
+  import ModalSubtitle from "@lib/components/ModalSubtitle.svelte"
   import ModalFooter from "@lib/components/ModalFooter.svelte"
 
   type Props = {
@@ -40,12 +42,8 @@
 <Modal tag="form" onsubmit={preventDefault(onSubmit)}>
   <ModalBody>
     <ModalHeader>
-      {#snippet title()}
-        <div>Verify your Email Address</div>
-      {/snippet}
-      {#snippet info()}
-        <div>Enter the one-time confirmation code sent to your email</div>
-      {/snippet}
+      <ModalTitle>Verify your Email Address</ModalTitle>
+      <ModalSubtitle>Enter the one-time confirmation code sent to your email</ModalSubtitle>
     </ModalHeader>
     <FieldInline>
       {#snippet label()}
