@@ -49,7 +49,7 @@
     deriveUserIsSpaceAdmin,
     deriveEventsForUrl,
     notificationSettings,
-    deriveIsMuted,
+    deriveShouldNotify,
   } from "@app/core/state"
   import {setSpaceNotifications} from "@app/core/commands"
   import {notifications} from "@app/util/notifications"
@@ -98,10 +98,10 @@
 
   const addRoom = () => pushModal(RoomCreate, {url}, {replaceState})
 
-  const isMuted = deriveIsMuted(url)
+  const shouldNotify = deriveShouldNotify(url)
 
   const toggleSpaceNotifications = () => {
-    setSpaceNotifications(url, !isMuted)
+    setSpaceNotifications(url, !$shouldNotify)
   }
 
   let showMenu = $state(false)
@@ -122,7 +122,7 @@
         <div class="flex items-center justify-between">
           <strong class="ellipsize flex items-center gap-1">
             <RelayName {url} />
-            {#if isMuted}
+            {#if $notificationSettings.push && !$shouldNotify}
               <Icon icon={VolumeCross} size={3} class="opacity-50" />
             {/if}
           </strong>
@@ -172,8 +172,8 @@
             <li>
               {#if $notificationSettings.push}
                 <Button onclick={toggleSpaceNotifications}>
-                  <Icon icon={isMuted ? VolumeCross : VolumeLoud} />
-                  {isMuted ? "Turn on" : "Turn off"} notifications
+                  <Icon icon={$shouldNotify ? VolumeLoud : VolumeCross} />
+                  {$shouldNotify ? "Turn off" : "Turn on"} notifications
                 </Button>
               {:else}
                 <Link href="/settings/alerts">

@@ -1002,8 +1002,7 @@ export const parseInviteLink = (invite: string): InviteData | undefined => {
 
 // Hierarchical notification helpers
 
-export const isMuted = (url: string, h?: string) => {
-  const {alerts} = getSettings()
+export const getShouldNotify = ({alerts}: SettingsValues, url: string, h?: string) => {
   const pref = alerts.find(spec({url}))
 
   if (!pref) return true
@@ -1012,5 +1011,7 @@ export const isMuted = (url: string, h?: string) => {
   if (!pref.notify) return pref.exceptions.includes(h)
 }
 
-export const deriveIsMuted = (url: string, h?: string) =>
-  derived(userSettingsValues, () => isMuted(url, h))
+export const shouldNotify = (url: string, h?: string) => getShouldNotify(getSettings(), url, h)
+
+export const deriveShouldNotify = (url: string, h?: string) =>
+  derived(userSettingsValues, $settings => getShouldNotify($settings, url, h))

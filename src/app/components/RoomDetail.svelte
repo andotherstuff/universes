@@ -32,7 +32,7 @@
     deriveUserIsRoomAdmin,
     deriveUserRoomMembershipStatus,
     deriveUserRooms,
-    deriveIsMuted,
+    deriveShouldNotify,
     MembershipStatus,
   } from "@app/core/state"
   import {
@@ -58,7 +58,7 @@
   const userRooms = deriveUserRooms(url)
 
   const isFavorite = $derived($userRooms.includes(h))
-  const isMuted = deriveIsMuted(url, h)
+  const shouldNotify = deriveShouldNotify(url, h)
 
   const back = () => history.back()
 
@@ -92,7 +92,7 @@
     }
   }
 
-  const toggleMute = () => {
+  const toggleShouldNotify = () => {
     toggleRoomNotifications(url, h)
   }
 
@@ -182,8 +182,8 @@
         <input
           type="checkbox"
           class="toggle toggle-primary"
-          checked={!isMuted}
-          onchange={toggleMute} />
+          checked={$shouldNotify}
+          onchange={toggleShouldNotify} />
       </div>
       <div class="flex items-center justify-between">
         <div class="flex items-center gap-2">

@@ -78,7 +78,7 @@ import {
   getSpaceRoomsFromGroupList,
   makeCommentFilter,
   userSpaceUrls,
-  isMuted,
+  shouldNotify,
   device,
 } from "@app/core/state"
 import {kv} from "@app/core/storage"
@@ -286,7 +286,7 @@ export const onNotification = call(() => {
 
           const h = getTagValue("h", event.tags)
 
-          if (Array.from(tracker.getRelays(event.id)).every(url => isMuted(url, h))) {
+          if (Array.from(tracker.getRelays(event.id)).every(url => !shouldNotify(url, h))) {
             continue
           }
 

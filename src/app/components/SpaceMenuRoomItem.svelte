@@ -6,7 +6,7 @@
   import RoomNameWithImage from "@app/components/RoomNameWithImage.svelte"
   import {makeRoomPath} from "@app/util/routes"
   import {notifications} from "@app/util/notifications"
-  import {deriveIsMuted} from "@app/core/state"
+  import {deriveShouldNotify} from "@app/core/state"
 
   interface Props {
     url: any
@@ -18,9 +18,9 @@
   const {url, h, notify = false, replaceState = false}: Props = $props()
 
   const path = makeRoomPath(url, h)
-  const isSpaceMuted = deriveIsMuted(url)
-  const isRoomMuted = deriveIsMuted(url, h)
-  const showDifferenceIcon = $derived($isRoomMuted !== $isSpaceMuted)
+  const shouldNotifyForSpace = deriveShouldNotify(url)
+  const shouldNotifyForRoom = deriveShouldNotify(url, h)
+  const showDifferenceIcon = $derived($shouldNotifyForRoom !== $shouldNotifyForSpace)
 </script>
 
 <SecondaryNavItem
@@ -29,6 +29,6 @@
   notification={notify ? $notifications.has(path) : false}>
   <RoomNameWithImage {url} {h} />
   {#if showDifferenceIcon}
-    <Icon icon={isRoomMuted ? VolumeCross : VolumeLoud} size={4} class="opacity-50" />
+    <Icon icon={$shouldNotifyForRoom ? VolumeLoud : VolumeCross} size={4} class="opacity-50" />
   {/if}
 </SecondaryNavItem>
