@@ -167,6 +167,7 @@ src/
 - Do not use `any`. If there are type errors related to `unknown`, they are likely because the upstream definition of the data is incorrect.
 - When dynamically building classes, use `cx` from `classnames` rather than embedded ternaries or svelte 4's old `class:` syntax.
 - When creating forms, use `FieldInline` or `Field` instead of custom elements/tailwindcss
+- Do not define svelte event handlers inline, instead name them and put them in the script section of templates
 
 ## Common Tasks
 
