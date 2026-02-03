@@ -80,6 +80,7 @@ import {
   ROOM_REMOVE_MEMBER,
   ROOMS,
   THREAD,
+  CLASSIFIED,
   WRAP,
   PROFILE,
   ZAP_GOAL,
@@ -169,7 +170,18 @@ export const DUFFLEPUD_URL = "https://dufflepud.onrender.com"
 
 export const NIP46_PERMS =
   "nip44_encrypt,nip44_decrypt," +
-  [CLIENT_AUTH, RELAY_JOIN, MESSAGE, THREAD, COMMENT, ROOMS, WRAP, REACTION, ZAP_REQUEST]
+  [
+    CLIENT_AUTH,
+    RELAY_JOIN,
+    MESSAGE,
+    THREAD,
+    CLASSIFIED,
+    COMMENT,
+    ROOMS,
+    WRAP,
+    REACTION,
+    ZAP_REQUEST,
+  ]
     .map(k => `sign_event:${k}`)
     .join(",")
 
@@ -256,7 +268,7 @@ if (ENABLE_ZAPS) {
   REACTION_KINDS.push(ZAP_RESPONSE)
 }
 
-export const CONTENT_KINDS = [ZAP_GOAL, EVENT_TIME, THREAD]
+export const CONTENT_KINDS = [ZAP_GOAL, EVENT_TIME, THREAD, CLASSIFIED]
 
 export const MESSAGE_KINDS = [...CONTENT_KINDS, MESSAGE]
 

@@ -18,8 +18,7 @@
   import Content from "@app/components/Content.svelte"
   import NoteCard from "@app/components/NoteCard.svelte"
   import SpaceMenuButton from "@app/components/SpaceMenuButton.svelte"
-  import GoalSummary from "@app/components/GoalSummary.svelte"
-  import GoalActions from "@app/components/GoalActions.svelte"
+  import ClassifiedActions from "@app/components/ClassifiedActions.svelte"
   import CommentActions from "@app/components/CommentActions.svelte"
   import EventReply from "@app/components/EventReply.svelte"
   import {deriveEvent, decodeRelay} from "@app/core/state"
@@ -29,8 +28,7 @@
   const url = decodeRelay(relay)
   const event = deriveEvent(id, [url])
   const filters = [{kinds: [COMMENT], "#E": [id]}]
-  const replies = deriveEventsAsc(deriveEventsById({repository, filters}))
-  const summary = getTagValue("summary", $event?.tags || [])
+  const replies = deriveEventsAsc(deriveEventsById({filters, repository}))
 
   const back = () => history.back()
 
@@ -71,7 +69,7 @@
     </div>
   {/snippet}
   {#snippet title()}
-    <h1 class="text-xl">{$event?.content}</h1>
+    <h1 class="text-xl">{getTagValue("title", $event?.tags || []) || ""}</h1>
   {/snippet}
   {#snippet action()}
     <div>
@@ -85,9 +83,8 @@
     <div class="flex flex-col gap-3">
       <NoteCard event={$event} {url} class="card2 bg-alt z-feature w-full">
         <div class="col-3 ml-12">
-          <Content showEntire event={{...$event, content: summary}} {url} />
-          <GoalSummary event={$event} {url} />
-          <GoalActions showRoom event={$event} {url} />
+          <Content showEntire event={$event} {url} />
+          <ClassifiedActions showRoom event={$event} {url} />
         </div>
       </NoteCard>
       {#if !showAll && $replies.length > 4}
@@ -102,7 +99,7 @@
         <NoteCard event={reply} {url} class="card2 bg-alt z-feature w-full">
           <div class="col-3 ml-12">
             <Content showEntire event={reply} {url} />
-            <CommentActions segment="goals" event={reply} {url} />
+            <CommentActions segment="classifieds" event={reply} {url} />
           </div>
         </NoteCard>
       {/each}
@@ -113,15 +110,15 @@
       <div class="flex justify-end p-2">
         <Button class="btn btn-primary" onclick={openReply}>
           <Icon icon={Reply} />
-          Comment on this goal
+          Reply to listing
         </Button>
       </div>
     {/if}
   {:else}
     {#await sleep(5000)}
-      <Spinner loading>Loading funding goal...</Spinner>
+      <Spinner loading>Loading listing...</Spinner>
     {:then}
-      <p>Failed to load funding goal.</p>
+      <p>Failed to load classified listing.</p>
     {/await}
   {/if}
 </PageContent>

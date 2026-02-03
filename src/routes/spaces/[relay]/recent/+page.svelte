@@ -6,6 +6,7 @@
   import {
     MESSAGE,
     THREAD,
+    CLASSIFIED,
     ZAP_GOAL,
     EVENT_TIME,
     COMMENT,
@@ -26,7 +27,12 @@
   import NoteItem from "@app/components/NoteItem.svelte"
   import RecentConversation from "@app/components/RecentConversation.svelte"
   import {decodeRelay, deriveEventsForUrl, CONTENT_KINDS} from "@app/core/state"
-  import {makeThreadPath, makeCalendarPath, makeGoalPath} from "@app/util/routes"
+  import {
+    makeThreadPath,
+    makeClassifiedPath,
+    makeCalendarPath,
+    makeGoalPath,
+  } from "@app/util/routes"
 
   const url = decodeRelay($page.params.relay!)
   const since = ago(MONTH)
@@ -131,6 +137,11 @@
             {#if event.kind === THREAD}
               <Link href={makeThreadPath(url, event.id)} class="btn btn-primary btn-sm">
                 View Thread
+                <Icon icon={AltArrowRight} />
+              </Link>
+            {:else if event.kind === CLASSIFIED}
+              <Link href={makeClassifiedPath(url, event.id)} class="btn btn-primary btn-sm">
+                View Listing
                 <Icon icon={AltArrowRight} />
               </Link>
             {:else if event.kind === ZAP_GOAL}

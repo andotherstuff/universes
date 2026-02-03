@@ -99,7 +99,7 @@
         <NoteCard event={reply} {url} class="card2 bg-alt z-feature w-full">
           <div class="col-3 ml-12">
             <Content showEntire event={reply} {url} />
-            <CommentActions event={reply} {url} />
+            <CommentActions segment="threads" event={reply} {url} />
           </div>
         </NoteCard>
       {/each}

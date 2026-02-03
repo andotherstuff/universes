@@ -131,8 +131,7 @@
 <form class="relative flex gap-2 p-2" onsubmit={preventDefault(submit)}>
   <div class="join">
     <Button
-      data-tip="Add an image"
-      class="center join-item tooltip tooltip-right h-10 w-10 min-w-10 rounded-full border border-solid border-base-200 bg-base-300"
+      class="center join-item h-10 w-10 min-w-10 rounded-full border border-solid border-base-200 bg-base-300"
       disabled={$uploading}
       onclick={uploadFiles}>
       {#if $uploading}
@@ -147,8 +146,7 @@
       props={{url, h, onClick: hidePopover}}
       params={{trigger: "manual", interactive: true}}>
       <Button
-        data-tip="More options"
-        class="center join-item tooltip tooltip-right h-10 w-10 min-w-10 rounded-full border border-solid border-base-200 bg-base-300"
+        class="center join-item h-10 w-10 min-w-10 rounded-full border border-solid border-base-200 bg-base-300"
         disabled={$uploading}
         onclick={showPopover}>
         <Icon icon={WidgetAdd} />

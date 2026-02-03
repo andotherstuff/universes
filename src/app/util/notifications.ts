@@ -40,6 +40,7 @@ import {
   ZAP_GOAL,
   EVENT_TIME,
   THREAD,
+  CLASSIFIED,
   COMMENT,
   DELETE,
   getTagValue,
@@ -56,6 +57,7 @@ import {
   makeChatPath,
   makeGoalPath,
   makeThreadPath,
+  makeClassifiedPath,
   makeCalendarPath,
   makeSpaceChatPath,
   makeRoomPath,
@@ -106,12 +108,14 @@ export const setChecked = (key: string) => checked.update(state => ({...state, [
 
 const goalCommentFilters = [{kinds: [COMMENT], "#K": [String(ZAP_GOAL)]}]
 const threadCommentFilters = [{kinds: [COMMENT], "#K": [String(THREAD)]}]
+const classifiedCommentFilters = [{kinds: [COMMENT], "#K": [String(CLASSIFIED)]}]
 const calendarCommentFilters = [{kinds: [COMMENT], "#K": [String(EVENT_TIME)]}]
 const messageFilters = [{kinds: MESSAGE_KINDS}]
 const dmFilters = [{kinds: DM_KINDS}]
 const allFilters = flatten([
   goalCommentFilters,
   threadCommentFilters,
+  classifiedCommentFilters,
   calendarCommentFilters,
   messageFilters,
   dmFilters,
@@ -129,6 +133,7 @@ export const notifications = derived(
         relaysByUrl,
         deriveEventsByIdByUrl({tracker, repository, filters: goalCommentFilters}),
         deriveEventsByIdByUrl({tracker, repository, filters: threadCommentFilters}),
+        deriveEventsByIdByUrl({tracker, repository, filters: classifiedCommentFilters}),
         deriveEventsByIdByUrl({tracker, repository, filters: calendarCommentFilters}),
         deriveEventsByIdByUrl({tracker, repository, filters: messageFilters}),
       ],
@@ -143,6 +148,7 @@ export const notifications = derived(
     $relaysByUrl,
     goalCommentsByUrl,
     threadCommentsByUrl,
+    classifiedCommentsByUrl,
     calendarCommentsByUrl,
     messagesByUrl,
   ]) => {
@@ -181,10 +187,12 @@ export const notifications = derived(
       const spacePathMobile = spacePath + ":mobile"
       const goalPath = makeGoalPath(url)
       const threadPath = makeThreadPath(url)
+      const classifiedPath = makeClassifiedPath(url)
       const calendarPath = makeCalendarPath(url)
       const messagesPath = makeSpaceChatPath(url)
       const goalComments = sortEventsDesc(goalCommentsByUrl.get(url)?.values() || [])
       const threadComments = sortEventsDesc(threadCommentsByUrl.get(url)?.values() || [])
+      const classifiedComments = sortEventsDesc(classifiedCommentsByUrl.get(url)?.values() || [])
       const calendarComments = sortEventsDesc(calendarCommentsByUrl.get(url)?.values() || [])
       const messages = sortEventsDesc(messagesByUrl.get(url)?.values() || [])
 
@@ -221,6 +229,24 @@ export const notifications = derived(
 
         if (hasNotification(threadItemPath, comment)) {
           paths.add(threadItemPath)
+        }
+      }
+
+      const commentsByClassifiedId = groupBy(
+        e => getTagValue("E", e.tags),
+        classifiedComments.filter(spec({kind: COMMENT})),
+      )
+
+      for (const [classifiedId, [comment]] of commentsByClassifiedId.entries()) {
+        const classifiedItemPath = makeClassifiedPath(url, classifiedId)
+
+        if (hasNotification(classifiedPath, comment)) {
+          paths.add(spacePathMobile)
+          paths.add(classifiedPath)
+        }
+
+        if (hasNotification(classifiedItemPath, comment)) {
+          paths.add(classifiedItemPath)
         }
       }
 

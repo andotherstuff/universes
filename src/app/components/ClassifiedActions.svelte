@@ -1,24 +1,27 @@
 <script lang="ts">
   import type {TrustedEvent, EventContent} from "@welshman/util"
+  import {getTagValue} from "@welshman/util"
+  import Link from "@lib/components/Link.svelte"
+  import RoomName from "@app/components/RoomName.svelte"
   import ReactionSummary from "@app/components/ReactionSummary.svelte"
   import ThunkStatusOrDeleted from "@app/components/ThunkStatusOrDeleted.svelte"
   import EventActivity from "@app/components/EventActivity.svelte"
   import EventActions from "@app/components/EventActions.svelte"
   import {publishDelete, publishReaction, canEnforceNip70} from "@app/core/commands"
-  import {makeSpacePath} from "@app/util/routes"
+  import {makeClassifiedPath, makeSpacePath} from "@app/util/routes"
 
   interface Props {
     url: string
     event: TrustedEvent
-    segment: string
+    showRoom?: boolean
     showActivity?: boolean
   }
 
-  const {url, event, segment, showActivity = false}: Props = $props()
+  const {url, event, showRoom, showActivity}: Props = $props()
 
+  const h = getTagValue("h", event.tags)
+  const path = makeClassifiedPath(url, event.id)
   const shouldProtect = canEnforceNip70(url)
-
-  const path = makeSpacePath(url, segment, event.id)
 
   const deleteReaction = async (event: TrustedEvent) =>
     publishDelete({relays: [url], event, protect: await shouldProtect})
@@ -27,13 +30,16 @@
     publishReaction({...template, event, relays: [url], protect: await shouldProtect})
 </script>
 
-<div class="flex flex-wrap items-center justify-between gap-2">
-  <div class="flex flex-grow flex-wrap justify-end gap-2">
-    <ReactionSummary {url} {event} {deleteReaction} {createReaction} reactionClass="tooltip-left" />
-    <ThunkStatusOrDeleted {event} />
-    {#if showActivity}
-      <EventActivity {url} {path} {event} />
-    {/if}
-    <EventActions {url} {event} noun="Comment" />
-  </div>
+<div class="flex flex-grow flex-wrap justify-end gap-2">
+  {#if h && showRoom}
+    <Link href={makeSpacePath(url, h)} class="btn btn-neutral btn-xs rounded-full">
+      Posted in #<RoomName {h} {url} />
+    </Link>
+  {/if}
+  <ReactionSummary {url} {event} {deleteReaction} {createReaction} reactionClass="tooltip-left" />
+  <ThunkStatusOrDeleted {event} />
+  {#if showActivity}
+    <EventActivity {url} {path} {event} />
+  {/if}
+  <EventActions {url} {event} noun="Listing" />
 </div>

@@ -1,7 +1,7 @@
 <script lang="ts">
   import {onMount} from "svelte"
   import {derived} from "svelte/store"
-  import {displayRelayUrl, EVENT_TIME, ZAP_GOAL, THREAD, REPORT} from "@welshman/util"
+  import {displayRelayUrl, EVENT_TIME, ZAP_GOAL, THREAD, CLASSIFIED, REPORT} from "@welshman/util"
   import {deriveRelay, pubkey} from "@welshman/app"
   import {fly} from "@lib/transition"
   import AltArrowDown from "@assets/icons/alt-arrow-down.svg?dataurl"
@@ -16,6 +16,7 @@
   import StarFallMinimalistic from "@assets/icons/star-fall-minimalistic-2.svg?dataurl"
   import NotesMinimalistic from "@assets/icons/notes-minimalistic.svg?dataurl"
   import CalendarMinimalistic from "@assets/icons/calendar-minimalistic.svg?dataurl"
+  import CaseMinimalistic from "@assets/icons/case-minimalistic.svg?dataurl"
   import AddCircle from "@assets/icons/add-circle.svg?dataurl"
   import ChatRound from "@assets/icons/chat-round.svg?dataurl"
   import VolumeLoud from "@assets/icons/volume-loud.svg?dataurl"
@@ -62,6 +63,7 @@
   const chatPath = makeSpacePath(url, "chat")
   const goalsPath = makeSpacePath(url, "goals")
   const threadsPath = makeSpacePath(url, "threads")
+  const classifiedsPath = makeSpacePath(url, "classifieds")
   const calendarPath = makeSpacePath(url, "calendar")
   const userRooms = deriveUserRooms(url)
   const otherRooms = deriveOtherRooms(url)
@@ -226,6 +228,14 @@
           href={threadsPath}
           notification={$notifications.has(threadsPath)}>
           <Icon icon={NotesMinimalistic} /> Threads
+        </SecondaryNavItem>
+      {/if}
+      {#if $spaceKinds.has(CLASSIFIED)}
+        <SecondaryNavItem
+          {replaceState}
+          href={classifiedsPath}
+          notification={$notifications.has(classifiedsPath)}>
+          <Icon icon={CaseMinimalistic} /> Classifieds
         </SecondaryNavItem>
       {/if}
       {#if $spaceKinds.has(EVENT_TIME)}

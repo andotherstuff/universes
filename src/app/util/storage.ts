@@ -8,12 +8,8 @@ import {
   ALERT_WEB,
   APP_DATA,
   BLOSSOM_SERVERS,
-  DIRECT_MESSAGE_FILE,
-  DIRECT_MESSAGE,
-  EVENT_TIME,
   FOLLOWS,
   MESSAGING_RELAYS,
-  MESSAGE,
   MUTES,
   PROFILE,
   RELAY_ADD_MEMBER,
@@ -30,8 +26,6 @@ import {
   ROOM_DELETE,
   ROOM_REMOVE_MEMBER,
   ROOMS,
-  THREAD,
-  ZAP_GOAL,
   verifiedSymbol,
 } from "@welshman/util"
 import type {Zapper, TrustedEvent, RelayProfile} from "@welshman/util"
@@ -53,6 +47,7 @@ import {
 } from "@welshman/app"
 import {isMobile} from "@lib/html"
 import type {IDBTable} from "@lib/indexeddb"
+import {MESSAGE_KINDS, DM_KINDS} from "@app/core/state"
 
 const kinds = {
   meta: [PROFILE, FOLLOWS, MUTES, RELAYS, BLOSSOM_SERVERS, MESSAGING_RELAYS, APP_DATA, ROOMS],
@@ -67,7 +62,7 @@ const kinds = {
     ROOM_REMOVE_MEMBER,
     ROOM_CREATE_PERMISSION,
   ],
-  content: [EVENT_TIME, THREAD, MESSAGE, ZAP_GOAL, DIRECT_MESSAGE, DIRECT_MESSAGE_FILE],
+  content: [...MESSAGE_KINDS, ...DM_KINDS],
 }
 
 const rankEvent = (event: TrustedEvent) => {

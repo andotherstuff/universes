@@ -13,6 +13,7 @@ import {
   DIRECT_MESSAGE_FILE,
   MESSAGE,
   THREAD,
+  CLASSIFIED,
   ZAP_GOAL,
   EVENT_TIME,
   getPubkeyTagValues,
@@ -65,6 +66,9 @@ export const makeGoalPath = (url: string, eventId?: string) => makeSpacePath(url
 
 export const makeThreadPath = (url: string, eventId?: string) =>
   makeSpacePath(url, "threads", eventId)
+
+export const makeClassifiedPath = (url: string, eventId?: string) =>
+  makeSpacePath(url, "classifieds", eventId)
 
 export const makeCalendarPath = (url: string, eventId?: string) =>
   makeSpacePath(url, "calendar", eventId)
@@ -121,6 +125,10 @@ export const getEventPath = async (event: TrustedEvent, urls: string[]) => {
       return makeThreadPath(url, event.id)
     }
 
+    if (event.kind === CLASSIFIED) {
+      return makeClassifiedPath(url, event.id)
+    }
+
     if (event.kind === EVENT_TIME) {
       return makeCalendarPath(url, event.id)
     }
@@ -141,6 +149,10 @@ export const getEventPath = async (event: TrustedEvent, urls: string[]) => {
         return makeThreadPath(url, id)
       }
 
+      if (parseInt(kind) === CLASSIFIED) {
+        return makeClassifiedPath(url, id)
+      }
+
       if (parseInt(kind) === EVENT_TIME) {
         return makeCalendarPath(url, id)
       }
@@ -158,6 +170,8 @@ export const getRoomItemPath = (url: string, event: TrustedEvent) => {
   switch (event.kind) {
     case THREAD:
       return makeThreadPath(url, event.id)
+    case CLASSIFIED:
+      return makeClassifiedPath(url, event.id)
     case ZAP_GOAL:
       return makeGoalPath(url, event.id)
     case EVENT_TIME:
