@@ -1,6 +1,7 @@
 import type {Component} from "svelte"
 import {derived, writable} from "svelte/store"
 import {randomId, always, assoc, Emitter} from "@welshman/lib"
+import {deriveDeduplicated} from "@welshman/store"
 import {goto} from "$app/navigation"
 import {page} from "$app/stores"
 
@@ -23,7 +24,7 @@ export const emitter = new Emitter()
 
 export const modals = writable<Record<string, Modal>>({})
 
-export const modal = derived([page, modals], ([$page, $modals]) => {
+export const modal = deriveDeduplicated([page, modals], ([$page, $modals]) => {
   return $modals[$page.url.hash.slice(1)]
 })
 
