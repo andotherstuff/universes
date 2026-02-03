@@ -1,5 +1,5 @@
 <script lang="ts">
-  import {currencyOptions} from "src/util/i18n"
+  import {currencyOptions} from "@lib/currency"
 
   export let code
 </script>

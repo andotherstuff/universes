@@ -93,7 +93,7 @@
   <p class="flex h-10 items-center justify-center py-20">
     <Spinner {loading}>
       {#if loading}
-        Looking for listingss...
+        Looking for listings...
       {:else if items.length === 0}
         No classified listings found.
       {:else}

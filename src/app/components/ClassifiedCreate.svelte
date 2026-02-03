@@ -14,6 +14,7 @@
   import ModalFooter from "@lib/components/ModalFooter.svelte"
   import Modal from "@lib/components/Modal.svelte"
   import ModalBody from "@lib/components/ModalBody.svelte"
+  import CurrencyInput from "@app/components/CurrencyInput.svelte"
   import EditorContent from "@app/editor/EditorContent.svelte"
   import {pushToast} from "@app/util/toast"
   import {PROTECTED} from "@app/core/state"
@@ -75,7 +76,9 @@
 
   const editor = makeEditor({url, submit, uploading, placeholder: "What's on your mind?"})
 
-  let title: string = $state("")
+  let title = $state("")
+  let currencyCode = $state("SAT")
+  let currencyAmount = $state(0)
 </script>
 
 <Modal tag="form" onsubmit={preventDefault(submit)}>
@@ -116,7 +119,12 @@
           <p>Price*</p>
         {/snippet}
         {#snippet input()}
-           todo: value and search select inline
+          <div class="join grid grid-cols-2">
+            <label class="join-item input input-bordered flex w-full items-center gap-2">
+              <input bind:value={currencyAmount} class="grow w-32" type="number" />
+            </label>
+            <CurrencyInput class="join-item" bind:value={currencyCode} />
+          </div>
         {/snippet}
       </Field>
       <Field>
@@ -124,7 +132,7 @@
           <p>Images</p>
         {/snippet}
         {#snippet input()}
-           todo: attach multiple images
+          todo: attach multiple images
         {/snippet}
       </Field>
       <Button
