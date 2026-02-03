@@ -116,7 +116,7 @@
   })
 </script>
 
-{#if $reactions.length > 0 || $zaps.length || $reports.length > 0}
+{#if $reactions.length > 0 || $zaps.length || $reports.length > 0 || children}
   <div class="flex min-w-0 flex-wrap gap-2">
     {#if url && $reports.length > 0}
       <button

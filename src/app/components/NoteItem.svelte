@@ -1,4 +1,5 @@
 <script lang="ts">
+  import type {Snippet} from "svelte"
   import type {NativeEmoji} from "emoji-picker-element/shared"
   import type {TrustedEvent, EventContent} from "@welshman/util"
   import SmileCircle from "@assets/icons/smile-circle.svg?dataurl"
@@ -9,7 +10,13 @@
   import ReactionSummary from "@app/components/ReactionSummary.svelte"
   import {publishDelete, publishReaction, canEnforceNip70} from "@app/core/commands"
 
-  const {url, event} = $props()
+  type Props = {
+    url: string
+    event: TrustedEvent
+    children?: Snippet
+  }
+
+  const {url, event, children}: Props = $props()
 
   const shouldProtect = canEnforceNip70(url)
 
@@ -36,5 +43,6 @@
         <Icon icon={SmileCircle} size={4} />
       </EmojiButton>
     </ReactionSummary>
+    {@render children?.()}
   </div>
 </NoteCard>

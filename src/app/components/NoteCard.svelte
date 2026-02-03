@@ -35,7 +35,7 @@
   let muted = $state(getPubkeyTagValues(getListTags($userMuteList)).includes(event.pubkey))
 </script>
 
-<div class="flex flex-col gap-2 {restProps.class}">
+<div class="flex flex-col gap-2 shadow-md {restProps.class}">
   {#if muted}
     <div class="flex items-center justify-between">
       <div class="row-2 relative">
@@ -45,7 +45,7 @@
       <Button class="link ml-8" onclick={ignoreMute}>Show anyway</Button>
     </div>
   {:else}
-    <div class="flex justify-between gap-2">
+    <div class="flex items-start justify-between gap-2">
       {#if !hideProfile}
         {#if minimal}
           @<ProfileName pubkey={event.pubkey} {url} />

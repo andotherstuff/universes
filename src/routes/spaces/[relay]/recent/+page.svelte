@@ -2,125 +2,88 @@
   import {onMount} from "svelte"
   import {derived} from "svelte/store"
   import {page} from "$app/stores"
-  import {groupBy, ago, WEEK, first, sortBy, now} from "@welshman/lib"
-  import {MESSAGE, THREAD, ZAP_GOAL, EVENT_TIME, COMMENT, getTagValue} from "@welshman/util"
+  import {groupBy, ago, MONTH, first, sortBy, uniqBy} from "@welshman/lib"
+  import {
+    MESSAGE,
+    THREAD,
+    ZAP_GOAL,
+    EVENT_TIME,
+    COMMENT,
+    getTagValue,
+    getTagValues,
+    getIdAndAddress,
+  } from "@welshman/util"
+  import type {TrustedEvent} from "@welshman/util"
+  import {repository} from "@welshman/app"
   import History from "@assets/icons/history.svg?dataurl"
-  import Add from "@assets/icons/add.svg?dataurl"
+  import AltArrowRight from "@assets/icons/alt-arrow-right.svg?dataurl"
   import {createScroller} from "@lib/html"
   import Icon from "@lib/components/Icon.svelte"
-  import Button from "@lib/components/Button.svelte"
+  import Link from "@lib/components/Link.svelte"
   import PageBar from "@lib/components/PageBar.svelte"
   import PageContent from "@lib/components/PageContent.svelte"
   import SpaceMenuButton from "@app/components/SpaceMenuButton.svelte"
-  import ConversationCard from "@app/components/ConversationCard.svelte"
-  import ThreadCard from "@app/components/ThreadCard.svelte"
-  import GoalCard from "@app/components/GoalCard.svelte"
-  import CalendarEventCard from "@app/components/CalendarEventCard.svelte"
-  import CommentCard from "@app/components/CommentCard.svelte"
-  import {decodeRelay, deriveEventsForUrl} from "@app/core/state"
-  import {goToSpace} from "@app/util/routes"
+  import NoteItem from "@app/components/NoteItem.svelte"
+  import RecentConversation from "@app/components/RecentConversation.svelte"
+  import {decodeRelay, deriveEventsForUrl, CONTENT_KINDS} from "@app/core/state"
+  import {makeThreadPath, makeCalendarPath, makeGoalPath} from "@app/util/routes"
 
   const url = decodeRelay($page.params.relay!)
-  const since = ago(WEEK)
-  const currentTime = now()
+  const since = ago(MONTH)
 
   const messages = deriveEventsForUrl(url, [{kinds: [MESSAGE], since}])
-  const threads = deriveEventsForUrl(url, [{kinds: [THREAD], since}])
-  const goals = deriveEventsForUrl(url, [{kinds: [ZAP_GOAL], since}])
-  const events = deriveEventsForUrl(url, [{kinds: [EVENT_TIME]}])
+  const content = deriveEventsForUrl(url, [{kinds: CONTENT_KINDS, since}])
   const comments = deriveEventsForUrl(url, [{kinds: [COMMENT], since}])
 
   const recentActivity = derived(
-    [messages, threads, goals, events, comments],
-    ([$messages, $threads, $goals, $events, $comments]) => {
+    [messages, content, comments],
+    ([$messages, $content, $comments]) => {
       const activity: Array<{
-        type: "message" | "thread" | "goal" | "event" | "upcoming" | "comment"
-        event: any
+        type: "message" | "content"
+        event: TrustedEvent
+        count: number
         timestamp: number
-        h?: string
-        latest?: any
-        count?: number
-        replyCount?: number
       }> = []
 
       const byRoom = groupBy(e => getTagValue("h", e.tags), $messages)
-      for (const [h, roomMessages] of byRoom.entries()) {
+      for (const roomMessages of byRoom.values()) {
         const latest = first(roomMessages)
         if (latest) {
           activity.push({
             type: "message",
             event: latest,
-            timestamp: latest.created_at,
-            h,
-            latest,
             count: roomMessages.length,
+            timestamp: latest.created_at,
           })
         }
       }
 
-      for (const thread of $threads) {
-        const replies = $comments.filter(c => getTagValue("E", c.tags) === thread.id)
-        activity.push({
-          type: "thread",
-          event: thread,
-          timestamp: thread.created_at,
-          h: getTagValue("h", thread.tags),
-          replyCount: replies.length,
-        })
+      const latestActivityByKey = new Map<string, number>()
+
+      for (const event of $content) {
+        for (const k of getIdAndAddress(event)) {
+          latestActivityByKey.set(k, Math.max(latestActivityByKey.get(k) || 0, event.created_at))
+        }
       }
 
-      for (const goal of $goals) {
-        const replies = $comments.filter(c => getTagValue("E", c.tags) === goal.id)
-        activity.push({
-          type: "goal",
-          event: goal,
-          timestamp: goal.created_at,
-          h: getTagValue("h", goal.tags),
-          replyCount: replies.length,
-        })
+      for (const event of $comments) {
+        for (const k of getTagValues(["E", "A"], event.tags)) {
+          latestActivityByKey.set(k, Math.max(latestActivityByKey.get(k) || 0, event.created_at))
+        }
       }
 
-      const pastEvents = $events.filter(e => {
-        const start = getTagValue("start", e.tags)
-        return start && parseInt(start) < currentTime
-      })
-      for (const event of pastEvents.slice(0, 5)) {
-        const replies = $comments.filter(c => getTagValue("E", c.tags) === event.id)
-        activity.push({
-          type: "event",
-          event,
-          timestamp: event.created_at,
-          h: getTagValue("h", event.tags),
-          replyCount: replies.length,
-        })
+      for (const [address, timestamp] of latestActivityByKey.entries()) {
+        const event = repository.getEvent(address)
+
+        if (event) {
+          activity.push({type: "content", event, timestamp, count: 1})
+        }
       }
 
-      const upcomingEvents = $events.filter(e => {
-        const start = getTagValue("start", e.tags)
-        return start && parseInt(start) >= currentTime
-      })
-      for (const event of upcomingEvents.slice(0, 3)) {
-        const replies = $comments.filter(c => getTagValue("E", c.tags) === event.id)
-        const start = getTagValue("start", event.tags)
-        activity.push({
-          type: "upcoming",
-          event,
-          timestamp: start ? parseInt(start) : event.created_at,
-          h: getTagValue("h", event.tags),
-          replyCount: replies.length,
-        })
-      }
-
-      for (const comment of $comments) {
-        activity.push({
-          type: "comment",
-          event: comment,
-          timestamp: comment.created_at,
-          h: getTagValue("h", comment.tags),
-        })
-      }
-
-      return sortBy(a => -a.timestamp, activity)
+      return sortBy(
+        a => -a.timestamp,
+        uniqBy(a => a.event.id, activity),
+      )
     },
   )
 
@@ -158,35 +121,30 @@
 <div bind:this={element}>
   <PageContent class="flex flex-col gap-2 p-2 pt-4">
     {#if $recentActivity.length === 0}
-      <div class="flex flex-col items-center gap-4 py-12 text-center">
-        <Icon icon={History} class="h-16 w-16 opacity-30" />
-        <div class="flex flex-col gap-2">
-          <h3 class="text-lg font-semibold">No Recent Activity</h3>
-          <p class="opacity-70">There hasn't been any activity in the last week.</p>
-        </div>
-        <div class="flex flex-col gap-2">
-          <Button class="btn-primary" onclick={() => goToSpace(url)}>
-            <Icon icon={Add} />
-            Browse Rooms
-          </Button>
-        </div>
-      </div>
+      <p class="flex flex-col items-center py-20 text-center">No recent activity found!</p>
     {:else}
-      {#each $recentActivity.slice(0, limit) as activity (activity.event.id)}
-        {#if activity.type === "message"}
-          <ConversationCard
-            {url}
-            h={activity.h}
-            latest={activity.latest}
-            count={activity.count || 0} />
-        {:else if activity.type === "thread"}
-          <ThreadCard {url} event={activity.event} replyCount={activity.replyCount || 0} />
-        {:else if activity.type === "goal"}
-          <GoalCard {url} event={activity.event} replyCount={activity.replyCount || 0} />
-        {:else if activity.type === "event" || activity.type === "upcoming"}
-          <CalendarEventCard {url} event={activity.event} replyCount={activity.replyCount || 0} />
-        {:else if activity.type === "comment"}
-          <CommentCard {url} event={activity.event} />
+      {#each $recentActivity.slice(0, limit) as { type, event, count = 0 } (event.id)}
+        {#if type === "message"}
+          <RecentConversation {url} {event} {count} />
+        {:else}
+          <NoteItem {url} {event}>
+            {#if event.kind === THREAD}
+              <Link href={makeThreadPath(url, event.id)} class="btn btn-primary btn-sm">
+                View Thread
+                <Icon icon={AltArrowRight} />
+              </Link>
+            {:else if event.kind === ZAP_GOAL}
+              <Link href={makeGoalPath(url, event.id)} class="btn btn-primary btn-sm">
+                View Goal
+                <Icon icon={AltArrowRight} />
+              </Link>
+            {:else if event.kind === EVENT_TIME}
+              <Link href={makeCalendarPath(url, event.id)} class="btn btn-primary btn-sm">
+                View Event
+                <Icon icon={AltArrowRight} />
+              </Link>
+            {/if}
+          </NoteItem>
         {/if}
       {/each}
     {/if}
