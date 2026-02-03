@@ -1,25 +1,25 @@
 <script lang="ts">
-  import {writable} from "svelte/store"
   import {makeEvent, CLASSIFIED} from "@welshman/util"
   import {publishThunk} from "@welshman/app"
   import {isMobile, preventDefault} from "@lib/html"
-  import Paperclip from "@assets/icons/paperclip-2.svg?dataurl"
   import AltArrowLeft from "@assets/icons/alt-arrow-left.svg?dataurl"
   import Icon from "@lib/components/Icon.svelte"
   import Field from "@lib/components/Field.svelte"
   import Button from "@lib/components/Button.svelte"
+  import Spinner from "@lib/components/Spinner.svelte"
   import ModalHeader from "@lib/components/ModalHeader.svelte"
   import ModalTitle from "@lib/components/ModalTitle.svelte"
   import ModalSubtitle from "@lib/components/ModalSubtitle.svelte"
   import ModalFooter from "@lib/components/ModalFooter.svelte"
   import Modal from "@lib/components/Modal.svelte"
   import ModalBody from "@lib/components/ModalBody.svelte"
+  import ImagesInput from "@lib/components/ImagesInput.svelte"
   import CurrencyInput from "@app/components/CurrencyInput.svelte"
   import EditorContent from "@app/editor/EditorContent.svelte"
   import {pushToast} from "@app/util/toast"
   import {PROTECTED} from "@app/core/state"
   import {makeEditor} from "@app/editor"
-  import {canEnforceNip70} from "@app/core/commands"
+  import {canEnforceNip70, uploadFile} from "@app/core/commands"
 
   type Props = {
     url: string
@@ -30,14 +30,10 @@
 
   const shouldProtect = canEnforceNip70(url)
 
-  const uploading = writable(false)
-
   const back = () => history.back()
 
-  const selectFiles = () => editor.then(ed => ed.commands.selectFiles())
-
   const submit = async () => {
-    if ($uploading) return
+    loading = true
 
     if (!title) {
       return pushToast({
@@ -52,33 +48,62 @@
     if (!content.trim()) {
       return pushToast({
         theme: "error",
-        message: "Please provide a message for your listing.",
+        message: "Please provide a description for your listing.",
       })
     }
 
-    const tags = [...ed.storage.nostr.getEditorTags(), ["title", title]]
+    const tags = [...ed.storage.nostr.getEditorTags(), ["summary", content], ["title", title]]
 
-    if (await shouldProtect) {
-      tags.push(PROTECTED)
+    try {
+      if (await shouldProtect) {
+        tags.push(PROTECTED)
+      }
+
+      if (h) {
+        tags.push(["h", h])
+      }
+
+      for (const image of images) {
+        if (typeof image === "string") {
+          tags.push(["image", image])
+        } else {
+          const {result, error} = await uploadFile(image, {url})
+
+          if (error) {
+            return pushToast({
+              theme: "error",
+              message: `Failed to upload file ${image.name}`,
+            })
+          }
+
+          if (result) {
+            tags.push(["image", result.url])
+          }
+        }
+      }
+
+      publishThunk({
+        relays: [url],
+        event: makeEvent(CLASSIFIED, {content, tags}),
+      })
+
+      history.back()
+    } finally {
+      loading = false
     }
-
-    if (h) {
-      tags.push(["h", h])
-    }
-
-    publishThunk({
-      relays: [url],
-      event: makeEvent(CLASSIFIED, {content, tags}),
-    })
-
-    history.back()
   }
 
-  const editor = makeEditor({url, submit, uploading, placeholder: "What's on your mind?"})
+  const editor = makeEditor({
+    url,
+    submit,
+    placeholder: "Provide a detailed description for your listing.",
+  })
 
   let title = $state("")
+  let loading = $state(false)
   let currencyCode = $state("SAT")
   let currencyAmount = $state(0)
+  let images = $state<(string | File)[]>([])
 </script>
 
 <Modal tag="form" onsubmit={preventDefault(submit)}>
@@ -129,29 +154,21 @@
       </Field>
       <Field>
         {#snippet label()}
-          <p>Images</p>
+          <p>Images (optional)</p>
         {/snippet}
         {#snippet input()}
-          todo: attach multiple images
+          <ImagesInput bind:value={images} />
         {/snippet}
       </Field>
-      <Button
-        data-tip="Add an image"
-        class="tooltip tooltip-left absolute bottom-1 right-2"
-        onclick={selectFiles}>
-        {#if $uploading}
-          <span class="loading loading-spinner loading-xs"></span>
-        {:else}
-          <Icon icon={Paperclip} size={3} />
-        {/if}
-      </Button>
     </div>
   </ModalBody>
   <ModalFooter>
-    <Button class="btn btn-link" onclick={back}>
+    <Button class="btn btn-link" onclick={back} disabled={loading}>
       <Icon icon={AltArrowLeft} />
       Go back
     </Button>
-    <Button type="submit" class="btn btn-primary">Create Listing</Button>
+    <Button type="submit" class="btn btn-primary" disabled={loading}>
+      <Spinner {loading}>Create Listing</Spinner>
+    </Button>
   </ModalFooter>
 </Modal>

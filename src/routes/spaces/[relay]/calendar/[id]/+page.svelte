@@ -15,7 +15,7 @@
   import PageContent from "@lib/components/PageContent.svelte"
   import Spinner from "@lib/components/Spinner.svelte"
   import Button from "@lib/components/Button.svelte"
-  import Content from "@app/components/Content.svelte"
+  import NoteContent from "@app/components/NoteContent.svelte"
   import NoteCard from "@app/components/NoteCard.svelte"
   import SpaceMenuButton from "@app/components/SpaceMenuButton.svelte"
   import CalendarEventActions from "@app/components/CalendarEventActions.svelte"
@@ -89,7 +89,7 @@
           <div class="flex py-2 opacity-50">
             <div class="h-px flex-grow bg-base-content opacity-25"></div>
           </div>
-          <Content showEntire event={$event} {url} />
+          <NoteContent showEntire event={$event} {url} />
         </div>
       </div>
       <div class="flex w-full flex-col justify-end sm:flex-row">
@@ -107,7 +107,7 @@
     {#each sortBy(e => e.created_at, $replies).slice(0, showAll ? undefined : 4) as reply (reply.id)}
       <NoteCard event={reply} {url} class="card2 bg-alt z-feature w-full">
         <div class="col-3 ml-12">
-          <Content showEntire event={reply} {url} />
+          <NoteContent showEntire event={reply} {url} />
           <CalendarEventActions event={reply} {url} />
         </div>
       </NoteCard>

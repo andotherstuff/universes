@@ -1,8 +1,9 @@
 <script lang="ts">
   import {formatTimestamp} from "@welshman/lib"
   import type {TrustedEvent} from "@welshman/util"
-  import {getTagValue} from "@welshman/util"
+  import {getTagValue, getTagValues} from "@welshman/util"
   import Link from "@lib/components/Link.svelte"
+  import ContentLinkBlock from "@app/components/ContentLinkBlock.svelte"
   import Content from "@app/components/Content.svelte"
   import ProfileLink from "@app/components/ProfileLink.svelte"
   import ClassifiedActions from "@app/components/ClassifiedActions.svelte"
@@ -18,6 +19,7 @@
 
   const title = getTagValue("title", event.tags)
   const h = getTagValue("h", event.tags)
+  const images = getTagValues("image", event.tags)
 </script>
 
 <Link
@@ -36,6 +38,11 @@
     </p>
   {/if}
   <Content {event} {url} expandMode="inline" />
+  <div class="grid grid-cols-3 sm:grid-cols-5">
+    {#each images as image (image)}
+      <ContentLinkBlock {event} value={{url: image}} />
+    {/each}
+  </div>
   <div class="flex w-full flex-col items-end justify-between gap-2 sm:flex-row">
     <span class="whitespace-nowrap py-1 text-sm opacity-75">
       Posted by

@@ -3,7 +3,7 @@
   import {writable} from "svelte/store"
   import type {Writable} from "svelte/store"
   import type {Instance} from "tippy.js"
-  import {preventDefault} from '@lib/html'
+  import {preventDefault} from "@lib/html"
   import {createSearch} from "@welshman/app"
   import {currencyOptions, displayCurrency} from "@lib/currency"
   import Suggestions from "@lib/components/Suggestions.svelte"

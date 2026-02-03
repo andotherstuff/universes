@@ -15,7 +15,7 @@
   import PageContent from "@lib/components/PageContent.svelte"
   import Spinner from "@lib/components/Spinner.svelte"
   import Button from "@lib/components/Button.svelte"
-  import Content from "@app/components/Content.svelte"
+  import NoteContent from "@app/components/NoteContent.svelte"
   import NoteCard from "@app/components/NoteCard.svelte"
   import SpaceMenuButton from "@app/components/SpaceMenuButton.svelte"
   import GoalSummary from "@app/components/GoalSummary.svelte"
@@ -85,7 +85,7 @@
     <div class="flex flex-col gap-3">
       <NoteCard event={$event} {url} class="card2 bg-alt z-feature w-full">
         <div class="col-3 ml-12">
-          <Content showEntire event={{...$event, content: summary}} {url} />
+          <NoteContent showEntire event={{...$event, content: summary}} {url} />
           <GoalSummary event={$event} {url} />
           <GoalActions showRoom event={$event} {url} />
         </div>
@@ -101,7 +101,7 @@
       {#each $replies.slice(0, showAll ? undefined : 4) as reply (reply.id)}
         <NoteCard event={reply} {url} class="card2 bg-alt z-feature w-full">
           <div class="col-3 ml-12">
-            <Content showEntire event={reply} {url} />
+            <NoteContent showEntire event={reply} {url} />
             <CommentActions segment="goals" event={reply} {url} />
           </div>
         </NoteCard>

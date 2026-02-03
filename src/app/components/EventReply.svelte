@@ -6,7 +6,6 @@
   import Paperclip from "@assets/icons/paperclip-2.svg?dataurl"
   import Icon from "@lib/components/Icon.svelte"
   import Button from "@lib/components/Button.svelte"
-  import ModalFooter from "@lib/components/ModalFooter.svelte"
   import EditorContent from "@app/editor/EditorContent.svelte"
   import {publishComment, canEnforceNip70} from "@app/core/commands"
   import {PROTECTED} from "@app/core/state"
@@ -65,12 +64,8 @@
 </script>
 
 <div bind:this={spacer}></div>
-<form
-  in:fly
-  bind:this={form}
-  onsubmit={preventDefault(submit)}
-  class="cb cw fixed z-feature -mx-2 pt-3">
-  <div class="card2 mx-2 my-2 bg-neutral">
+<form in:fly bind:this={form} onsubmit={preventDefault(submit)} class="cb cw fixed z-feature pt-3">
+  <div class="card2 mx-2 my-2 bg-alt shadow-md">
     <div class="relative">
       <div class="note-editor flex-grow overflow-hidden">
         <EditorContent {editor} />
@@ -86,9 +81,9 @@
         {/if}
       </Button>
     </div>
-    <ModalFooter>
+    <div class="flex justify-between pt-3">
       <Button class="btn btn-link" onclick={onClose}>Cancel</Button>
       <Button type="submit" class="btn btn-primary">Post Reply</Button>
-    </ModalFooter>
+    </div>
   </div>
 </form>

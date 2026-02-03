@@ -186,7 +186,12 @@
           {/if}
         {:else if isEllipsis(parsed) && expandInline}
           {@html renderAsHtml(parsed)}
-          <button type="button" class="text-sm underline"> Read more </button>
+          <button
+            type="button"
+            class="text-sm underline"
+            onclick={stopPropagation(preventDefault(expand))}>
+            Read more
+          </button>
         {:else}
           {@html renderAsHtml(parsed)}
         {/if}

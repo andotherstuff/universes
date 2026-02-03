@@ -12,6 +12,6 @@
   const {children, tag = "div", ...props}: Props = $props()
 </script>
 
-<svelte:element this={tag} {...props} class={cx("flex flex-col overflow-hidden pb-6", props.class)}>
+<svelte:element this={tag} {...props} class={cx("flex flex-col overflow-hidden", props.class)}>
   {@render children?.()}
 </svelte:element>
