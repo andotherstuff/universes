@@ -1,6 +1,6 @@
 <script lang="ts">
-  import {onMount} from 'svelte'
-  import {setKey, popKey} from '@lib/implicit'
+  import {onMount} from "svelte"
+  import {setKey, popKey} from "@lib/implicit"
   import {sleep} from "@welshman/lib"
   import {ManagementMethod} from "@welshman/util"
   import {manageRelay} from "@welshman/app"
@@ -81,16 +81,17 @@
     const nonSpaceMembers = pubkeysSnapshot.filter(pubkey => !$spaceMembers.includes(pubkey))
 
     if (nonSpaceMembers.length > 0) {
-      setKey('RoomMembersAdd.pubkeys', pubkeysSnapshot)
+      setKey("RoomMembersAdd.pubkeys", pubkeysSnapshot)
 
       pushModal(Confirm, {
         title: "New Space Members",
         subtitle: "Automatically add members to space",
-        message: nonSpaceMembers.length === 1
-          ? `${displayProfileByPubkey(nonSpaceMembers[0])} is not a member of this space. Add them?`
-          : `${nonSpaceMembers.length} people are not members of this space. Add them?`,
+        message:
+          nonSpaceMembers.length === 1
+            ? `${displayProfileByPubkey(nonSpaceMembers[0])} is not a member of this space. Add them?`
+            : `${nonSpaceMembers.length} people are not members of this space. Add them?`,
         confirm: async () => {
-          setKey('RoomMembersAdd.confirm', true)
+          setKey("RoomMembersAdd.confirm", true)
           back()
         },
       })
@@ -100,12 +101,12 @@
   }
 
   let loading = $state(false)
-  let pubkeys: string[] = $state(popKey('RoomMembersAdd.pubkeys') || [])
+  let pubkeys: string[] = $state(popKey("RoomMembersAdd.pubkeys") || [])
 
   onMount(() => {
-    console.log('=====')
-    if (popKey('RoomMembersAdd.confirm')) {
-      console.log('hi')
+    console.log("=====")
+    if (popKey("RoomMembersAdd.confirm")) {
+      console.log("hi")
       addMembers()
     }
   })

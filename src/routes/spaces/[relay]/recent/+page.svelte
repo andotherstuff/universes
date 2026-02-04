@@ -10,7 +10,6 @@
     ZAP_GOAL,
     EVENT_TIME,
     COMMENT,
-    getAddress,
     getTagValue,
     getTagValues,
     getIdAndAddress,
@@ -18,23 +17,18 @@
   import type {TrustedEvent} from "@welshman/util"
   import {repository} from "@welshman/app"
   import History from "@assets/icons/history.svg?dataurl"
-  import AltArrowRight from "@assets/icons/alt-arrow-right.svg?dataurl"
   import {createScroller} from "@lib/html"
   import Icon from "@lib/components/Icon.svelte"
-  import Link from "@lib/components/Link.svelte"
   import PageBar from "@lib/components/PageBar.svelte"
   import PageContent from "@lib/components/PageContent.svelte"
   import SpaceMenuButton from "@app/components/SpaceMenuButton.svelte"
   import NoteItem from "@app/components/NoteItem.svelte"
+  import ThreadItem from "@app/components/ThreadItem.svelte"
+  import ClassifiedItem from "@app/components/ClassifiedItem.svelte"
+  import GoalItem from "@app/components/GoalItem.svelte"
+  import CalendarEventItem from "@app/components/CalendarEventItem.svelte"
   import RecentConversation from "@app/components/RecentConversation.svelte"
-  import ClassifiedStatus from "@app/components/ClassifiedStatus.svelte"
   import {decodeRelay, deriveEventsForUrl, CONTENT_KINDS} from "@app/core/state"
-  import {
-    makeThreadPath,
-    makeClassifiedPath,
-    makeCalendarPath,
-    makeGoalPath,
-  } from "@app/util/routes"
 
   const url = decodeRelay($page.params.relay!)
   const since = ago(MONTH)
@@ -134,39 +128,16 @@
       {#each $recentActivity.slice(0, limit) as { type, event, count = 0 } (event.id)}
         {#if type === "message"}
           <RecentConversation {url} {event} {count} />
+        {:else if event.kind === THREAD}
+          <ThreadItem {url} {event} />
+        {:else if event.kind === CLASSIFIED}
+          <ClassifiedItem {url} {event} />
+        {:else if event.kind === ZAP_GOAL}
+          <GoalItem {url} {event} />
+        {:else if event.kind === EVENT_TIME}
+          <CalendarEventItem {url} {event} />
         {:else}
-          <NoteItem {url} {event}>
-            {#if event.kind === THREAD}
-              <Link
-                href={makeThreadPath(url, event.id)}
-                class="btn btn-primary btn-xs rounded-full">
-                View Thread
-                <Icon icon={AltArrowRight} />
-              </Link>
-            {:else if event.kind === CLASSIFIED}
-              <div class="flex gap-2">
-                <ClassifiedStatus {event} />
-                <Link
-                  href={makeClassifiedPath(url, getAddress(event))}
-                  class="btn btn-primary btn-xs rounded-full">
-                  View Listing
-                  <Icon icon={AltArrowRight} />
-                </Link>
-              </div>
-            {:else if event.kind === ZAP_GOAL}
-              <Link href={makeGoalPath(url, event.id)} class="btn btn-primary btn-xs rounded-full">
-                View Goal
-                <Icon icon={AltArrowRight} />
-              </Link>
-            {:else if event.kind === EVENT_TIME}
-              <Link
-                href={makeCalendarPath(url, getAddress(event))}
-                class="btn btn-primary btn-xs rounded-full">
-                View Event
-                <Icon icon={AltArrowRight} />
-              </Link>
-            {/if}
-          </NoteItem>
+          <NoteItem {url} {event} />
         {/if}
       {/each}
     {/if}

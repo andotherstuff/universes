@@ -1,5 +1,5 @@
 import type {Component} from "svelte"
-import {derived, writable} from "svelte/store"
+import {writable} from "svelte/store"
 import {randomId, always, assoc, Emitter} from "@welshman/lib"
 import {deriveDeduplicated} from "@welshman/store"
 import {goto} from "$app/navigation"

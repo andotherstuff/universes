@@ -18,7 +18,6 @@
   import NoteContent from "@app/components/NoteContent.svelte"
   import NoteCard from "@app/components/NoteCard.svelte"
   import SpaceMenuButton from "@app/components/SpaceMenuButton.svelte"
-  import GoalSummary from "@app/components/GoalSummary.svelte"
   import GoalActions from "@app/components/GoalActions.svelte"
   import CommentActions from "@app/components/CommentActions.svelte"
   import EventReply from "@app/components/EventReply.svelte"
@@ -86,7 +85,6 @@
       <NoteCard event={$event} {url} class="card2 bg-alt z-feature w-full">
         <div class="col-3 ml-12">
           <NoteContent showEntire event={{...$event, content: summary}} {url} />
-          <GoalSummary event={$event} {url} />
           <GoalActions showRoom event={$event} {url} />
         </div>
       </NoteCard>
