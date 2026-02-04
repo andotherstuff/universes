@@ -17,6 +17,8 @@ export const daysBetween = (start: number, end: number) => [...range(start, end,
 
 export const ucFirst = (s: string) => s.slice(0, 1).toUpperCase() + s.slice(1)
 
+export const errorMessage = (err: unknown) => String(err).replace(/^.*Error: /, "")
+
 export const buildUrl = (base: string | URL, ...pathname: string[]) => {
   const url = new URL(base)
 

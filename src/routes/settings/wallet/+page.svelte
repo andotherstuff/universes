@@ -3,10 +3,12 @@
   import {LOCALE} from "@welshman/lib"
   import {displayRelayUrl, isNWCWallet, fromMsats} from "@welshman/util"
   import {session, pubkey, profilesByPubkey} from "@welshman/app"
-  import Bolt from "@assets/icons/bolt.svg?dataurl"
+  import DownloadMinimalistic from "@assets/icons/download-minimalistic.svg?dataurl"
+  import UploadMinimalistic from "@assets/icons/upload-minimalistic.svg?dataurl"
   import Icon from "@lib/components/Icon.svelte"
   import Button from "@lib/components/Button.svelte"
   import WalletPay from "@app/components/WalletPay.svelte"
+  import WalletReceive from "@app/components/WalletReceive.svelte"
   import WalletConnect from "@app/components/WalletConnect.svelte"
   import WalletDisconnect from "@app/components/WalletDisconnect.svelte"
   import WalletUpdateReceivingAddress from "@app/components/WalletUpdateReceivingAddress.svelte"
@@ -31,6 +33,7 @@
   )
 
   const pay = () => pushModal(WalletPay)
+  const receive = () => pushModal(WalletReceive)
 </script>
 
 <div class="content column gap-4">
@@ -94,10 +97,22 @@
             </p>
           </div>
         {/if}
-        <Button class="btn btn-neutral btn-sm" onclick={disconnect}>
-          <Icon icon={CloseCircle} />
-          Disconnect Wallet
-        </Button>
+        <div class="flex justify-between">
+          <Button class="btn btn-neutral btn-sm" onclick={disconnect}>
+            <Icon icon={CloseCircle} />
+            Disconnect Wallet
+          </Button>
+          <div class="flex gap-2">
+            <Button class="btn btn-primary btn-sm" onclick={pay}>
+              <Icon icon={UploadMinimalistic} />
+              Send
+            </Button>
+            <Button class="btn btn-secondary btn-sm" onclick={receive}>
+              <Icon icon={DownloadMinimalistic} />
+              Receive
+            </Button>
+          </div>
+        </div>
       {:else}
         <p class="py-12 text-center opacity-75">No wallet connected</p>
       {/if}
@@ -121,11 +136,5 @@
         Your profile has a different lightning address than your connected wallet.
       </div>
     {/if}
-  </div>
-  <div class="flex justify-center py-12">
-    <Button class="btn btn-primary" onclick={pay}>
-      <Icon icon={Bolt} />
-      Pay With Lightning
-    </Button>
   </div>
 </div>
