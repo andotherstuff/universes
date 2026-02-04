@@ -531,7 +531,6 @@ export const uploadFile = async (file: File, options: UploadFileOptions = {}) =>
 
     const ext = "." + type.split("/")[1]
     const server = await getBlossomServer(options)
-    console.log("====", server)
     const hashes = [await sha256(await file.arrayBuffer())]
     const $signer = signer.get() || Nip01Signer.ephemeral()
     const authTemplate = makeBlossomAuthEvent({action: "upload", server, hashes})

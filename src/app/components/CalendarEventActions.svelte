@@ -2,6 +2,7 @@
   import type {TrustedEvent, EventContent} from "@welshman/util"
   import {getTagValue} from "@welshman/util"
   import {pubkey} from "@welshman/app"
+  import Pen2 from "@assets/icons/pen-2.svg?dataurl"
   import Icon from "@lib/components/Icon.svelte"
   import Button from "@lib/components/Button.svelte"
   import Link from "@lib/components/Link.svelte"
@@ -14,7 +15,6 @@
   import {publishDelete, publishReaction, canEnforceNip70} from "@app/core/commands"
   import {makeCalendarPath, makeSpacePath} from "@app/util/routes"
   import {pushModal} from "@app/util/modal"
-  import Pen2 from "@assets/icons/pen-2.svg?dataurl"
 
   type Props = {
     url: string
@@ -26,7 +26,7 @@
   const {url, event, showRoom, showActivity}: Props = $props()
 
   const h = getTagValue("h", event.tags)
-  const path = makeCalendarPath(url, event.id)
+  const path = makeCalendarPath(url, getAddress(event))
   const shouldProtect = canEnforceNip70(url)
 
   const editEvent = () => pushModal(CalendarEventEdit, {url, event})

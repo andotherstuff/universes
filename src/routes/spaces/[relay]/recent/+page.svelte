@@ -140,7 +140,7 @@
                 <Icon icon={AltArrowRight} />
               </Link>
             {:else if event.kind === CLASSIFIED}
-              <Link href={makeClassifiedPath(url, event.id)} class="btn btn-primary btn-sm">
+              <Link href={makeClassifiedPath(url, getAddress(event))} class="btn btn-primary btn-sm">
                 View Listing
                 <Icon icon={AltArrowRight} />
               </Link>
@@ -150,7 +150,7 @@
                 <Icon icon={AltArrowRight} />
               </Link>
             {:else if event.kind === EVENT_TIME}
-              <Link href={makeCalendarPath(url, event.id)} class="btn btn-primary btn-sm">
+              <Link href={makeCalendarPath(url, getAddress(event))} class="btn btn-primary btn-sm">
                 View Event
                 <Icon icon={AltArrowRight} />
               </Link>

@@ -24,7 +24,7 @@
 
 <Link
   class="col-2 card2 bg-alt w-full cursor-pointer shadow-xl"
-  href={makeClassifiedPath(url, event.id)}>
+  href={makeClassifiedPath(url, getAddress(event))}>
   {#if title}
     <div class="flex w-full items-center justify-between gap-2">
       <p class="text-xl">{title}</p>

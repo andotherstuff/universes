@@ -10,14 +10,16 @@
   const props: ComponentProps<typeof Content> = $props()
 </script>
 
-{#if props.event.kind === EVENT_TIME}
-  <NoteContentEventTime {...props} />
-{:else if props.event.kind === THREAD}
-  <NoteContentThread {...props} />
-{:else if props.event.kind === CLASSIFIED}
-  <NoteContentClassified {...props} />
-{:else if props.event.kind === ZAP_GOAL}
-  <NoteContentGoal {...props} />
-{:else}
-  <Content {...props} />
-{/if}
+{#key props.event.id}
+  {#if props.event.kind === EVENT_TIME}
+    <NoteContentEventTime {...props} />
+  {:else if props.event.kind === THREAD}
+    <NoteContentThread {...props} />
+  {:else if props.event.kind === CLASSIFIED}
+    <NoteContentClassified {...props} />
+  {:else if props.event.kind === ZAP_GOAL}
+    <NoteContentGoal {...props} />
+  {:else}
+    <Content {...props} />
+  {/if}
+{/key}

@@ -62,16 +62,13 @@ export const makeRoomPath = (url: string, h: string) => `/spaces/${encodeRelay(u
 
 export const makeSpaceChatPath = (url: string) => makeRoomPath(url, "chat")
 
-export const makeGoalPath = (url: string, eventId?: string) => makeSpacePath(url, "goals", eventId)
+export const makeGoalPath = (url: string, id?: string) => makeSpacePath(url, "goals", id)
 
-export const makeThreadPath = (url: string, eventId?: string) =>
-  makeSpacePath(url, "threads", eventId)
+export const makeThreadPath = (url: string, id?: string) => makeSpacePath(url, "threads", id)
 
-export const makeClassifiedPath = (url: string, eventId?: string) =>
-  makeSpacePath(url, "classifieds", eventId)
+export const makeClassifiedPath = (url: string, address?: string) => makeSpacePath(url, "classifieds", address)
 
-export const makeCalendarPath = (url: string, eventId?: string) =>
-  makeSpacePath(url, "calendar", eventId)
+export const makeCalendarPath = (url: string, address?: string) => makeSpacePath(url, "calendar", address)
 
 export const getPrimaryNavItem = ($page: Page) => $page.route?.id?.split("/")[1]
 
@@ -126,17 +123,18 @@ export const getEventPath = async (event: TrustedEvent, urls: string[]) => {
     }
 
     if (event.kind === CLASSIFIED) {
-      return makeClassifiedPath(url, event.id)
+      return makeClassifiedPath(url, getAddress(event))
     }
 
     if (event.kind === EVENT_TIME) {
-      return makeCalendarPath(url, event.id)
+      return makeCalendarPath(url, getAddress(event))
     }
 
     if (event.kind === MESSAGE) {
       return h ? makeRoomPath(url, h) : makeSpacePath(url, "chat")
     }
 
+    const address = event.tags.find(nthEq(0, "A"))?.[1]
     const kind = event.tags.find(nthEq(0, "K"))?.[1]
     const id = event.tags.find(nthEq(0, "E"))?.[1]
 
@@ -149,17 +147,20 @@ export const getEventPath = async (event: TrustedEvent, urls: string[]) => {
         return makeThreadPath(url, id)
       }
 
-      if (parseInt(kind) === CLASSIFIED) {
-        return makeClassifiedPath(url, id)
-      }
-
-      if (parseInt(kind) === EVENT_TIME) {
-        return makeCalendarPath(url, id)
-      }
-
       if (parseInt(kind) === MESSAGE) {
         return h ? makeRoomPath(url, h) : makeSpacePath(url, "chat")
       }
+    }
+
+    if (address && kind) {
+      if (parseInt(kind) === CLASSIFIED) {
+        return makeClassifiedPath(url, address)
+      }
+
+      if (parseInt(kind) === EVENT_TIME) {
+        return makeCalendarPath(url, address)
+      }
+
     }
   }
 
@@ -171,10 +172,10 @@ export const getRoomItemPath = (url: string, event: TrustedEvent) => {
     case THREAD:
       return makeThreadPath(url, event.id)
     case CLASSIFIED:
-      return makeClassifiedPath(url, event.id)
+      return makeClassifiedPath(url, getAddress(event))
     case ZAP_GOAL:
       return makeGoalPath(url, event.id)
     case EVENT_TIME:
-      return makeCalendarPath(url, event.id)
+      return makeCalendarPath(url, getAddress(event))
   }
 }

@@ -232,13 +232,13 @@ export const notifications = derived(
         }
       }
 
-      const commentsByClassifiedId = groupBy(
-        e => getTagValue("E", e.tags),
+      const commentsByClassifiedAddress = groupBy(
+        e => getTagValue("A", e.tags),
         classifiedComments.filter(spec({kind: COMMENT})),
       )
 
-      for (const [classifiedId, [comment]] of commentsByClassifiedId.entries()) {
-        const classifiedItemPath = makeClassifiedPath(url, classifiedId)
+      for (const [address, [comment]] of commentsByClassifiedAddress.entries()) {
+        const classifiedItemPath = makeClassifiedPath(url, address)
 
         if (hasNotification(classifiedPath, comment)) {
           paths.add(spacePathMobile)
@@ -250,13 +250,13 @@ export const notifications = derived(
         }
       }
 
-      const commentsByEventId = groupBy(
-        e => getTagValue("E", e.tags),
+      const commentsByEventAddress = groupBy(
+        e => getTagValue("A", e.tags),
         calendarComments.filter(spec({kind: COMMENT})),
       )
 
-      for (const [eventId, [comment]] of commentsByEventId.entries()) {
-        const calendarItemPath = makeCalendarPath(url, eventId)
+      for (const [address, [comment]] of commentsByEventAddress.entries()) {
+        const calendarItemPath = makeCalendarPath(url, address)
 
         if (hasNotification(calendarPath, comment)) {
           paths.add(spacePathMobile)

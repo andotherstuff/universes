@@ -24,10 +24,10 @@
   import {deriveEvent, decodeRelay} from "@app/core/state"
   import {setChecked} from "@app/util/notifications"
 
-  const {relay, id} = $page.params as MakeNonOptional<typeof $page.params>
+  const {relay, address} = $page.params as MakeNonOptional<typeof $page.params>
   const url = decodeRelay(relay)
-  const event = deriveEvent(id, [url])
-  const filters = [{kinds: [COMMENT], "#E": [id]}]
+  const event = deriveEvent(address, [url])
+  const filters = [{kinds: [COMMENT], "#A": [address]}]
   const replies = deriveEventsAsc(deriveEventsById({filters, repository}))
 
   const back = () => history.back()
@@ -115,10 +115,12 @@
       </div>
     {/if}
   {:else}
-    {#await sleep(5000)}
-      <Spinner loading>Loading listing...</Spinner>
-    {:then}
-      <p>Failed to load classified listing.</p>
-    {/await}
+    <div class="py-20 m-auto">
+      {#await sleep(5000)}
+        <Spinner loading>Loading listing...</Spinner>
+      {:then}
+        <p>Failed to load classified listing.</p>
+      {/await}
+    </div>
   {/if}
 </PageContent>
