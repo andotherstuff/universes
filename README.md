@@ -15,8 +15,6 @@ You can also optionally create an `.env` file and populate it with the following
 - `VITE_PLATFORM_RELAYS` - A list of comma-separated relay urls that will make flotilla operate in "platform mode". Disables all space browse/add/select functionality and makes the first platform relay the home page.
 - `VITE_PLATFORM_ACCENT` - A hex color for the app's accent color
 - `VITE_PLATFORM_DESCRIPTION` - A description of the app
-- `VITE_GLITCHTIP_API_KEY` - A Sentry DSN for use with glitchtip (error reporting)
-- `GLITCHTIP_AUTH_TOKEN` - A glitchtip auth token for error reporting
 
 If you're deploying a custom version of flotilla, be sure to remove the `plausible.coracle.social` script from `app.html`. This sends analytics to a server hosted by the developer.
 

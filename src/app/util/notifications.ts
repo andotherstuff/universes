@@ -5,9 +5,9 @@ import {Badge} from "@capawesome/capacitor-badge"
 import {PushNotifications} from "@capacitor/push-notifications"
 import type {ActionPerformed, RegistrationError, Token} from "@capacitor/push-notifications"
 import {synced, throttled} from "@welshman/store"
+import {load, LOCAL_RELAY_URL} from "@welshman/net"
 import {
   pubkey,
-  signer,
   tracker,
   repository,
   relaysByUrl,
@@ -23,7 +23,6 @@ import {
   poll,
   prop,
   hash,
-  parseJson,
   flatten,
   find,
   spec,
@@ -47,6 +46,7 @@ import {
   getPubkeyTagValues,
   getRelaysFromList,
   matchFilters,
+  getIdFilters,
   sortEventsDesc,
   makeEvent,
   Address,
@@ -451,7 +451,7 @@ class CapacitorNotifications implements IPushAdapter {
   _getSubscriptionIdentifier = (relay: string, key: string) =>
     String(hash(relay + key + device.get()))
 
-  _getPushStuff = async (url: string) => {
+  _getPushUrl = async (url: string) => {
     let relay = await loadRelay(url)
 
     if (!relay?.self || !relay?.supported_nips?.map(String)?.includes("9a")) {
@@ -459,7 +459,7 @@ class CapacitorNotifications implements IPushAdapter {
     }
 
     if (relay?.self) {
-      return {url: relay.url, pubkey: relay.self}
+      return relay.url
     }
   }
 
@@ -471,33 +471,24 @@ class CapacitorNotifications implements IPushAdapter {
       return
     }
 
-    const stuff = await this._getPushStuff(relay)
+    const url = await this._getPushUrl(relay)
 
-    if (!stuff) {
+    if (!url) {
       console.warn(`Failed to subscribe ${relay} to notifications: unsupported`)
       return
     }
 
-    const {url, pubkey} = stuff
     const identifier = this._getSubscriptionIdentifier(relay, key)
 
     const thunk = publishThunk({
       relays: [url],
       event: makeEvent(30390, {
-        content: await signer
-          .get()
-          .nip44.encrypt(
-            pubkey,
-            JSON.stringify([
-              ["relay", relay],
-              ["callback", subscription.callback],
-              ...ignore.map(filter => ["ignore", JSON.stringify(filter)]),
-              ...filters.map(filter => ["filter", JSON.stringify(filter)]),
-            ]),
-          ),
         tags: [
           ["d", identifier],
-          ["p", pubkey],
+          ["relay", relay],
+          ["callback", subscription.callback],
+          ...ignore.map(filter => ["ignore", JSON.stringify(filter)]),
+          ...filters.map(filter => ["filter", JSON.stringify(filter)]),
         ],
       }),
     })
@@ -510,14 +501,14 @@ class CapacitorNotifications implements IPushAdapter {
   }
 
   _unsyncRelay = async (relay: string, key: string) => {
-    const stuff = await this._getPushStuff(relay)
+    const url = await this._getPushUrl(relay)
 
-    if (!stuff) {
+    if (!url) {
       console.warn(`Failed to unsubscribe ${relay} from notifications: unsupported`)
       return
     }
 
-    const relays = [stuff.url]
+    const relays = [url]
     const identifier = this._getSubscriptionIdentifier(relay, key)
     const address = new Address(30390, pubkey.get()!, identifier).toString()
     const event = makeEvent(DELETE, {tags: [["a", address]]})
@@ -598,11 +589,17 @@ class CapacitorNotifications implements IPushAdapter {
       PushNotifications.addListener(
         "pushNotificationActionPerformed",
         async (action: ActionPerformed) => {
-          const {relay, pubkey, payload} = action.notification.data
-          const event = parseJson(await signer.get().nip44.decrypt(pubkey, payload))
+          const {relay, id} = action.notification.data
+
+          const [event] = await load({
+            relays: [relay, LOCAL_RELAY_URL],
+            filters: getIdFilters([id]),
+          })
 
           if (event) {
             goto(await getEventPath(event, [relay]))
+          } else {
+            goto(makeSpacePath(relay))
           }
         },
       )
