@@ -9,9 +9,6 @@
   import Field from "@lib/components/Field.svelte"
   import Button from "@lib/components/Button.svelte"
   import Spinner from "@lib/components/Spinner.svelte"
-  import ModalHeader from "@lib/components/ModalHeader.svelte"
-  import ModalTitle from "@lib/components/ModalTitle.svelte"
-  import ModalSubtitle from "@lib/components/ModalSubtitle.svelte"
   import ModalFooter from "@lib/components/ModalFooter.svelte"
   import Modal from "@lib/components/Modal.svelte"
   import ModalBody from "@lib/components/ModalBody.svelte"
@@ -125,10 +122,7 @@
 
 <Modal tag="form" onsubmit={preventDefault(submit)}>
   <ModalBody>
-    <ModalHeader>
-      <ModalTitle>Create a Classified Listing</ModalTitle>
-      <ModalSubtitle>Advertise a job, sale, or need.</ModalSubtitle>
-    </ModalHeader>
+    {@render header?.()}
     <div class="col-8 relative">
       <Field>
         {#snippet label()}
@@ -198,7 +192,7 @@
       Go back
     </Button>
     <Button type="submit" class="btn btn-primary" disabled={loading}>
-      <Spinner {loading}>Create Listing</Spinner>
+      <Spinner {loading}>Save Listing</Spinner>
     </Button>
   </ModalFooter>
 </Modal>

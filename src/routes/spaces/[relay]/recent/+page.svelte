@@ -10,6 +10,7 @@
     ZAP_GOAL,
     EVENT_TIME,
     COMMENT,
+    getAddress,
     getTagValue,
     getTagValues,
     getIdAndAddress,
@@ -26,6 +27,7 @@
   import SpaceMenuButton from "@app/components/SpaceMenuButton.svelte"
   import NoteItem from "@app/components/NoteItem.svelte"
   import RecentConversation from "@app/components/RecentConversation.svelte"
+  import ClassifiedStatus from "@app/components/ClassifiedStatus.svelte"
   import {decodeRelay, deriveEventsForUrl, CONTENT_KINDS} from "@app/core/state"
   import {
     makeThreadPath,
@@ -135,22 +137,31 @@
         {:else}
           <NoteItem {url} {event}>
             {#if event.kind === THREAD}
-              <Link href={makeThreadPath(url, event.id)} class="btn btn-primary btn-sm">
+              <Link
+                href={makeThreadPath(url, event.id)}
+                class="btn btn-primary btn-xs rounded-full">
                 View Thread
                 <Icon icon={AltArrowRight} />
               </Link>
             {:else if event.kind === CLASSIFIED}
-              <Link href={makeClassifiedPath(url, getAddress(event))} class="btn btn-primary btn-sm">
-                View Listing
-                <Icon icon={AltArrowRight} />
-              </Link>
+              <div class="flex gap-2">
+                <ClassifiedStatus {event} />
+                <Link
+                  href={makeClassifiedPath(url, getAddress(event))}
+                  class="btn btn-primary btn-xs rounded-full">
+                  View Listing
+                  <Icon icon={AltArrowRight} />
+                </Link>
+              </div>
             {:else if event.kind === ZAP_GOAL}
-              <Link href={makeGoalPath(url, event.id)} class="btn btn-primary btn-sm">
+              <Link href={makeGoalPath(url, event.id)} class="btn btn-primary btn-xs rounded-full">
                 View Goal
                 <Icon icon={AltArrowRight} />
               </Link>
             {:else if event.kind === EVENT_TIME}
-              <Link href={makeCalendarPath(url, getAddress(event))} class="btn btn-primary btn-sm">
+              <Link
+                href={makeCalendarPath(url, getAddress(event))}
+                class="btn btn-primary btn-xs rounded-full">
                 View Event
                 <Icon icon={AltArrowRight} />
               </Link>

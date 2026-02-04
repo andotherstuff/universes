@@ -4,6 +4,7 @@ import * as nip19 from "nostr-tools/nip19"
 import {goto} from "$app/navigation"
 import {nthEq, sleep} from "@welshman/lib"
 import type {TrustedEvent} from "@welshman/util"
+import {getAddress} from "@welshman/util"
 import {tracker, loadRelay} from "@welshman/app"
 import {scrollToEvent} from "@lib/html"
 import {identity} from "@welshman/lib"
@@ -66,9 +67,11 @@ export const makeGoalPath = (url: string, id?: string) => makeSpacePath(url, "go
 
 export const makeThreadPath = (url: string, id?: string) => makeSpacePath(url, "threads", id)
 
-export const makeClassifiedPath = (url: string, address?: string) => makeSpacePath(url, "classifieds", address)
+export const makeClassifiedPath = (url: string, address?: string) =>
+  makeSpacePath(url, "classifieds", address)
 
-export const makeCalendarPath = (url: string, address?: string) => makeSpacePath(url, "calendar", address)
+export const makeCalendarPath = (url: string, address?: string) =>
+  makeSpacePath(url, "calendar", address)
 
 export const getPrimaryNavItem = ($page: Page) => $page.route?.id?.split("/")[1]
 
@@ -160,7 +163,6 @@ export const getEventPath = async (event: TrustedEvent, urls: string[]) => {
       if (parseInt(kind) === EVENT_TIME) {
         return makeCalendarPath(url, address)
       }
-
     }
   }
 

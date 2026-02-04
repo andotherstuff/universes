@@ -1,6 +1,6 @@
 <script lang="ts">
   import type {TrustedEvent, EventContent} from "@welshman/util"
-  import {getTagValue} from "@welshman/util"
+  import {getTagValue, getAddress} from "@welshman/util"
   import {pubkey} from "@welshman/app"
   import Pen2 from "@assets/icons/pen-2.svg?dataurl"
   import Link from "@lib/components/Link.svelte"
@@ -8,6 +8,7 @@
   import Button from "@lib/components/Button.svelte"
   import RoomName from "@app/components/RoomName.svelte"
   import ReactionSummary from "@app/components/ReactionSummary.svelte"
+  import ClassifiedStatus from "@app/components/ClassifiedStatus.svelte"
   import ThunkStatusOrDeleted from "@app/components/ThunkStatusOrDeleted.svelte"
   import EventActivity from "@app/components/EventActivity.svelte"
   import EventActions from "@app/components/EventActions.svelte"
@@ -45,7 +46,9 @@
     </Link>
   {/if}
   <ReactionSummary {url} {event} {deleteReaction} {createReaction} reactionClass="tooltip-left" />
-  <ThunkStatusOrDeleted {event} />
+  <ThunkStatusOrDeleted {event}>
+    <ClassifiedStatus {event} />
+  </ThunkStatusOrDeleted>
   {#if showActivity}
     <EventActivity {url} {path} {event} />
   {/if}

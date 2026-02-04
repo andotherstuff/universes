@@ -49,7 +49,7 @@
         {count}
         recent messages{count === 1 ? "" : "s"}
       </span>
-      <Button class="btn btn-sm btn-primary" onclick={onClick}>
+      <Button class="btn btn-xs rounded-full btn-primary" onclick={onClick}>
         View Conversation
         <Icon icon={AltArrowRight} />
       </Button>

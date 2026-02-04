@@ -1,8 +1,9 @@
 <script lang="ts">
   import {formatTimestamp} from "@welshman/lib"
   import type {TrustedEvent} from "@welshman/util"
-  import {getTagValue, getTagValues} from "@welshman/util"
+  import {getTag, getAddress, getTagValue, getTagValues} from "@welshman/util"
   import Link from "@lib/components/Link.svelte"
+  import CurrencySymbol from "@lib/components/CurrencySymbol.svelte"
   import ContentLinkBlock from "@app/components/ContentLinkBlock.svelte"
   import Content from "@app/components/Content.svelte"
   import ProfileLink from "@app/components/ProfileLink.svelte"
@@ -20,6 +21,7 @@
   const title = getTagValue("title", event.tags)
   const h = getTagValue("h", event.tags)
   const images = getTagValues("image", event.tags)
+  const [_, price = 0, currency = "SAT"] = getTag("price", event.tags) || []
 </script>
 
 <Link
@@ -27,7 +29,10 @@
   href={makeClassifiedPath(url, getAddress(event))}>
   {#if title}
     <div class="flex w-full items-center justify-between gap-2">
-      <p class="text-xl">{title}</p>
+      <p class="text-xl">
+        {title} —
+        <CurrencySymbol code={currency} />{price}
+      </p>
       <p class="text-sm opacity-75">
         {formatTimestamp(event.created_at)}
       </p>

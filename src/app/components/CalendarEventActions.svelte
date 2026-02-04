@@ -1,6 +1,6 @@
 <script lang="ts">
   import type {TrustedEvent, EventContent} from "@welshman/util"
-  import {getTagValue} from "@welshman/util"
+  import {getTagValue, getAddress} from "@welshman/util"
   import {pubkey} from "@welshman/app"
   import Pen2 from "@assets/icons/pen-2.svg?dataurl"
   import Icon from "@lib/components/Icon.svelte"
