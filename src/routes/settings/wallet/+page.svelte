@@ -103,17 +103,19 @@
             </p>
           </div>
         {/if}
-        <div class="flex justify-between">
+        <div class="flex flex-col gap-4 lg:flex-row lg:justify-between">
           <Button class="btn btn-neutral btn-sm" onclick={disconnect}>
             <Icon icon={CloseCircle} />
             Disconnect Wallet
           </Button>
-          <div class="flex gap-2">
-            <Button class="btn btn-primary btn-sm" onclick={pay}>
+          <div class="flex w-full gap-4 lg:w-auto">
+            <Button class="btn btn-primary btn-sm flex-1 justify-center lg:flex-none" onclick={pay}>
               <Icon icon={UploadMinimalistic} />
               Send
             </Button>
-            <Button class="btn btn-secondary btn-sm" onclick={receive}>
+            <Button
+              class="btn btn-secondary btn-sm flex-1 justify-center lg:flex-none"
+              onclick={receive}>
               <Icon icon={DownloadMinimalistic} />
               Receive
             </Button>
