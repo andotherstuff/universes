@@ -1,6 +1,5 @@
 <script lang="ts">
   import {Invoice} from "@getalby/lightning-tools/bolt11"
-  import {session} from "@welshman/app"
   import AltArrowLeft from "@assets/icons/alt-arrow-left.svg?dataurl"
   import Bolt from "@assets/icons/bolt.svg?dataurl"
   import Button from "@lib/components/Button.svelte"
@@ -20,10 +19,16 @@
   const back = () => history.back()
 
   const create = async () => {
+    const satAmount = Math.floor(Number(sats))
+
+    if (!Number.isFinite(satAmount) || satAmount <= 0) {
+      pushToast({theme: "error", message: "Enter an amount greater than 0."})
+      return
+    }
+
     loading = true
 
     try {
-      const satAmount = Math.floor(Number(sats))
       const paymentRequest = await createInvoice({sats: satAmount})
 
       invoice = new Invoice({pr: paymentRequest})
@@ -49,55 +54,37 @@
   let sats = $state(10)
 
   const invoiceHasAmount = $derived((invoice?.satoshi ?? 0) > 0)
-  const amountInvalid = $derived(!Number.isFinite(sats) || sats <= 0)
-  const createDisabledReason = $derived(
-    !$session?.wallet
-      ? "Connect a wallet to create invoices."
-      : amountInvalid
-        ? "Enter an amount greater than 0."
-        : "",
-  )
-  const createDisabled = $derived(loading || amountInvalid || !$session?.wallet)
-  const showCreateTooltip = $derived(Boolean(createDisabledReason))
 </script>
 
 <Modal>
   <ModalBody>
     <ModalHeader>
       <ModalTitle>Receive with Lightning</ModalTitle>
-      <ModalSubtitle
-        >Use your Nostr wallet to receive Bitcoin payments over lightning.</ModalSubtitle>
+      <ModalSubtitle>Use your wallet to receive Bitcoin payments over lightning.</ModalSubtitle>
     </ModalHeader>
     {#if invoice}
       <div class="card2 bg-alt flex flex-col gap-2">
-        {#if $session?.wallet?.type === "webln" && !invoiceHasAmount}
-          <p class="text-sm opacity-75">
-            Uh oh! It looks like your wallet returned an invoice without an amount. Some wallets
-            can't pay those, so you may want to create a new invoice with a pre-set amount.
-          </p>
-        {:else}
-          <div class="flex flex-col items-center gap-12 pt-4">
-            <QRCode code={invoice.paymentRequest} class="h-64 w-64" />
-            <p class="text-center text-sm opacity-75">Scan with your wallet, or click to copy.</p>
-          </div>
-          <FieldInline>
-            {#snippet label()}
-              Amount (satoshis)
-            {/snippet}
-            {#snippet input()}
-              <div class="flex flex-grow justify-end">
-                <label class="input input-bordered flex items-center gap-2">
-                  <Icon icon={Bolt} />
-                  <input bind:value={sats} type="number" class="w-14" disabled={invoiceHasAmount} />
-                </label>
-              </div>
-            {/snippet}
-            {#snippet info()}
-              Share this invoice to receive <strong>{sats}</strong> satoshis
-              {invoiceHasAmount ? "" : " (payer chooses the exact amount)"}.
-            {/snippet}
-          </FieldInline>
-        {/if}
+        <div class="flex flex-col items-center gap-12 pt-4">
+          <QRCode code={invoice.paymentRequest} class="h-64 w-64" />
+          <p class="text-center text-sm opacity-75">Scan with your wallet, or click to copy.</p>
+        </div>
+        <FieldInline>
+          {#snippet label()}
+            Amount (satoshis)
+          {/snippet}
+          {#snippet input()}
+            <div class="flex flex-grow justify-end">
+              <label class="input input-bordered flex items-center gap-2">
+                <Icon icon={Bolt} />
+                <input bind:value={sats} type="number" class="w-14" disabled={invoiceHasAmount} />
+              </label>
+            </div>
+          {/snippet}
+          {#snippet info()}
+            Share this invoice to receive <strong>{sats}</strong> satoshis
+            {invoiceHasAmount ? "" : " (payer chooses the exact amount)"}.
+          {/snippet}
+        </FieldInline>
       </div>
     {:else}
       <div class="card2 bg-alt flex flex-col gap-2">
@@ -124,21 +111,14 @@
       Go back
     </Button>
     {#if !invoice}
-      <div class="flex flex-col items-end gap-1">
-        <div
-          class:tooltip={showCreateTooltip}
-          class:tooltip-left={showCreateTooltip}
-          data-tip={showCreateTooltip ? createDisabledReason : undefined}>
-          <Button class="btn btn-primary" onclick={create} disabled={createDisabled}>
-            {#if loading}
-              <span class="loading loading-spinner loading-sm"></span>
-            {:else}
-              <Icon icon={Bolt} />
-            {/if}
-            Create Invoice
-          </Button>
-        </div>
-      </div>
+      <Button class="btn btn-primary" onclick={create} disabled={loading}>
+        {#if loading}
+          <span class="loading loading-spinner loading-sm"></span>
+        {:else}
+          <Icon icon={Bolt} />
+        {/if}
+        Create Invoice
+      </Button>
     {/if}
   </ModalFooter>
 </Modal>
