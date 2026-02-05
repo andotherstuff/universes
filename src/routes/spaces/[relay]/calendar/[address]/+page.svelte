@@ -25,12 +25,16 @@
   import EventReply from "@app/components/EventReply.svelte"
   import {deriveEvent, decodeRelay} from "@app/core/state"
   import {setChecked} from "@app/util/notifications"
+  import {makeTitle} from "@app/util/title"
 
   const {relay, id} = $page.params as MakeNonOptional<typeof $page.params>
   const url = decodeRelay(relay)
   const event = deriveEvent(id, [url])
   const filters = [{kinds: [COMMENT], "#E": [id]}]
   const replies = deriveEventsAsc(deriveEventsById({filters, repository}))
+  const pageTitle = $derived.by(() =>
+    makeTitle(getTagValue("title", $event?.tags || []) || "Event"),
+  )
 
   const back = () => history.back()
 
@@ -60,6 +64,10 @@
     }
   })
 </script>
+
+<svelte:head>
+  <title>{pageTitle}</title>
+</svelte:head>
 
 <PageBar>
   {#snippet icon()}
