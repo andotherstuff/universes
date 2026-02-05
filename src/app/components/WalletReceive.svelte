@@ -2,6 +2,7 @@
   import {Invoice} from "@getalby/lightning-tools/bolt11"
   import AltArrowLeft from "@assets/icons/alt-arrow-left.svg?dataurl"
   import Bolt from "@assets/icons/bolt.svg?dataurl"
+  import Refresh from "@assets/icons/refresh.svg?dataurl"
   import Button from "@lib/components/Button.svelte"
   import FieldInline from "@lib/components/FieldInline.svelte"
   import Icon from "@lib/components/Icon.svelte"
@@ -57,8 +58,6 @@
   let loading = $state(false)
   let invoice: Invoice | undefined = $state()
   let sats = $state(10)
-
-  const invoiceHasAmount = $derived((invoice?.satoshi ?? 0) > 0)
 </script>
 
 <Modal>
@@ -73,10 +72,6 @@
           <QRCode code={invoice.paymentRequest} class="w-full max-w-64" />
           <p class="text-center text-sm opacity-75">Scan with your wallet, or click to copy.</p>
         </div>
-        <p class="text-sm opacity-75">
-          Share this invoice to receive <strong>{sats}</strong> satoshis
-          {invoiceHasAmount ? "" : " (payer chooses the exact amount)"}.
-        </p>
       </div>
     {:else}
       <div class="card2 bg-alt flex flex-col gap-2">
@@ -103,7 +98,10 @@
       Go back
     </Button>
     {#if invoice}
-      <Button class="btn btn-neutral" onclick={reset} disabled={loading}>Clear Invoice</Button>
+      <Button class="btn btn-neutral" onclick={reset} disabled={loading}>
+        <Icon icon={Refresh} />
+        Re-generate
+      </Button>
     {:else}
       <Button class="btn btn-primary" onclick={create} disabled={loading}>
         {#if loading}
