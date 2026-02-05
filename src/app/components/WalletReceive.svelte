@@ -49,6 +49,11 @@
     }
   }
 
+  const reset = () => {
+    invoice = undefined
+    sats = 10
+  }
+
   let loading = $state(false)
   let invoice: Invoice | undefined = $state()
   let sats = $state(10)
@@ -64,27 +69,14 @@
     </ModalHeader>
     {#if invoice}
       <div class="card2 bg-alt flex flex-col gap-2">
-        <div class="flex flex-col items-center gap-12 pt-4">
-          <QRCode code={invoice.paymentRequest} class="h-64 w-64" />
+        <div class="flex flex-col items-center gap-6 pt-4">
+          <QRCode code={invoice.paymentRequest} class="w-full max-w-64" />
           <p class="text-center text-sm opacity-75">Scan with your wallet, or click to copy.</p>
         </div>
-        <FieldInline>
-          {#snippet label()}
-            Amount (satoshis)
-          {/snippet}
-          {#snippet input()}
-            <div class="flex flex-grow justify-end">
-              <label class="input input-bordered flex items-center gap-2">
-                <Icon icon={Bolt} />
-                <input bind:value={sats} type="number" class="w-14" disabled={invoiceHasAmount} />
-              </label>
-            </div>
-          {/snippet}
-          {#snippet info()}
-            Share this invoice to receive <strong>{sats}</strong> satoshis
-            {invoiceHasAmount ? "" : " (payer chooses the exact amount)"}.
-          {/snippet}
-        </FieldInline>
+        <p class="text-sm opacity-75">
+          Share this invoice to receive <strong>{sats}</strong> satoshis
+          {invoiceHasAmount ? "" : " (payer chooses the exact amount)"}.
+        </p>
       </div>
     {:else}
       <div class="card2 bg-alt flex flex-col gap-2">
@@ -110,7 +102,9 @@
       <Icon icon={AltArrowLeft} />
       Go back
     </Button>
-    {#if !invoice}
+    {#if invoice}
+      <Button class="btn btn-neutral" onclick={reset} disabled={loading}>Clear Invoice</Button>
+    {:else}
       <Button class="btn btn-primary" onclick={create} disabled={loading}>
         {#if loading}
           <span class="loading loading-spinner loading-sm"></span>
