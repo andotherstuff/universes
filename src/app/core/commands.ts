@@ -434,9 +434,11 @@ export const getNwcClient = () => {
 
   const {info} = $session.wallet
 
-  return new nwc.NWCClient(
-    info.nostrWalletConnectUrl ? {nostrWalletConnectUrl: info.nostrWalletConnectUrl} : info,
-  )
+  if (info.nostrWalletConnectUrl) {
+    return new nwc.NWCClient({nostrWalletConnectUrl: info.nostrWalletConnectUrl})
+  }
+
+  return new nwc.NWCClient(info)
 }
 
 export const payInvoice = async (invoice: string, msats?: number) => {
