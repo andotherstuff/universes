@@ -8,6 +8,7 @@
   import Button from "@lib/components/Button.svelte"
   import {pushToast} from "@app/util/toast"
   import {Push, clearBadges} from "@app/util/notifications"
+  import {makeTitle} from "@app/util/title"
   import {notificationSettings} from "@app/core/state"
 
   const reset = () => {
@@ -47,7 +48,13 @@
 
   let loading = $state(false)
   let settings = $state({...notificationSettings.get()})
+
+  const pageTitle = makeTitle("Alert Settings")
 </script>
+
+<svelte:head>
+  <title>{pageTitle}</title>
+</svelte:head>
 
 <form class="content column gap-4" {onsubmit}>
   <div class="card2 bg-alt col-4 shadow-md">

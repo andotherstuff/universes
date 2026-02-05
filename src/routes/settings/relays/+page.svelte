@@ -18,6 +18,7 @@
   import RelayItem from "@app/components/RelayItem.svelte"
   import RelayAdd from "@app/components/RelayAdd.svelte"
   import {pushModal} from "@app/util/modal"
+  import {makeTitle} from "@app/util/title"
   import {discoverRelays} from "@app/core/requests"
   import Globus from "@assets/icons/globus.svg?dataurl"
   import Inbox from "@assets/icons/inbox.svg?dataurl"
@@ -56,7 +57,13 @@
   onMount(() => {
     discoverRelays(getRelayLists())
   })
+
+  const pageTitle = makeTitle("Relay Settings")
 </script>
+
+<svelte:head>
+  <title>{pageTitle}</title>
+</svelte:head>
 
 <div class="content column gap-4">
   <Collapse class="card2 bg-alt column gap-4 shadow-md">

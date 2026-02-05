@@ -2,6 +2,7 @@
   import {preventDefault} from "@lib/html"
   import Button from "@lib/components/Button.svelte"
   import {pushToast} from "@app/util/toast"
+  import {makeTitle} from "@app/util/title"
   import {PLATFORM_NAME, RelayAuthMode, userSettingsValues} from "@app/core/state"
   import {publishSettings} from "@app/core/commands"
 
@@ -20,7 +21,13 @@
   })
 
   let settings = $state({...$userSettingsValues})
+
+  const pageTitle = makeTitle("Privacy Settings")
 </script>
+
+<svelte:head>
+  <title>{pageTitle}</title>
+</svelte:head>
 
 <form class="content column gap-4" {onsubmit}>
   <div class="card2 bg-alt flex flex-col gap-4 shadow-md">
