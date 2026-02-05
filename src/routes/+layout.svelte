@@ -42,9 +42,11 @@
   import * as notifications from "@app/util/notifications"
   import * as storage from "@app/util/storage"
   import {syncKeyboard} from "@app/util/keyboard"
+  import {makeTitle} from "@app/util/title"
   import NewNotificationSound from "@src/app/components/NewNotificationSound.svelte"
 
   const {children} = $props()
+  const pageTitle = makeTitle()
 
   const policies = [authPolicy, blockPolicy, trustPolicy, mostlyRestrictedPolicy]
 
@@ -194,6 +196,7 @@
 </script>
 
 <svelte:head>
+  <title>{pageTitle}</title>
   {#if !dev}
     <link rel="manifest" href="/manifest.webmanifest" />
   {/if}
