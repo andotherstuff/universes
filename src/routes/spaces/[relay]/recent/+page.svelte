@@ -29,6 +29,7 @@
   import CalendarEventItem from "@app/components/CalendarEventItem.svelte"
   import RecentConversation from "@app/components/RecentConversation.svelte"
   import {decodeRelay, deriveEventsForUrl, CONTENT_KINDS} from "@app/core/state"
+  import {makeTitle} from "@app/util/title"
 
   const url = decodeRelay($page.params.relay!)
   const since = ago(MONTH)
@@ -36,6 +37,7 @@
   const messages = deriveEventsForUrl(url, [{kinds: [MESSAGE], since}])
   const content = deriveEventsForUrl(url, [{kinds: CONTENT_KINDS, since}])
   const comments = deriveEventsForUrl(url, [{kinds: [COMMENT], since}])
+  const pageTitle = makeTitle("Recent Activity")
 
   const recentActivity = derived(
     [messages, content, comments],
@@ -103,6 +105,10 @@
     return () => scroller.stop()
   })
 </script>
+
+<svelte:head>
+  <title>{pageTitle}</title>
+</svelte:head>
 
 <PageBar>
   {#snippet icon()}

@@ -53,6 +53,7 @@
   import {checked} from "@app/util/notifications"
   import {pushModal} from "@app/util/modal"
   import {pushToast} from "@app/util/toast"
+  import {makeTitle} from "@app/util/title"
 
   const {h, relay} = $page.params as MakeNonOptional<typeof $page.params>
   const mounted = now()
@@ -60,6 +61,8 @@
   const url = decodeRelay(relay)
   const room = deriveRoom(url, h)
   const shouldProtect = canEnforceNip70(url)
+  const roomTitle = $derived.by(() => $room?.name || "Room")
+  const pageTitle = $derived.by(() => makeTitle(roomTitle))
   const membershipStatus = deriveUserRoomMembershipStatus(url, h)
   const at = $derived(parseInt($page.url.searchParams.get("at") || String(now())))
 
@@ -363,6 +366,10 @@
     }
   })
 </script>
+
+<svelte:head>
+  <title>{pageTitle}</title>
+</svelte:head>
 
 <PageBar>
   {#snippet icon()}
