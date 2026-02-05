@@ -33,7 +33,13 @@
   )
 
   const pay = () => pushModal(WalletPay)
-  const receive = () => pushModal(WalletReceive)
+  const receive = () => {
+    if ($session?.wallet) {
+      pushModal(WalletReceive)
+    } else {
+      pushModal(WalletConnect)
+    }
+  }
 </script>
 
 <div class="content column gap-4">

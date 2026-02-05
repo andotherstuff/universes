@@ -20,11 +20,6 @@
   const back = () => history.back()
 
   const create = async () => {
-    if (!$session?.wallet) {
-      pushToast({theme: "error", message: "Connect a wallet to create invoices."})
-      return
-    }
-
     loading = true
 
     try {
