@@ -6,7 +6,7 @@ import {copyToClipboard} from "@lib/html"
 export type ToastParams = {
   message?: string
   timeout?: number
-  theme?: "error" | "success"
+  theme?: "error"
   children?: {
     component: Component<any>
     props: Record<string, any>

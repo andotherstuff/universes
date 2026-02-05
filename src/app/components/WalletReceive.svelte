@@ -34,7 +34,7 @@
       invoice = new Invoice({pr: paymentRequest})
       sats = invoice.satoshi && invoice.satoshi > 0 ? invoice.satoshi : satAmount
 
-      pushToast({theme: "success", message: "Invoice created"})
+      pushToast({message: "Invoice created"})
     } catch (e) {
       console.warn(e)
 
