@@ -17,6 +17,7 @@
   import ModalSubtitle from "@lib/components/ModalSubtitle.svelte"
   import ModalFooter from "@lib/components/ModalFooter.svelte"
   import EmojiButton from "@lib/components/EmojiButton.svelte"
+  import {errorMessage} from "@lib/util"
   import ProfileLink from "@app/components/ProfileLink.svelte"
   import {payInvoice} from "@app/core/commands"
   import {pushToast} from "@app/util/toast"
@@ -85,7 +86,7 @@
     } catch (e) {
       console.error(e)
 
-      const message = String(e).replace(/^.*Error: /, "")
+      const message = errorMessage(e)
 
       pushToast({
         theme: "error",

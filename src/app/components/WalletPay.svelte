@@ -14,6 +14,7 @@
   import ModalTitle from "@lib/components/ModalTitle.svelte"
   import ModalSubtitle from "@lib/components/ModalSubtitle.svelte"
   import ModalFooter from "@lib/components/ModalFooter.svelte"
+  import {errorMessage} from "@lib/util"
   import {payInvoice} from "@app/core/commands"
   import {pushToast} from "@app/util/toast"
   import {clearModals} from "@app/util/modal"
@@ -29,14 +30,18 @@
     loading = true
 
     try {
-      await payInvoice(invoice!.paymentRequest, sats * 1000)
+      if (hasAmount) {
+        await payInvoice(invoice!.paymentRequest)
+      } else {
+        await payInvoice(invoice!.paymentRequest, sats * 1000)
+      }
 
       pushToast({message: `Payment sent!`})
       clearModals()
     } catch (e) {
       console.error(e)
 
-      const message = String(e).replace(/^.*Error: /, "")
+      const message = errorMessage(e)
 
       pushToast({
         theme: "error",
@@ -50,6 +55,7 @@
   let loading = $state(false)
   let invoice: Invoice | undefined = $state()
   let sats = $state(0)
+  const hasAmount = $derived((invoice?.satoshi ?? 0) > 0)
 </script>
 
 <Modal>
@@ -60,7 +66,7 @@
     </ModalHeader>
     {#if invoice}
       <div class="card2 bg-alt flex flex-col gap-2">
-        {#if $session?.wallet?.type === "webln" && invoice.satoshi === 0}
+        {#if $session?.wallet?.type === "webln" && !hasAmount}
           <p class="text-sm opacity-75">
             Uh oh! It looks like your current wallet doesn't support invoices without an amount. See
             if you can get a lightning invoice with a pre-set amount.
@@ -101,7 +107,13 @@
       <Icon icon={AltArrowLeft} />
       Go back
     </Button>
-    <Button class="btn btn-primary" onclick={confirm} disabled={!invoice || sats === 0 || loading}>
+    <Button
+      class="btn btn-primary"
+      onclick={confirm}
+      disabled={!invoice ||
+        sats === 0 ||
+        loading ||
+        ($session?.wallet?.type === "webln" && !hasAmount)}>
       {#if loading}
         <span class="loading loading-spinner loading-sm"></span>
       {:else}

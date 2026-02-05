@@ -92,6 +92,9 @@
     ],
     "onlyBuiltDependencies": [
       "sharp"
-    ]
+    ],
+    "overrides": {
+      "sharp": "0.35.0-rc.0"
+    }
   }
 }
