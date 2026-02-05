@@ -24,6 +24,7 @@
   import InfoKeys from "@app/components/InfoKeys.svelte"
   import {PLATFORM_NAME} from "@app/core/state"
   import {pushModal} from "@app/util/modal"
+  import {makeTitle} from "@app/util/title"
   import {clip} from "@app/util/toast"
 
   const npub = nip19.npubEncode($pubkey!)
@@ -40,8 +41,14 @@
 
   const startRecovery = () => pushModal(InfoKeys)
 
+  const pageTitle = makeTitle("Profile Settings")
+
   let showAdvanced = false
 </script>
+
+<svelte:head>
+  <title>{pageTitle}</title>
+</svelte:head>
 
 <div class="content column gap-4">
   <div class="card2 bg-alt shadow-md">
