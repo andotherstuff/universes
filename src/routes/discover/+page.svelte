@@ -23,6 +23,7 @@
   import SpaceJoin from "@app/components/SpaceJoin.svelte"
   import {groupListPubkeysByUrl, parseInviteLink} from "@app/core/state"
   import {pushModal} from "@app/util/modal"
+  import {makeTitle} from "@app/util/title"
 
   const openMenu = () => pushModal(SpaceAdd, {hideDiscover: true})
 
@@ -82,7 +83,13 @@
       scroller.stop()
     }
   })
+
+  const pageTitle = makeTitle("Discover Spaces")
 </script>
+
+<svelte:head>
+  <title>{pageTitle}</title>
+</svelte:head>
 
 <Page class="cw-full">
   <ContentSearch>
