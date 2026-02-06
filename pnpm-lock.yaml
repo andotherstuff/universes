@@ -56,6 +56,9 @@ importers:
       '@noble/curves':
         specifier: ^1.9.7
         version: 1.9.7
+      '@noble/hashes':
+        specifier: ^2.0.1
+        version: 2.0.1
       '@pomade/core':
         specifier: ^0.0.12
         version: 0.0.12(@frostr/bifrost@1.0.7(typescript@5.9.3))(@noble/hashes@2.0.1)(@welshman/lib@0.8.3)(@welshman/net@0.8.3(@welshman/lib@0.8.3)(@welshman/util@0.8.3(@noble/curves@1.9.7)(@welshman/lib@0.8.3)(nostr-tools@2.20.0(typescript@5.9.3)))(ws@8.18.3))(@welshman/signer@0.8.3(@noble/curves@1.9.7)(@noble/hashes@2.0.1)(@welshman/lib@0.8.3)(@welshman/net@0.8.3(@welshman/lib@0.8.3)(@welshman/util@0.8.3(@noble/curves@1.9.7)(@welshman/lib@0.8.3)(nostr-tools@2.20.0(typescript@5.9.3)))(ws@8.18.3))(@welshman/util@0.8.3(@noble/curves@1.9.7)(@welshman/lib@0.8.3)(nostr-tools@2.20.0(typescript@5.9.3)))(nostr-signer-capacitor-plugin@0.0.4(@capacitor/core@8.0.1))(nostr-tools@2.20.0(typescript@5.9.3)))(@welshman/util@0.8.3(@noble/curves@1.9.7)(@welshman/lib@0.8.3)(nostr-tools@2.20.0(typescript@5.9.3)))(nostr-tools@2.20.0(typescript@5.9.3))
