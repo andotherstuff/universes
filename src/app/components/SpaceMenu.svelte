@@ -2,8 +2,9 @@
   import {onMount} from "svelte"
   import {derived} from "svelte/store"
   import {displayRelayUrl, EVENT_TIME, ZAP_GOAL, THREAD, CLASSIFIED, REPORT} from "@welshman/util"
-  import {deriveRelay, pubkey} from "@welshman/app"
+  import {deriveRelay, createSearch, pubkey} from "@welshman/app"
   import {fly} from "@lib/transition"
+  import Magnifier from "@assets/icons/magnifier.svg?dataurl"
   import AltArrowDown from "@assets/icons/alt-arrow-down.svg?dataurl"
   import RemoteControllerMinimalistic from "@assets/icons/remote-controller-minimalistic.svg?dataurl"
   import UserRounded from "@assets/icons/user-rounded.svg?dataurl"
@@ -51,6 +52,7 @@
     deriveEventsForUrl,
     notificationSettings,
     deriveShouldNotify,
+    displayRoom,
   } from "@app/core/state"
   import {setSpaceNotifications} from "@app/core/commands"
   import {notifications} from "@app/util/notifications"
@@ -74,6 +76,16 @@
   const spaceKinds = derived(
     deriveEventsForUrl(url, [{kinds: CONTENT_KINDS}]),
     $events => new Set($events.map(e => e.kind)),
+  )
+
+  const roomSearch = derived(otherRooms, $otherRooms =>
+    createSearch(
+      $otherRooms.map(h => ({h, name: displayRoom(url, h)})),
+      {
+        getValue: item => item.h,
+        fuseOptions: {keys: ["name"]},
+      },
+    ),
   )
 
   const openMenu = () => {
@@ -106,6 +118,13 @@
     setSpaceNotifications(url, !$shouldNotify)
   }
 
+  const clearTerm = () => {
+    setTimeout(() => {
+      term = ""
+    }, 100)
+  }
+
+  let term = $state("")
   let showMenu = $state(false)
   let replaceState = $state(false)
   let element: Element | undefined = $state()
@@ -201,7 +220,8 @@
         </Popover>
       {/if}
     </div>
-    <div class="flex max-h-[calc(100vh-150px)] min-h-0 flex-col gap-1 overflow-auto">
+    <div
+      class="flex max-h-[calc(100vh-150px)] min-h-0 flex-col gap-1 overflow-auto overflow-x-hidden">
       {#if hasNip29($relay)}
         <SecondaryNavItem {replaceState} href={makeSpacePath(url, "recent")}>
           <Icon icon={History} /> Recent Activity
@@ -264,7 +284,13 @@
             {/if}
           </SecondaryNavHeader>
         {/if}
-        {#each $otherRooms as h, i (h)}
+        {#if $otherRooms.length > 20}
+          <label class="input input-sm input-bordered mx-4 flex items-center gap-2">
+            <Icon icon={Magnifier} />
+            <input bind:value={term} onblur={clearTerm} class="grow" />
+          </label>
+        {/if}
+        {#each $roomSearch.searchValues(term) as h, i (h)}
           <SpaceMenuRoomItem {replaceState} {url} {h} />
         {/each}
         {#if $canCreateRoom}

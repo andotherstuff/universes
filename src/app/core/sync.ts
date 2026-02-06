@@ -1,18 +1,7 @@
 import {page} from "$app/stores"
 import type {Unsubscriber} from "svelte/store"
 import {derived, get} from "svelte/store"
-import {
-  partition,
-  call,
-  sortBy,
-  assoc,
-  dissoc,
-  chunk,
-  sleep,
-  identity,
-  WEEK,
-  ago,
-} from "@welshman/lib"
+import {last, call, assoc, chunk, sleep, identity, WEEK, ago} from "@welshman/lib"
 import {
   getListTags,
   getRelayTagValues,
@@ -30,7 +19,7 @@ import {
   isSignedEvent,
   unionFilters,
 } from "@welshman/util"
-import type {Filter, TrustedEvent} from "@welshman/util"
+import type {Filter} from "@welshman/util"
 import {request, load, pull} from "@welshman/net"
 import {
   pubkey,
@@ -45,7 +34,6 @@ import {
   loadFollowList,
   loadMuteList,
   loadProfile,
-  tracker,
   repository,
   shouldUnwrap,
   hasNegentropy,
@@ -69,44 +57,37 @@ import {hasBlossomSupport} from "@app/core/commands"
 
 // Utils
 
-type PullOpts = {
-  relays: string[]
-  filters: Filter[]
+type SyncOpts = {
+  url: string
   signal: AbortSignal
+  filters: Filter[]
 }
 
-export const pullWithFallback = ({relays, filters, signal}: PullOpts) => {
-  const [smart, dumb] = partition(hasNegentropy, relays)
-  const events = repository.query(filters, {shouldSort: false}).filter(isSignedEvent)
-  const promises: Promise<TrustedEvent[]>[] = [pull({relays: smart, filters, signal, events})]
+export const pullWithFallback = ({url, signal, filters}: SyncOpts) => {
+  const relays = [url]
+  const events = repository.query(filters).filter(isSignedEvent)
 
-  // Since pulling from relays without negentropy is expensive, limit how many
-  // duplicates we repeatedly download
-  for (const url of dumb) {
-    const urlEvents = events.filter(e => tracker.getRelays(e.id).has(url))
-
-    if (urlEvents.length >= 100) {
-      filters = filters.map(assoc("since", sortBy(e => -e.created_at, urlEvents)[10]!.created_at))
-    }
-
-    promises.push(load({relays: [url], filters, signal}))
+  if (hasNegentropy(url)) {
+    pull({relays, signal, events, filters})
+  } else {
+    request({
+      relays,
+      signal,
+      autoClose: true,
+      filters: filters.map(assoc("since", last(events.slice(10))?.created_at || 0)),
+    })
   }
-
-  return Promise.all(promises)
 }
 
-const pullAndListen = ({relays, filters, signal}: PullOpts) => {
-  pullWithFallback({
-    relays,
-    signal,
-    filters: filters.map(f => ({limit: 100, ...f})),
-  })
+const listen = ({url, signal, filters}: SyncOpts) => {
+  const relays = [url]
 
-  request({
-    relays,
-    signal,
-    filters: unionFilters(filters.map(dissoc("limit"))).map(assoc("limit", 0)),
-  })
+  request({relays, signal, filters: unionFilters(filters).map(assoc("limit", 0))})
+}
+
+const pullAndListen = ({url, filters, signal}: SyncOpts) => {
+  pullWithFallback({url, signal, filters})
+  listen({url, signal, filters})
 }
 
 // Relays
@@ -145,7 +126,7 @@ const syncUserSpaceMembership = (url: string) => {
 
   if ($pubkey) {
     pullAndListen({
-      relays: [url],
+      url,
       signal: controller.signal,
       filters: [
         {kinds: [RELAY_ADD_MEMBER], "#p": [$pubkey], limit: 1},
@@ -164,7 +145,7 @@ const syncUserRoomMembership = (url: string, h: string) => {
 
   if ($pubkey) {
     pullAndListen({
-      relays: [url],
+      url,
       signal: controller.signal,
       filters: [
         {kinds: [ROOM_ADD_MEMBER], "#p": [$pubkey], "#h": [h], limit: 1},
@@ -252,19 +233,38 @@ const syncUserData = () => {
 const syncSpace = (url: string) => {
   const controller = new AbortController()
 
+  // These are separated so that old versions of relay29 don't barf
+
   pullAndListen({
-    relays: [url],
+    url,
     signal: controller.signal,
-    filters: [
-      {kinds: [RELAY_MEMBERS]},
-      {kinds: [ROOM_ADMINS, ROOM_MEMBERS]},
-      {kinds: [ROOM_META, ROOM_DELETE], limit: 1000},
-      {kinds: [ROOM_ADD_MEMBER, ROOM_REMOVE_MEMBER]},
-      {kinds: [RELAY_ADD_MEMBER, RELAY_REMOVE_MEMBER]},
-      ...MESSAGE_KINDS.map(kind => ({kinds: [kind]})),
-      makeCommentFilter(CONTENT_KINDS),
-      {kinds: REACTION_KINDS, limit: 0},
-    ],
+    filters: [{kinds: [RELAY_MEMBERS, RELAY_ADD_MEMBER, RELAY_REMOVE_MEMBER]}],
+  })
+
+  pullAndListen({
+    url,
+    signal: controller.signal,
+    filters: [{kinds: [ROOM_META, ROOM_ADMINS, ROOM_MEMBERS]}],
+  })
+
+  pullAndListen({
+    url,
+    signal: controller.signal,
+    filters: [{kinds: [ROOM_DELETE, ROOM_ADD_MEMBER, ROOM_REMOVE_MEMBER]}],
+  })
+
+  const since = ago(WEEK)
+
+  pullAndListen({
+    url,
+    signal: controller.signal,
+    filters: [{kinds: MESSAGE_KINDS, since}, makeCommentFilter(CONTENT_KINDS, {since})],
+  })
+
+  listen({
+    url,
+    signal: controller.signal,
+    filters: [{kinds: REACTION_KINDS, limit: 0}],
   })
 
   return () => controller.abort()
@@ -310,18 +310,10 @@ const syncSpaces = () => {
 const syncDMRelay = (url: string, pubkey: string) => {
   const controller = new AbortController()
 
-  // Load historical data
-  pullWithFallback({
-    relays: [url],
+  pullAndListen({
+    url,
     signal: controller.signal,
-    filters: [{kinds: [WRAP], "#p": [pubkey], until: ago(WEEK, 2)}],
-  })
-
-  // Load new events
-  request({
-    relays: [url],
-    signal: controller.signal,
-    filters: [{kinds: [WRAP], "#p": [pubkey], since: ago(WEEK, 2)}],
+    filters: [{kinds: [WRAP], "#p": [pubkey]}],
   })
 
   return () => controller.abort()
