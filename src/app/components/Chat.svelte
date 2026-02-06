@@ -107,11 +107,15 @@
 
       if (isLink(p) && imeta) {
         addTemplate(DIRECT_MESSAGE, buffer.splice(0).join(""), tags)
-        addTemplate(
-          DIRECT_MESSAGE_FILE,
-          p.value.url.toString(),
-          imeta.slice(1).filter(nthNe(0, "url")),
-        )
+        const imetaFields = imeta.filter(tag => tag.length > 1)
+        const imetaTag = ["imeta", ...imetaFields.map(([key, value]) => `${key} ${value}`)]
+        const fileTags = [...imeta.slice(1).filter(nthNe(0, "url"))]
+
+        if (imetaFields.length > 0) {
+          fileTags.push(imetaTag)
+        }
+
+        addTemplate(DIRECT_MESSAGE_FILE, p.value.url.toString(), fileTags)
       } else {
         buffer.push(p.raw)
       }
