@@ -30,13 +30,11 @@
   import {pushToast} from "@app/util/toast"
   import {makeFeed} from "@app/core/requests"
   import {popKey} from "@lib/implicit"
-  import {makeTitle} from "@app/util/title"
 
   const mounted = now()
   const lastChecked = $checked[$page.url.pathname]
   const url = decodeRelay($page.params.relay!)
   const shouldProtect = canEnforceNip70(url)
-  const pageTitle = makeTitle("Space Chat")
 
   const replyTo = (event: TrustedEvent) => {
     parent = event
@@ -258,10 +256,6 @@
     }
   })
 </script>
-
-<svelte:head>
-  <title>{pageTitle}</title>
-</svelte:head>
 
 <PageBar>
   {#snippet icon()}

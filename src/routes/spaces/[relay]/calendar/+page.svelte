@@ -22,10 +22,8 @@
   import {decodeRelay, makeCommentFilter} from "@app/core/state"
   import {makeCalendarFeed} from "@app/core/requests"
   import {setChecked} from "@app/util/notifications"
-  import {makeTitle} from "@app/util/title"
 
   const url = decodeRelay($page.params.relay!)
-  const pageTitle = makeTitle("Calendar")
 
   const makeEvent = () => pushModal(CalendarEventCreate, {url})
 
@@ -114,10 +112,6 @@
     }
   })
 </script>
-
-<svelte:head>
-  <title>{pageTitle}</title>
-</svelte:head>
 
 <PageBar>
   {#snippet icon()}

@@ -51,7 +51,6 @@
   import {popKey} from "@lib/implicit"
   import {pushToast} from "@app/util/toast"
   import {pushModal} from "@app/util/modal"
-  import {makeTitle} from "@app/util/title"
 
   const {h, relay} = $page.params as MakeNonOptional<typeof $page.params>
   const mounted = now()
@@ -59,8 +58,6 @@
   const url = decodeRelay(relay)
   const room = deriveRoom(url, h)
   const shouldProtect = canEnforceNip70(url)
-  const roomTitle = $derived.by(() => $room?.name || "Room")
-  const pageTitle = $derived.by(() => makeTitle(roomTitle))
   const membershipStatus = deriveUserRoomMembershipStatus(url, h)
 
   const showRoomDetail = () => pushModal(RoomDetail, {url, h})
@@ -328,10 +325,6 @@
     }, 800)
   })
 </script>
-
-<svelte:head>
-  <title>{pageTitle}</title>
-</svelte:head>
 
 <PageBar>
   {#snippet icon()}

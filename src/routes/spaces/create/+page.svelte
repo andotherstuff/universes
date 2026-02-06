@@ -7,14 +7,7 @@
   import Page from "@lib/components/Page.svelte"
   import PageHeader from "@lib/components/PageHeader.svelte"
   import PageContent from "@lib/components/PageContent.svelte"
-  import {makeTitle} from "@app/util/title"
-
-  const pageTitle = makeTitle("Create a Space")
 </script>
-
-<svelte:head>
-  <title>{pageTitle}</title>
-</svelte:head>
 
 <Page class="cw-full">
   <PageContent class="cw-full flex flex-col items-center gap-2 p-2 pt-4">

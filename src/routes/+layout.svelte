@@ -2,16 +2,18 @@
   import "@src/app.css"
   import "@capacitor-community/safe-area"
   import * as nip19 from "nostr-tools/nip19"
-  import type {Unsubscriber} from "svelte/store"
-  import {get} from "svelte/store"
+  import type {Readable, Unsubscriber} from "svelte/store"
+  import {derived, get} from "svelte/store"
   import {App, type URLOpenListenerEvent} from "@capacitor/app"
   import {dev} from "$app/environment"
   import {goto} from "$app/navigation"
+  import {page} from "$app/stores"
   import {sync, throttled} from "@welshman/store"
   import {call} from "@welshman/lib"
   import {defaultSocketPolicies} from "@welshman/net"
   import {pubkey, sessions, signerLog, shouldUnwrap} from "@welshman/app"
   import * as lib from "@welshman/lib"
+  import type {TrustedEvent} from "@welshman/util"
   import * as util from "@welshman/util"
   import * as feeds from "@welshman/feeds"
   import * as router from "@welshman/router"
@@ -46,7 +48,141 @@
   import NewNotificationSound from "@src/app/components/NewNotificationSound.svelte"
 
   const {children} = $props()
-  const pageTitle = makeTitle()
+  const staticTitles = new Map<string, string>([
+    ["/", "Redirecting"],
+    ["/home", "Home"],
+    ["/discover", "Discover Spaces"],
+    ["/spaces", "Your Spaces"],
+    ["/spaces/create", "Create a Space"],
+    ["/spaces/[relay]", "Space"],
+    ["/spaces/[relay]/chat", "Space Chat"],
+    ["/spaces/[relay]/recent", "Recent Activity"],
+    ["/spaces/[relay]/threads", "Threads"],
+    ["/spaces/[relay]/classifieds", "Classifieds"],
+    ["/spaces/[relay]/calendar", "Calendar"],
+    ["/spaces/[relay]/goals", "Goals"],
+    ["/chat", "Messages"],
+    ["/join", "Join Space"],
+    ["/people", "Find People"],
+    ["/settings/about", "About"],
+    ["/settings/profile", "Profile Settings"],
+    ["/settings/content", "Content Settings"],
+    ["/settings/privacy", "Privacy Settings"],
+    ["/settings/relays", "Relay Settings"],
+    ["/settings/alerts", "Alert Settings"],
+    ["/settings/wallet", "Wallet Settings"],
+    ["/[bech32]", "Opening Link"],
+  ])
+  const eventRoutes = new Set([
+    "/spaces/[relay]/threads/[id]",
+    "/spaces/[relay]/goals/[id]",
+    "/spaces/[relay]/calendar/[address]",
+    "/spaces/[relay]/classifieds/[address]",
+  ])
+
+  const roomForTitle: Readable<{name?: string} | undefined> = derived(page, ($page, set) => {
+    if ($page.route.id !== "/spaces/[relay]/[h]") {
+      set(undefined)
+      return
+    }
+
+    const {relay, h} = $page.params
+
+    if (!relay || !h) {
+      set(undefined)
+      return
+    }
+
+    const url = appState.decodeRelay(relay)
+    const room = appState.deriveRoom(url, h)
+
+    return room.subscribe(set)
+  })
+
+  const eventForTitle: Readable<TrustedEvent | undefined> = derived(page, ($page, set) => {
+    const routeId = $page.route.id
+    const relay = $page.params.relay
+    if (!routeId || !relay || !eventRoutes.has(routeId)) {
+      set(undefined)
+      return
+    }
+
+    const eventId = $page.params.id || $page.params.address
+
+    if (!eventId) {
+      set(undefined)
+      return
+    }
+
+    const url = appState.decodeRelay(relay)
+    const event = appState.deriveEvent(eventId, [url])
+
+    return event.subscribe(set)
+  })
+
+  const pageTitle = $derived.by(() => {
+    const routeId = $page.route.id || ""
+    const staticTitle = staticTitles.get(routeId)
+
+    if (staticTitle) {
+      return makeTitle(staticTitle)
+    }
+
+    if (routeId === "/chat/[chat]") {
+      const chatId = $page.params.chat
+
+      if (!chatId) {
+        return makeTitle("Chat")
+      }
+
+      const self = $pubkey
+      const chatPeers = self
+        ? lib.uniq(lib.append(self, appState.splitChatId(chatId)))
+        : appState.splitChatId(chatId)
+      const others = self ? chatPeers.filter(pk => pk !== self) : chatPeers
+
+      if (others.length === 1) {
+        return makeTitle(`Chat with ${util.displayPubkey(others[0])}`)
+      }
+
+      if (others.length > 1) {
+        return makeTitle(`Group chat (${others.length})`)
+      }
+
+      return makeTitle("Chat")
+    }
+
+    if (routeId === "/spaces/[relay]/[h]") {
+      return makeTitle($roomForTitle?.name || "Room")
+    }
+
+    if (routeId === "/spaces/[relay]/threads/[id]") {
+      const title = util.getTagValue("title", $eventForTitle?.tags || []) || "Thread"
+
+      return makeTitle(title)
+    }
+
+    if (routeId === "/spaces/[relay]/calendar/[address]") {
+      const title = util.getTagValue("title", $eventForTitle?.tags || []) || "Event"
+
+      return makeTitle(title)
+    }
+
+    if (routeId === "/spaces/[relay]/classifieds/[address]") {
+      const title = util.getTagValue("title", $eventForTitle?.tags || []) || "Listing"
+
+      return makeTitle(title)
+    }
+
+    if (routeId === "/spaces/[relay]/goals/[id]") {
+      const title =
+        $eventForTitle?.content || util.getTagValue("summary", $eventForTitle?.tags || []) || "Goal"
+
+      return makeTitle(title)
+    }
+
+    return makeTitle()
+  })
 
   const policies = [authPolicy, blockPolicy, trustPolicy, mostlyRestrictedPolicy]
 
@@ -193,10 +329,15 @@
     App.removeAllListeners()
     unsubscribe.then(call)
   })
+
+  $effect(() => {
+    if (typeof document !== "undefined") {
+      document.title = pageTitle
+    }
+  })
 </script>
 
 <svelte:head>
-  <title>{pageTitle}</title>
   {#if !dev}
     <link rel="manifest" href="/manifest.webmanifest" />
   {/if}

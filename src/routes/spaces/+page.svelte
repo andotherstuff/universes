@@ -10,15 +10,9 @@
   import SpaceAdd from "@app/components/SpaceAdd.svelte"
   import {userSpaceUrls, loadUserGroupList, PLATFORM_RELAYS} from "@app/core/state"
   import {pushModal} from "@app/util/modal"
-  import {makeTitle} from "@app/util/title"
 
   const addSpace = () => pushModal(SpaceAdd)
-  const pageTitle = makeTitle("Your Spaces")
 </script>
-
-<svelte:head>
-  <title>{pageTitle}</title>
-</svelte:head>
 
 <Page class="cw-full">
   <PageBar class="cw-full">

@@ -13,14 +13,11 @@
   import ChatEnable from "@app/components/ChatEnable.svelte"
   import {pushModal} from "@app/util/modal"
   import {goToSpace} from "@app/util/routes"
-  import {makeTitle} from "@app/util/title"
   import {PLATFORM_NAME, PLATFORM_RELAYS} from "@app/core/state"
 
   const addSpace = () => pushModal(SpaceAdd)
 
   const openChat = () => ($shouldUnwrap ? goto("/chat") : pushModal(ChatEnable, {next: "/chat"}))
-
-  const pageTitle = makeTitle("Home")
 
   onMount(async () => {
     if (PLATFORM_RELAYS.length > 0) {
@@ -28,10 +25,6 @@
     }
   })
 </script>
-
-<svelte:head>
-  <title>{pageTitle}</title>
-</svelte:head>
 
 <div class="hero min-h-screen overflow-auto pb-8">
   <div class="hero-content">
