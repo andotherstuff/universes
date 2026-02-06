@@ -1,5 +1,6 @@
 import type {SendPaymentResponse, WebLNProvider} from "@webbtc/webln-types"
 import {Invoice} from "../bolt11"
+import {sendBoostagram, type Boost} from "../podcasting2"
 import type {
   KeySendRawData,
   KeysendResponse,
@@ -242,6 +243,27 @@ export class LightningAddress {
     if (args.payerdata) invoiceParams.payerdata = JSON.stringify(args.payerdata)
 
     return this.generateInvoice(invoiceParams)
+  }
+
+  async boost(boost: Boost, amount = 0) {
+    if (!this.keysendData) {
+      throw new Error("No keysendData available. Please call fetch() first.")
+    }
+    const {destination, customKey, customValue} = this.keysendData
+    const webln = this.getWebLN()
+    if (!webln) {
+      throw new Error("WebLN not available")
+    }
+    return sendBoostagram(
+      {
+        destination,
+        customKey,
+        customValue,
+        amount,
+        boost,
+      },
+      {webln},
+    )
   }
 
   async zapInvoice(
