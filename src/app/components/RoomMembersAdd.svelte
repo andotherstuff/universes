@@ -104,9 +104,7 @@
   let pubkeys: string[] = $state(popKey("RoomMembersAdd.pubkeys") || [])
 
   onMount(() => {
-    console.log("=====")
     if (popKey("RoomMembersAdd.confirm")) {
-      console.log("hi")
       addMembers()
     }
   })

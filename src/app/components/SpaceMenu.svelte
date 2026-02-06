@@ -285,7 +285,7 @@
           </SecondaryNavHeader>
         {/if}
         {#if $otherRooms.length > 20}
-          <label class="input input-sm input-bordered mx-4 flex items-center gap-2">
+          <label class="input input-sm input-bordered flex items-center gap-2">
             <Icon icon={Magnifier} />
             <input bind:value={term} onblur={clearTerm} class="grow" />
           </label>

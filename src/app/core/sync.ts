@@ -20,7 +20,7 @@ import {
   unionFilters,
 } from "@welshman/util"
 import type {Filter} from "@welshman/util"
-import {request, load, pull} from "@welshman/net"
+import {request, pull} from "@welshman/net"
 import {
   pubkey,
   loadRelay,

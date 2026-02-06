@@ -15,6 +15,7 @@
   import PageContent from "@lib/components/PageContent.svelte"
   import Spinner from "@lib/components/Spinner.svelte"
   import Button from "@lib/components/Button.svelte"
+  import Content from "@app/components/Content.svelte"
   import NoteContent from "@app/components/NoteContent.svelte"
   import NoteCard from "@app/components/NoteCard.svelte"
   import SpaceMenuButton from "@app/components/SpaceMenuButton.svelte"
@@ -26,10 +27,10 @@
   import {deriveEvent, decodeRelay} from "@app/core/state"
   import {setChecked} from "@app/util/notifications"
 
-  const {relay, id} = $page.params as MakeNonOptional<typeof $page.params>
+  const {relay, address} = $page.params as MakeNonOptional<typeof $page.params>
   const url = decodeRelay(relay)
-  const event = deriveEvent(id, [url])
-  const filters = [{kinds: [COMMENT], "#E": [id]}]
+  const event = deriveEvent(address, [url])
+  const filters = [{kinds: [COMMENT], "#A": [address]}]
   const replies = deriveEventsAsc(deriveEventsById({filters, repository}))
 
   const back = () => history.back()
@@ -89,7 +90,7 @@
           <div class="flex py-2 opacity-50">
             <div class="h-px flex-grow bg-base-content opacity-25"></div>
           </div>
-          <NoteContent showEntire event={$event} {url} />
+          <Content showEntire event={$event} {url} />
         </div>
       </div>
       <div class="flex w-full flex-col justify-end sm:flex-row">
