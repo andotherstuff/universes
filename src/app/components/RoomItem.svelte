@@ -1,4 +1,5 @@
 <script lang="ts">
+  import {onMount} from "svelte"
   import cx from "classnames"
   import {hash, now, displayList, formatTimestampAsTime, formatTimestampAsDate} from "@welshman/lib"
   import type {TrustedEvent, EventContent} from "@welshman/util"
@@ -10,7 +11,6 @@
     deriveProfileDisplay,
     displayProfileByPubkey,
   } from "@welshman/app"
-  import {isMobile} from "@lib/html"
   import Pen from "@assets/icons/pen.svg?dataurl"
   import Reply from "@assets/icons/reply-2.svg?dataurl"
   import ReplyAlt from "@assets/icons/reply.svg?dataurl"
@@ -65,6 +65,25 @@
 
   const onTap = () => pushModal(RoomItemMenuMobile, {url, event, reply, edit})
 
+  const detectHover = () => {
+    if (!window.matchMedia) return false
+
+    return (
+      window.matchMedia("(hover: hover)").matches ||
+      window.matchMedia("(any-hover: hover)").matches ||
+      window.matchMedia("(pointer: fine)").matches ||
+      window.matchMedia("(any-pointer: fine)").matches
+    )
+  }
+
+  let canHover = $state(false)
+
+  const showHoverMenu = $derived.by(() => canHover)
+
+  onMount(() => {
+    canHover = detectHover()
+  })
+
   const openProfile = () => pushModal(ProfileDetail, {pubkey: event.pubkey, url})
 
   const deleteReaction = async (event: TrustedEvent) =>
@@ -76,7 +95,7 @@
 
 <TapTarget
   data-event={event.id}
-  onTap={inert ? null : onTap}
+  onTap={inert || showHoverMenu ? undefined : onTap}
   class="group relative flex w-full cursor-default flex-col p-2 pb-3 text-left hover:bg-base-100/50">
   <div class="flex w-full gap-3 overflow-auto">
     {#if showPubkey}
@@ -138,10 +157,10 @@
       </div>
     {/if}
   </div>
-  {#if !isMobile}
+  {#if showHoverMenu}
     <button
       class="join absolute right-1 top-1 border border-solid border-neutral text-xs opacity-0 transition-all"
-      class:group-hover:opacity-100={!isMobile}>
+      class:group-hover:opacity-100={showHoverMenu}>
       {#if ENABLE_ZAPS}
         <RoomItemZapButton {url} {event} />
       {/if}

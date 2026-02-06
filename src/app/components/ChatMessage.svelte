@@ -1,9 +1,9 @@
 <script lang="ts">
+  import {onMount} from "svelte"
   import {type Instance} from "tippy.js"
   import {hash, formatTimestampAsTime} from "@welshman/lib"
   import type {TrustedEvent, EventContent} from "@welshman/util"
   import {thunks, mergeThunks, pubkey, deriveProfileDisplay, sendWrapped} from "@welshman/app"
-  import {isMobile} from "@lib/html"
   import MenuDots from "@assets/icons/menu-dots.svg?dataurl"
   import Icon from "@lib/components/Icon.svelte"
   import Button from "@lib/components/Button.svelte"
@@ -46,6 +46,25 @@
 
   const showMobileMenu = () => pushModal(ChatMessageMenuMobile, {event, pubkeys, reply})
 
+  const detectHover = () => {
+    if (!window.matchMedia) return false
+
+    return (
+      window.matchMedia("(hover: hover)").matches ||
+      window.matchMedia("(any-hover: hover)").matches ||
+      window.matchMedia("(pointer: fine)").matches ||
+      window.matchMedia("(any-pointer: fine)").matches
+    )
+  }
+
+  let canHover = $state(false)
+
+  const showHoverMenu = $derived.by(() => canHover)
+
+  onMount(() => {
+    canHover = detectHover()
+  })
+
   const togglePopover = () => {
     if (popoverIsVisible) {
       popover?.hide()
@@ -67,7 +86,7 @@
   class:chat-start={!isOwn}
   class:flex-row-reverse={!isOwn}
   class:chat-end={isOwn}>
-  {#if !isMobile}
+  {#if showHoverMenu}
     <Tippy
       bind:popover
       component={ChatMessageMenu}
@@ -85,7 +104,7 @@
       <button
         type="button"
         class="opacity-0 transition-all"
-        class:group-hover:opacity-100={!isMobile}
+        class:group-hover:opacity-100={showHoverMenu}
         onclick={togglePopover}>
         <Icon icon={MenuDots} size={4} />
       </button>
@@ -94,7 +113,7 @@
   <div class="flex min-w-0 flex-col" class:items-end={isOwn}>
     <TapTarget
       class="bg-alt chat-bubble mx-1 mb-2 flex cursor-auto flex-col gap-1 text-left lg:max-w-2xl"
-      onTap={showMobileMenu}>
+      onTap={showHoverMenu ? undefined : showMobileMenu}>
       {#if showPubkey}
         <div class="flex items-center gap-2">
           {#if !isOwn}

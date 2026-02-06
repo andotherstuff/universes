@@ -44,6 +44,20 @@ const guessFilename = (url: string, meta: string[][], hash?: string) => {
   return "download"
 }
 
+const openInNewTab = (url: string, filename?: string) => {
+  const a = document.createElement("a")
+
+  a.href = url
+  a.target = "_blank"
+  a.rel = "noopener"
+  if (filename) {
+    a.download = filename
+  }
+  document.body.appendChild(a)
+  a.click()
+  document.body.removeChild(a)
+}
+
 export const downloadLinkFile = async ({url, event}: DownloadLinkFileOptions) => {
   const meta =
     getTags("imeta", event.tags)
@@ -56,34 +70,42 @@ export const downloadLinkFile = async ({url, event}: DownloadLinkFileOptions) =>
   const algorithm = getTagValue("encryption-algorithm", meta)
   const $signer = signer.get()
 
-  let response: Response | undefined
+  const fallbackFilename = getTagValue("name", meta) || getTagValue("filename", meta)
+  const fallback = () => openInNewTab(url, fallbackFilename)
 
-  if (hash && $signer) {
-    const server = new URL(url).origin
-    const template = makeBlossomAuthEvent({action: "get", server, hashes: [hash]})
-    const authEvent = await $signer.sign(template)
+  try {
+    let response: Response | undefined
 
-    response = await getBlob(server, hash, {authEvent})
+    if (hash && $signer) {
+      const server = new URL(url).origin
+      const template = makeBlossomAuthEvent({action: "get", server, hashes: [hash]})
+      const authEvent = await $signer.sign(template)
+
+      response = await getBlob(server, hash, {authEvent})
+    }
+
+    if (!response?.ok) {
+      response = await fetch(url)
+    }
+
+    if (!response.ok || response.type === "opaque") {
+      fallback()
+      return
+    }
+
+    let data = new Uint8Array(await response.arrayBuffer())
+
+    if (algorithm === "aes-gcm" && key && nonce) {
+      const decrypted = await decryptFile({ciphertext: data, key, nonce, algorithm})
+      data = new Uint8Array(decrypted)
+    }
+
+    const filename = guessFilename(url, meta, hash)
+    const contentType = getTagValue("type", meta) || response.headers.get("content-type")
+    const blob = new Blob([data], {type: contentType || "application/octet-stream"})
+
+    downloadBlob(filename, blob)
+  } catch {
+    fallback()
   }
-
-  if (!response?.ok) {
-    response = await fetch(url)
-  }
-
-  if (!response.ok) {
-    throw new Error(`Failed to download file (HTTP ${response.status})`)
-  }
-
-  let data = new Uint8Array(await response.arrayBuffer())
-
-  if (algorithm === "aes-gcm" && key && nonce) {
-    const decrypted = await decryptFile({ciphertext: data, key, nonce, algorithm})
-    data = new Uint8Array(decrypted)
-  }
-
-  const filename = guessFilename(url, meta, hash)
-  const contentType = getTagValue("type", meta) || response.headers.get("content-type")
-  const blob = new Blob([data], {type: contentType || "application/octet-stream"})
-
-  downloadBlob(filename, blob)
 }
