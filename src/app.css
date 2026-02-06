@@ -102,19 +102,19 @@
   }
 
   .mt-sai {
-    padding-top: var(--sait);
+    margin-top: var(--sait);
   }
 
   .mr-sai {
-    padding-right: var(--sair);
+    margin-right: var(--sair);
   }
 
   .mb-sai {
-    padding-bottom: var(--saib);
+    margin-bottom: var(--saib);
   }
 
   .ml-sai {
-    padding-left: var(--sail);
+    margin-left: var(--sail);
   }
 
   .mx-sai {

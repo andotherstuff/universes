@@ -5,14 +5,14 @@ const config: CapacitorConfig = {
   appName: "Flotilla",
   webDir: "build",
   android: {
-    adjustMarginsForEdgeToEdge: false,
+    adjustMarginsForEdgeToEdge: true,
   },
   plugins: {
     CapacitorHttp: {
       enabled: true,
     },
     SystemBars: {
-      insetsHandling: "disable",
+      insetsHandling: "enable",
     },
     SplashScreen: {
       androidSplashResourceName: "splash",
