@@ -9,7 +9,6 @@
   import ContentSearch from "@lib/components/ContentSearch.svelte"
   import PeopleItem from "@app/components/PeopleItem.svelte"
   import {bootstrapPubkeys} from "@app/core/state"
-  import {makeTitle} from "@app/util/title"
 
   let term = $state("")
   let limit = $state(10)
@@ -36,13 +35,7 @@
 
     return () => scroller.stop()
   })
-
-  const pageTitle = makeTitle("Find People")
 </script>
-
-<svelte:head>
-  <title>{pageTitle}</title>
-</svelte:head>
 
 <Page class="cw-full">
   <ContentSearch>

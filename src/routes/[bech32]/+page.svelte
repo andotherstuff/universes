@@ -9,10 +9,8 @@
   import {goto} from "$app/navigation"
   import Spinner from "@lib/components/Spinner.svelte"
   import {goToEvent} from "@app/util/routes"
-  import {makeTitle} from "@app/util/title"
 
   const {bech32} = $page.params as MakeNonOptional<typeof $page.params>
-  const pageTitle = makeTitle("Opening Link")
 
   const attemptToNavigate = async () => {
     const {type, data} = nip19.decode(bech32) as any
@@ -46,9 +44,5 @@
     }
   })
 </script>
-
-<svelte:head>
-  <title>{pageTitle}</title>
-</svelte:head>
 
 <Spinner />

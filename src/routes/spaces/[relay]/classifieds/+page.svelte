@@ -20,10 +20,8 @@
   import {makeCommentFilter} from "@app/core/state"
   import {makeFeed} from "@app/core/requests"
   import {pushModal} from "@app/util/modal"
-  import {makeTitle} from "@app/util/title"
 
   const url = decodeRelay($page.params.relay!)
-  const pageTitle = makeTitle("Classifieds")
 
   let loading = $state(true)
   let element: HTMLElement | undefined = $state()
@@ -63,10 +61,6 @@
     }
   })
 </script>
-
-<svelte:head>
-  <title>{pageTitle}</title>
-</svelte:head>
 
 <PageBar>
   {#snippet icon()}
