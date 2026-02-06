@@ -11,6 +11,7 @@
   import {PROTECTED} from "@app/core/state"
   import {makeEditor} from "@app/editor"
   import {pushToast} from "@app/util/toast"
+  import {mergeImetaTags, warnMissingImeta} from "@app/util/imeta"
 
   const {url, event, onClose, onSubmit} = $props()
 
@@ -25,7 +26,10 @@
 
     const ed = await editor
     const content = ed.getText({blockSeparator: "\n"}).trim()
-    const tags = ed.storage.nostr.getEditorTags()
+    let tags = ed.storage.nostr.getEditorTags()
+    const imeta = mergeImetaTags(content, tags)
+    tags = imeta.tags
+    warnMissingImeta(imeta.missing)
 
     if (await shouldProtect) {
       tags.push(PROTECTED)

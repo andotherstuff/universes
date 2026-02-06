@@ -1,6 +1,7 @@
 <script lang="ts">
   import type {Instance} from "tippy.js"
   import {writable} from "svelte/store"
+  import {onDestroy, onMount} from "svelte"
   import type {EventContent} from "@welshman/util"
   import {isMobile, preventDefault} from "@lib/html"
   import GallerySend from "@assets/icons/gallery-send.svg?dataurl"
@@ -12,7 +13,7 @@
   import ComposeMenu from "@app/components/ComposeMenu.svelte"
   import EditorContent from "@app/editor/EditorContent.svelte"
   import {makeEditor} from "@app/editor"
-  import {onDestroy, onMount} from "svelte"
+  import {mergeImetaTags, warnMissingImeta} from "@app/util/imeta"
 
   type Props = {
     url?: string
@@ -55,9 +56,13 @@
 
     const ed = await editor
     const content = ed.getText({blockSeparator: "\n"}).trim()
-    const tags = ed.storage.nostr.getEditorTags()
 
     if (!content) return
+
+    let tags = ed.storage.nostr.getEditorTags()
+    const imeta = mergeImetaTags(content, tags)
+    tags = imeta.tags
+    warnMissingImeta(imeta.missing)
 
     onSubmit({content, tags})
 
