@@ -19,6 +19,7 @@ import {makeMentionNodeView} from "@app/editor/MentionNodeView"
 import ProfileSuggestion from "@app/editor/ProfileSuggestion.svelte"
 import {uploadFile} from "@app/core/commands"
 import {deriveSpaceMembers} from "@app/core/state"
+import {recordImetaFromFiles} from "@app/util/imeta"
 import {pushToast} from "@app/util/toast"
 
 export const makeEditor = async ({
@@ -105,6 +106,10 @@ export const makeEditor = async ({
               upload: (attrs: FileAttributes) =>
                 uploadFile(attrs.file, {url, encrypt: encryptFiles}),
               onDrop: () => uploading?.set(true),
+              onUpload(currentEditor) {
+                const files = currentEditor.storage.fileUpload?.getFiles?.() || []
+                recordImetaFromFiles(files)
+              },
               onComplete: () => uploading?.set(false),
               onUploadError(currentEditor, task) {
                 currentEditor.commands.removeFailedUploads()

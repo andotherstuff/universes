@@ -2,12 +2,14 @@
   import {onMount} from "svelte"
   import type {Snippet} from "svelte"
   import {goto} from "$app/navigation"
+  import {parse, isLink} from "@welshman/content"
   import type {TrustedEvent} from "@welshman/util"
   import {COMMENT, ManagementMethod} from "@welshman/util"
   import {pubkey, repository, relaysByUrl, manageRelay} from "@welshman/app"
   import ShareCircle from "@assets/icons/share-circle.svg?dataurl"
   import Code2 from "@assets/icons/code-2.svg?dataurl"
   import TrashBin2 from "@assets/icons/trash-bin-2.svg?dataurl"
+  import Download from "@assets/icons/download.svg?dataurl"
   import Danger from "@assets/icons/danger.svg?dataurl"
   import {setKey} from "@lib/implicit"
   import Button from "@lib/components/Button.svelte"
@@ -18,6 +20,7 @@
   import EventShare from "@app/components/EventShare.svelte"
   import EventDeleteConfirm from "@app/components/EventDeleteConfirm.svelte"
   import {hasNip29, deriveUserIsSpaceAdmin} from "@app/core/state"
+  import {downloadLinkFile} from "@app/util/download"
   import {pushModal} from "@app/util/modal"
   import {pushToast} from "@app/util/toast"
   import {makeSpaceChatPath} from "@app/util/routes"
@@ -35,9 +38,40 @@
   const isRoot = event.kind !== COMMENT
   const userIsAdmin = deriveUserIsSpaceAdmin(url)
 
+  const hasFileExtension = (url: URL) => {
+    const filename = url.pathname.split("/").pop()
+
+    if (!filename) return false
+
+    const dotIndex = filename.lastIndexOf(".")
+
+    return dotIndex > 0 && dotIndex < filename.length - 1
+  }
+
+  const downloadTarget = $derived.by(() => {
+    for (const parsed of parse(event)) {
+      if (isLink(parsed) && hasFileExtension(parsed.value.url)) {
+        return parsed.value.url.toString()
+      }
+    }
+
+    return undefined
+  })
+
   const report = () => pushModal(Report, {url, event})
 
   const showInfo = () => pushModal(EventInfo, {url, event})
+
+  const download = async () => {
+    if (!downloadTarget) return
+
+    try {
+      await downloadLinkFile({url: downloadTarget, event})
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Failed to download file"
+      pushToast({theme: "error", message})
+    }
+  }
 
   const share = async () => {
     if (hasNip29($relaysByUrl.get(url))) {
@@ -93,6 +127,14 @@
     </Button>
   </li>
   {@render customActions?.()}
+  {#if downloadTarget}
+    <li>
+      <Button onclick={download}>
+        <Icon size={4} icon={Download} />
+        Download
+      </Button>
+    </li>
+  {/if}
   {#if event.pubkey === $pubkey}
     <li>
       <Button onclick={showDelete} class="text-error">

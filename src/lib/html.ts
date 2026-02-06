@@ -90,6 +90,18 @@ export const downloadText = (filename: string, text: string) => {
   URL.revokeObjectURL(url)
 }
 
+export const downloadBlob = (filename: string, blob: Blob) => {
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement("a")
+
+  a.href = url
+  a.download = filename
+  document.body.appendChild(a)
+  a.click()
+  document.body.removeChild(a)
+  URL.revokeObjectURL(url)
+}
+
 export const isIntersecting = async (element: Element) =>
   new Promise(resolve => {
     const observer = new IntersectionObserver(xs => {
