@@ -83,6 +83,9 @@ importers:
       '@vite-pwa/sveltekit':
         specifier: ^0.6.8
         version: 0.6.8(@sveltejs/kit@2.50.1(@sveltejs/vite-plugin-svelte@4.0.4(svelte@5.48.0)(vite@5.4.21(@types/node@25.0.10)(terser@5.46.0)))(svelte@5.48.0)(typescript@5.9.3)(vite@5.4.21(@types/node@25.0.10)(terser@5.46.0)))(@vite-pwa/assets-generator@0.2.6)(vite-plugin-pwa@0.21.2(@vite-pwa/assets-generator@0.2.6)(vite@5.4.21(@types/node@25.0.10)(terser@5.46.0))(workbox-build@7.3.0)(workbox-window@7.3.0))
+      '@webbtc/webln-types':
+        specifier: ^3.0.0
+        version: 3.0.0
       '@welshman/app':
         specifier: ^0.8.3
         version: 0.8.3(115025b37827c6b7449e2d3b8f405799)
@@ -1872,6 +1875,9 @@ packages:
 
   '@vitest/utils@1.6.1':
     resolution: {integrity: sha512-jOrrUvXM4Av9ZWiG1EajNto0u96kWAhJ1LmPmJhXXQx/32MecEKd10pOLYgS2BQx1TgkGhloPU1ArDW2vvaY6g==}
+
+  '@webbtc/webln-types@3.0.0':
+    resolution: {integrity: sha512-aXfTHLKz5lysd+6xTeWl+qHNh/p3qVYbeLo+yDN5cUDmhie2ZoGvkppfWxzbGkcFBzb6dJyQ2/i2cbmDHas+zQ==}
 
   '@welshman/app@0.8.3':
     resolution: {integrity: sha512-A3s7j/j5vQy3hLmAYE/AgP/qW4wm3E/F0QgFJiFHA/Nj+Kbbjm4eL34+8CoI+gcXnxHiFZAgjgb1SmK7sjWOaA==}
@@ -7102,6 +7108,8 @@ snapshots:
       estree-walker: 3.0.3
       loupe: 2.3.7
       pretty-format: 29.7.0
+
+  '@webbtc/webln-types@3.0.0': {}
 
   '@welshman/app@0.8.3(115025b37827c6b7449e2d3b8f405799)':
     dependencies:

@@ -64,6 +64,7 @@
     "@types/throttle-debounce": "^5.0.2",
     "@vite-pwa/assets-generator": "^0.2.6",
     "@vite-pwa/sveltekit": "^0.6.8",
+    "@webbtc/webln-types": "^3.0.0",
     "@welshman/app": "^0.8.3",
     "@welshman/content": "^0.8.3",
     "@welshman/editor": "^0.8.3",
