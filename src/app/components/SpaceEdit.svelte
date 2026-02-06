@@ -134,27 +134,23 @@
         <p>Icon</p>
       {/snippet}
       {#snippet input()}
-        <div class="flex items-center justify-between">
-          <div class="flex items-center gap-4">
-            {#if imagePreview}
-              <div class="flex items-center gap-2">
-                <span class="text-sm opacity-75">Selected:</span>
-                <ImageIcon src={imagePreview} alt="" />
-              </div>
-            {:else}
-              <span class="text-sm opacity-75">No icon selected</span>
-            {/if}
-            <div class="flex gap-2">
-              <IconPickerButton onSelect={handleIconSelect} class="btn btn-primary btn-xs">
-                <Icon icon={StickerSmileSquare} size={4} />
-                Select
-              </IconPickerButton>
-              <label class="btn btn-neutral btn-xs cursor-pointer">
-                <Icon icon={UploadMinimalistic} size={4} />
-                Upload
-                <input type="file" accept="image/*" class="hidden" onchange={handleImageUpload} />
-              </label>
+        <div class="flex items-center gap-4 justify-between flex-grow">
+          {#if imagePreview}
+            <div class="flex items-center gap-2">
+              <span class="text-sm opacity-75">Selected:</span>
+              <ImageIcon src={imagePreview} alt="" />
             </div>
+          {:else}
+            <span class="text-sm opacity-75">No icon selected</span>
+          {/if}
+          <div class="flex gap-2">
+            <IconPickerButton onSelect={handleIconSelect} class="btn btn-primary btn-sm">
+              <Icon icon={StickerSmileSquare} size={4} />
+            </IconPickerButton>
+            <label class="btn btn-neutral btn-sm cursor-pointer">
+              <Icon icon={UploadMinimalistic} size={4} />
+              <input type="file" accept="image/*" class="hidden" onchange={handleImageUpload} />
+            </label>
           </div>
         </div>
       {/snippet}

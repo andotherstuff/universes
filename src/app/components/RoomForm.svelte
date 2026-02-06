@@ -125,13 +125,11 @@
             <span class="text-sm opacity-75">No icon selected</span>
           {/if}
           <div class="flex gap-2">
-            <IconPickerButton onSelect={handleIconSelect} class="btn btn-primary btn-xs">
+            <IconPickerButton onSelect={handleIconSelect} class="btn btn-primary btn-sm">
               <Icon icon={StickerSmileSquare} size={4} />
-              <span class="hidden sm:inline">Select</span>
             </IconPickerButton>
-            <label class="btn btn-neutral btn-xs cursor-pointer">
+            <label class="btn btn-neutral btn-sm cursor-pointer">
               <Icon icon={UploadMinimalistic} size={4} />
-              <span class="hidden sm:inline">Upload</span>
               <input type="file" accept="image/*" class="hidden" onchange={handleImageUpload} />
             </label>
           </div>
