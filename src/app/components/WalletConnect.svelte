@@ -1,6 +1,6 @@
 <script lang="ts">
   import {debounce} from "throttle-debounce"
-  import {nwc} from "@getalby/sdk"
+  import {nwc} from "@lib/lightning"
   import {sleep, assoc} from "@welshman/lib"
   import type {NWCInfo} from "@welshman/util"
   import {pubkey, userProfile, updateSession} from "@welshman/app"
