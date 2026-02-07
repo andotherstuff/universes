@@ -32,6 +32,7 @@ import type {
   Nip47TimeoutValues,
   Nip47Transaction,
   Nip47LookupInvoiceRequest,
+  NWCAuthorizationUrlOptions,
 } from "./types"
 import {
   Nip47NetworkError,
@@ -48,6 +49,7 @@ import {
   decryptContent,
   derivePublicKey,
   encryptContent,
+  generateSecret,
   normalizePubkey,
   normalizeSecretKey,
   selectPreferredEncryption,
@@ -113,6 +115,143 @@ export class NWCClient {
     }
 
     return options
+  }
+
+  static getAuthorizationUrl(
+    authorizationBasePath: string,
+    options: NWCAuthorizationUrlOptions = {},
+    pubkey: string,
+  ): URL {
+    if (authorizationBasePath.includes("/#/")) {
+      throw new Error("hash router paths not supported")
+    }
+
+    const url = new URL(authorizationBasePath)
+
+    if (options.name) {
+      url.searchParams.set("name", options.name)
+    }
+    url.searchParams.set("pubkey", pubkey)
+    if (options.returnTo) {
+      url.searchParams.set("return_to", options.returnTo)
+    }
+
+    if (options.budgetRenewal) {
+      url.searchParams.set("budget_renewal", options.budgetRenewal)
+    }
+    if (options.expiresAt) {
+      url.searchParams.set("expires_at", Math.floor(options.expiresAt.getTime() / 1000).toString())
+    }
+    if (options.maxAmount) {
+      url.searchParams.set("max_amount", options.maxAmount.toString())
+    }
+
+    if (options.requestMethods) {
+      url.searchParams.set("request_methods", options.requestMethods.join(" "))
+    }
+    if (options.notificationTypes) {
+      url.searchParams.set("notification_types", options.notificationTypes.join(" "))
+    }
+
+    if (options.isolated) {
+      url.searchParams.set("isolated", "true")
+    }
+
+    if (options.metadata) {
+      url.searchParams.set("metadata", JSON.stringify(options.metadata))
+    }
+
+    return url
+  }
+
+  static fromAuthorizationUrl(
+    authorizationBasePath: string,
+    options: NWCAuthorizationUrlOptions = {},
+    secret?: string,
+  ): Promise<NWCClient> {
+    const resolvedSecret = secret || generateSecret()
+
+    if (!options.name) {
+      options.name = document.location.host
+    }
+
+    const url = this.getAuthorizationUrl(
+      authorizationBasePath,
+      options,
+      derivePublicKey(resolvedSecret),
+    )
+    const height = 600
+    const width = 400
+    const top = window.outerHeight / 2 + window.screenY - height / 2
+    const left = window.outerWidth / 2 + window.screenX - width / 2
+
+    return new Promise((resolve, reject) => {
+      const popup = window.open(
+        url.toString(),
+        `${document.title} - Wallet Connect`,
+        `height=${height},width=${width},top=${top},left=${left}`,
+      )
+      if (!popup) {
+        reject(new Error("failed to execute window.open"))
+        return
+      }
+
+      const checkForPopup = () => {
+        if (popup && popup.closed) {
+          clearInterval(popupChecker)
+          window.removeEventListener("message", onMessage)
+          reject(new Error("Popup closed"))
+        }
+      }
+
+      const onMessage = (message: {
+        data?: {
+          type: "nwc:success" | unknown
+          relayUrls?: string[]
+          relayUrl?: string
+          walletPubkey?: string
+          lud16?: string
+        }
+        origin: string
+      }) => {
+        const data = message.data
+        if (
+          data &&
+          data.type === "nwc:success" &&
+          message.origin === `${url.protocol}//${url.host}`
+        ) {
+          if (!data.relayUrls && data.relayUrl) {
+            data.relayUrls = [data.relayUrl]
+          }
+          if (!data.relayUrls) {
+            reject(new Error("no relayUrls or relayUrl in response"))
+            return
+          }
+
+          if (!data.walletPubkey) {
+            reject(new Error("no walletPubkey in response"))
+            return
+          }
+
+          resolve(
+            new NWCClient({
+              relayUrls: data.relayUrls,
+              walletPubkey: data.walletPubkey,
+              secret: resolvedSecret,
+              lud16: data.lud16,
+            }),
+          )
+          clearInterval(popupChecker)
+          window.removeEventListener("message", onMessage)
+          if (popup) {
+            popup.close()
+          }
+        }
+      }
+
+      const popupChecker = setInterval(checkForPopup, 500)
+      window.addEventListener("message", onMessage)
+    })
   }
 
   constructor(options: NewNWCClientOptions = {}) {

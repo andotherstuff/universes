@@ -222,22 +222,35 @@ export type DecodedInvoice = {
 
 export type GetAccountInformationResponse = {
   identifier: string
-  name: string
   email: string
-  avatar: string
-  pubkey: string
-  created_at: number
-  updated_at: number
+  name?: string
+  avatar?: string
+  pubkey?: string
+  created_at?: number
+  updated_at?: number
+  keysend_custom_key?: string
+  keysend_custom_value?: string
+  keysend_pubkey?: string
+  lightning_address?: string
+  nostr_pubkey?: string
 }
 
 export type GetAccountBalanceResponse = {
   balance: number
+  currency?: string
+  unit?: string
 }
 
 export type SendPaymentResponse = {
-  preimage: string
-  fees_paid: number
-  payment_hash: string
+  amount?: number
+  description?: string
+  destination?: string
+  fee?: number
+  payment_hash?: string
+  payment_preimage?: string
+  payment_request?: string
+  preimage?: string
+  fees_paid?: number
 }
 
 export type SignMessageRequestParams = {

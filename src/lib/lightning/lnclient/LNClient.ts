@@ -1,0 +1,79 @@
+import {Invoice} from "../bolt11"
+import {LightningAddress} from "../lnurl"
+import {
+  NWCClient,
+  type NewNWCClientOptions,
+  type Nip47MakeInvoiceRequest,
+  type Nip47PayInvoiceRequest,
+} from "../nwc"
+import {ReceiveInvoice} from "./ReceiveInvoice"
+import {type Amount, resolveAmount} from "./Amount"
+
+export type LNClientCredentials = string | NWCClient | NewNWCClientOptions
+
+export class LNClient {
+  readonly nwcClient: NWCClient
+
+  constructor(credentials: LNClientCredentials) {
+    if (typeof credentials === "string") {
+      this.nwcClient = new NWCClient({
+        nostrWalletConnectUrl: credentials,
+      })
+    } else if (credentials instanceof NWCClient) {
+      this.nwcClient = credentials
+    } else {
+      this.nwcClient = new NWCClient(credentials)
+    }
+  }
+
+  async pay(
+    recipient: string,
+    amount?: Amount,
+    args?: Omit<Nip47PayInvoiceRequest, "invoice" | "amount">,
+  ) {
+    let invoice = recipient
+    const parsedAmount = amount ? await resolveAmount(amount) : undefined
+
+    if (invoice.includes("@")) {
+      if (!parsedAmount) {
+        throw new Error("Amount must be provided when paying to a lightning address")
+      }
+
+      const ln = new LightningAddress(recipient)
+      await ln.fetch()
+      const invoiceObj = await ln.requestInvoice({
+        satoshi: parsedAmount.satoshi,
+        comment: args?.metadata?.comment,
+        payerdata: args?.metadata?.payer_data,
+      })
+      invoice = invoiceObj.paymentRequest
+    }
+
+    const result = await this.nwcClient.payInvoice({
+      ...(args || {}),
+      invoice,
+      amount: parsedAmount?.millisat,
+    })
+
+    return {
+      ...result,
+      invoice: new Invoice({pr: invoice}),
+    }
+  }
+
+  async requestPayment(amount: Amount, args?: Omit<Nip47MakeInvoiceRequest, "amount">) {
+    const parsedAmount = await resolveAmount(amount)
+    const transaction = await this.nwcClient.makeInvoice({
+      ...(args || {}),
+      amount: parsedAmount.millisat,
+    })
+
+    return new ReceiveInvoice(this.nwcClient, transaction)
+  }
+
+  close() {
+    this.nwcClient.close()
+  }
+}
+
+export {LNClient as LN}
