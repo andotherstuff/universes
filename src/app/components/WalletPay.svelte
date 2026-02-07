@@ -1,5 +1,5 @@
 <script lang="ts">
-  import {Invoice} from "@getalby/lightning-tools/bolt11"
+  import {Invoice} from "@lib/lightning/bolt11"
   import {debounce} from "throttle-debounce"
   import {session} from "@welshman/app"
   import Bolt from "@assets/icons/bolt.svg?dataurl"

@@ -3,7 +3,7 @@ import {NWCClient} from "./NWCClient"
 import {derivePublicKey, generateSecret} from "./transport"
 
 describe("NWCClient", () => {
-  it("parses and rebuilds wallet connect urls", () => {
+  it("builds and accepts wallet connect urls", () => {
     const secret = generateSecret()
     const walletSecret = generateSecret()
     const walletPubkey = derivePublicKey(walletSecret)
@@ -16,16 +16,19 @@ describe("NWCClient", () => {
       lud16: "user@example.com",
     })
 
-    const url = client.getNostrWalletConnectUrl()
-    const parsed = NWCClient.parseWalletConnectUrl(url)
+    const url = client.options.nostrWalletConnectUrl
 
-    expect(parsed.walletPubkey).toBe(walletPubkey)
-    expect(parsed.relayUrls).toEqual(relayUrls)
-    expect(parsed.secret).toBe(secret)
     expect(url).toContain(`nostr+walletconnect://${walletPubkey}?`)
     expect(url).toContain(`relay=${relayUrls[0]}`)
     expect(url).toContain(`relay=${relayUrls[1]}`)
-    expect(url).toContain(`pubkey=${client.publicKey}`)
+    expect(url).toContain(`pubkey=${derivePublicKey(secret)}`)
+    expect(url).toContain(`secret=${secret}`)
+
+    const parsedClient = new NWCClient({nostrWalletConnectUrl: url})
+
+    expect(parsedClient.walletPubkey).toBe(walletPubkey)
+    expect(parsedClient.relayUrls).toEqual(relayUrls)
+    expect(parsedClient.options.secret).toBe(secret)
   })
 
   it("accepts a single relay url", () => {

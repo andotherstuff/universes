@@ -1,5 +1,5 @@
 <script lang="ts">
-  import {Invoice} from "@getalby/lightning-tools/bolt11"
+  import {Invoice} from "@lib/lightning/bolt11"
   import AltArrowLeft from "@assets/icons/alt-arrow-left.svg?dataurl"
   import Bolt from "@assets/icons/bolt.svg?dataurl"
   import Refresh from "@assets/icons/refresh.svg?dataurl"
