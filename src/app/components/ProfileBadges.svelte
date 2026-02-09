@@ -3,7 +3,7 @@
   import {load} from "@welshman/net"
   import {Router} from "@welshman/router"
   import type {Filter} from "@welshman/util"
-  import {deriveArray, deriveEventsById} from "@welshman/store"
+  import {deriveEventsDesc, deriveEventsById} from "@welshman/store"
   import {formatTimestampRelative} from "@welshman/lib"
   import {NOTE, ROOMS, COMMENT} from "@welshman/util"
   import {repository, loadRelayList} from "@welshman/app"
@@ -20,7 +20,7 @@
 
   const {pubkey, url}: Props = $props()
   const filters: Filter[] = [{authors: [pubkey], limit: 1}]
-  const events = deriveArray(deriveEventsById({repository, filters}))
+  const events = deriveEventsDesc(deriveEventsById({repository, filters}))
   const groupList = deriveGroupList(pubkey)
   const spaceUrls = $derived(getSpaceUrlsFromGroupList($groupList))
 
