@@ -21,37 +21,45 @@ export class IDB {
   adapters: IDBAdapters = []
   connection: Maybe<Promise<IDBPDatabase>>
   unsubscribers: Maybe<Unsubscriber[]>
+  failedToConnect = false
 
   constructor(readonly options: IDBOptions) {}
 
   async connect() {
-    if (!this.connection) {
+    if (!this.failedToConnect && !this.connection) {
       const {name, version} = this.options
       const adapters = this.adapters
 
-      this.connection = openDB(name, version, {
-        upgrade(idbDb: IDBPDatabase) {
-          const names = new Set(adapters.map(a => a.name))
+      try {
+        this.connection = openDB(name, version, {
+          upgrade(idbDb: IDBPDatabase) {
+            const names = new Set(adapters.map(a => a.name))
 
-          for (const table of idbDb.objectStoreNames) {
-            if (!names.has(table)) {
-              idbDb.deleteObjectStore(table)
+            for (const table of idbDb.objectStoreNames) {
+              if (!names.has(table)) {
+                idbDb.deleteObjectStore(table)
+              }
             }
-          }
 
-          for (const {name, keyPath} of adapters) {
-            try {
-              idbDb.createObjectStore(name, {keyPath})
-            } catch (e) {
-              console.warn(e)
+            for (const {name, keyPath} of adapters) {
+              try {
+                idbDb.createObjectStore(name, {keyPath})
+              } catch (e) {
+                console.warn(e)
+              }
             }
-          }
-        },
-        blocked() {},
-        blocking() {},
-      })
+          },
+          blocked() {},
+          blocking() {},
+        })
 
-      this.unsubscribers = await Promise.all(adapters.map(({name, init}) => init(this.table(name))))
+        this.unsubscribers = await Promise.all(
+          adapters.map(({name, init}) => init(this.table(name))),
+        )
+      } catch (e) {
+        console.error("Failed to connect to indexeddb", e)
+        this.failedToConnect = true
+      }
     }
 
     return this.connection
@@ -61,6 +69,9 @@ export class IDB {
 
   getAll = async <T>(table: string): Promise<T[]> => {
     const connection = await this.connect()
+
+    if (!connection) return []
+
     const tx = connection.transaction(table, "readwrite")
     const store = tx.objectStore(table)
     const result = await store.getAll()
@@ -72,6 +83,9 @@ export class IDB {
 
   bulkPut = async <T>(table: string, data: Iterable<T>) => {
     const connection = await this.connect()
+
+    if (!connection) return
+
     const tx = connection.transaction(table, "readwrite")
     const store = tx.objectStore(table)
 
@@ -90,6 +104,9 @@ export class IDB {
 
   bulkDelete = async (table: string, ids: Iterable<string>) => {
     const connection = await this.connect()
+
+    if (!connection) return
+
     const tx = connection.transaction(table, "readwrite")
     const store = tx.objectStore(table)
 
