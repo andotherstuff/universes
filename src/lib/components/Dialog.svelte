@@ -27,7 +27,7 @@
       "relative text-base-content text-base-content flex-grow pointer-events-auto",
       "rounded-t-box sm:rounded-box",
       {
-        "bg-alt shadow-m max-h-[90vh] flex flex-col max-w-full": !fullscreen,
+        "bg-alt shadow-m max-h-[90vh] flex flex-col max-w-full pb-sai sm:pb-0": !fullscreen,
       },
     ),
   )
