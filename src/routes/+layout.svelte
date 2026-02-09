@@ -157,15 +157,20 @@
     // Listen for signer errors, report to user via toast
     unsubscribers.push(
       throttled(10_000, signerLog).subscribe($log => {
-        const cutoff = Date.now() - 3_000
-        const recent = $log.filter(x => x.started_at < cutoff).slice(-10)
-        const ok = recent.filter(x => x.ok)
+        if ($toast) return
 
-        if (!$toast && recent.length > 5 && ok.length === 0) {
+        const longCutoff = Date.now() - 30_000
+        const shortCutoff = Date.now() - 10_000
+        const pending = $log.filter(x => !x.finished_at && x.started_at < longCutoff)
+        const completed = $log.filter(x => x.finished_at && x.finished_at > shortCutoff)
+        const showPendingError = pending.length > 10
+        const showCompletedError = completed.length > 5 && completed.filter(x => x.ok).length === 0
+
+        if (showPendingError || showCompletedError) {
           pushToast({
             theme: "error",
             timeout: 60_000,
-            message: "Your signer appears to be unresponsive.",
+            message: "Your signer isn't responding.",
             action: {
               message: "Details",
               onclick: () => goto("/settings/profile"),

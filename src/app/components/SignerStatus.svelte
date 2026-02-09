@@ -15,14 +15,13 @@
   const pending = $derived($signerLog.filter(x => !x.finished_at))
   const failure = $derived(finished.filter(spec({ok: false})))
   const success = $derived(finished.filter(spec({ok: true})))
-  const recent = $derived($signerLog.filter(x => x.started_at < Date.now() - 5000).slice(-10))
-  const recentFinished = $derived(recent.filter(x => x.finished_at))
-  const recentPending = $derived(recent.filter(x => !x.finished_at))
-  const recentAvg = $derived(avg(recentFinished.map(x => x.finished_at! - x.started_at)))
-  const recentFailure = $derived(recentFinished.filter(x => !x.ok))
-  const recentSuccess = $derived(recentFinished.filter(x => x.ok))
+  const cutoff = $derived(Date.now() - 10_000)
+  const recentCompleted = $derived($signerLog.filter(x => x.finished_at && x.finished_at > cutoff))
+  const recentAvg = $derived(avg(recentCompleted.map(x => x.finished_at! - x.started_at)))
+  const recentFailure = $derived(recentCompleted.filter(x => !x.ok))
+  const recentSuccess = $derived(recentCompleted.filter(x => x.ok))
   const isDisconnected = $derived(
-    recent.length > 0 && recentFailure.length + recentPending.length === recent.length,
+    recentCompleted.length > 0 && recentFailure.length === recentCompleted.length,
   )
 
   const logout = () => pushModal(LogOut)
@@ -38,7 +37,7 @@
             <Icon icon={CloseCircle} class="text-error" size={4} /> Disconnected
           {:else if recentFailure.length > 3}
             <Icon icon={Danger} class="text-warning" size={4} /> Partial Failure
-          {:else if recentAvg > 1000 || recentPending.length > 3}
+          {:else if recentAvg > 1000 || pending.length > 10}
             <Icon icon={ClockCircle} class="text-warning" size={4} /> Slow connection
           {:else if recentSuccess.length === 0 && recentFailure.length > 0}
             <Icon icon={Danger} class="text-warning" size={4} /> Partial Failure
