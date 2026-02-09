@@ -11,6 +11,8 @@
   import Button from "@lib/components/Button.svelte"
   import Link from "@lib/components/Link.svelte"
   import Icon from "@lib/components/Icon.svelte"
+  import Modal from "@lib/components/Modal.svelte"
+  import ModalBody from "@lib/components/ModalBody.svelte"
   import EmojiPicker from "@lib/components/EmojiPicker.svelte"
   import ZapButton from "@app/components/ZapButton.svelte"
   import EventInfo from "@app/components/EventInfo.svelte"
@@ -54,35 +56,37 @@
   const showDelete = () => pushModal(EventDeleteConfirm, {url, event})
 </script>
 
-<div class="flex flex-col gap-2">
-  {#if event.pubkey === $pubkey}
-    <Button class="btn btn-neutral text-error" onclick={showDelete}>
-      <Icon size={4} icon={TrashBin2} />
-      Delete Message
+<Modal>
+  <ModalBody>
+    {#if event.pubkey === $pubkey}
+      <Button class="btn btn-neutral text-error" onclick={showDelete}>
+        <Icon size={4} icon={TrashBin2} />
+        Delete Message
+      </Button>
+    {/if}
+    <Button class="btn btn-neutral" onclick={showInfo}>
+      <Icon size={4} icon={Code2} />
+      Message Info
     </Button>
-  {/if}
-  <Button class="btn btn-neutral" onclick={showInfo}>
-    <Icon size={4} icon={Code2} />
-    Message Info
-  </Button>
-  {#if path}
-    <Link class="btn btn-neutral" href={path}>
-      <Icon size={4} icon={MenuDots} />
-      View Details
-    </Link>
-  {/if}
-  {#if ENABLE_ZAPS}
-    <ZapButton replaceState {url} {event} class="btn btn-neutral w-full">
-      <Icon size={4} icon={Bolt} />
-      Send Zap
-    </ZapButton>
-  {/if}
-  <Button class="btn btn-neutral w-full" onclick={sendReply}>
-    <Icon size={4} icon={Reply} />
-    Send Reply
-  </Button>
-  <Button class="btn btn-neutral w-full" onclick={showEmojiPicker}>
-    <Icon size={4} icon={SmileCircle} />
-    Send Reaction
-  </Button>
-</div>
+    {#if path}
+      <Link class="btn btn-neutral" href={path}>
+        <Icon size={4} icon={MenuDots} />
+        View Details
+      </Link>
+    {/if}
+    {#if ENABLE_ZAPS}
+      <ZapButton replaceState {url} {event} class="btn btn-neutral w-full">
+        <Icon size={4} icon={Bolt} />
+        Send Zap
+      </ZapButton>
+    {/if}
+    <Button class="btn btn-neutral w-full" onclick={sendReply}>
+      <Icon size={4} icon={Reply} />
+      Send Reply
+    </Button>
+    <Button class="btn btn-neutral w-full" onclick={showEmojiPicker}>
+      <Icon size={4} icon={SmileCircle} />
+      Send Reaction
+    </Button>
+  </ModalBody>
+</Modal>
