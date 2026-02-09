@@ -1,4 +1,4 @@
-import {nwc} from "@getalby/sdk"
+import {nwc} from "@lib/lightning"
 import * as nip19 from "nostr-tools/nip19"
 import {get, derived} from "svelte/store"
 import {

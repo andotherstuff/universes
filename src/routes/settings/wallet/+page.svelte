@@ -1,5 +1,5 @@
 <script lang="ts">
-  import {nwc} from "@getalby/sdk"
+  import {nwc} from "@lib/lightning"
   import {LOCALE} from "@welshman/lib"
   import {displayRelayUrl, isNWCWallet, fromMsats} from "@welshman/util"
   import {session, pubkey, profilesByPubkey} from "@welshman/app"
