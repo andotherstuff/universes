@@ -33,6 +33,7 @@
   )
 
   const pay = () => pushModal(WalletPay)
+
   const receive = () => {
     if ($session?.wallet) {
       pushModal(WalletReceive)
