@@ -274,7 +274,7 @@
 .input-editor,
 .chat-editor,
 .note-editor {
-  @apply -m-1 min-h-12 p-1;
+  @apply -m-1 min-h-12 p-1 text-sm;
 }
 
 .tiptap {

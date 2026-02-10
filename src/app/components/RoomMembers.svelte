@@ -12,6 +12,9 @@
   import Modal from "@lib/components/Modal.svelte"
   import ModalBody from "@lib/components/ModalBody.svelte"
   import ModalFooter from "@lib/components/ModalFooter.svelte"
+  import ModalHeader from "@lib/components/ModalHeader.svelte"
+  import ModalTitle from "@lib/components/ModalTitle.svelte"
+  import ModalSubtitle from "@lib/components/ModalSubtitle.svelte"
   import Profile from "@app/components/Profile.svelte"
   import RoomName from "@app/components/RoomName.svelte"
   import RoomMembersAdd from "@app/components/RoomMembersAdd.svelte"
@@ -63,51 +66,53 @@
 
 <Modal>
   <ModalBody>
-    <div class="flex min-w-0 flex-col gap-1">
-      <h1 class="ellipsize whitespace-nowrap text-2xl font-bold">Members</h1>
-      <p class="ellipsize text-sm opacity-75">of <RoomName {url} {h} /></p>
-    </div>
-    {#if $userIsAdmin}
-      <div class="flex gap-2">
-        <Button class="btn btn-primary" onclick={addMember}>
-          <Icon icon={AddCircle} />
-          Add members
-        </Button>
-      </div>
-    {/if}
-    {#each $members as pubkey (pubkey)}
-      <div class="card2 bg-alt relative">
-        <div class="flex items-center justify-between gap-2">
-          <div class="min-w-0 flex-1">
-            <Profile {pubkey} {url} />
-          </div>
-          <div class="relative">
-            <Button class="btn btn-circle btn-ghost btn-sm" onclick={() => toggleMenu(pubkey)}>
-              <Icon icon={MenuDots} />
-            </Button>
-            {#if menuPubkey === pubkey}
-              <Popover hideOnClick onClose={closeMenu}>
-                <ul
-                  transition:fly
-                  class="menu absolute right-0 z-popover mt-2 w-48 gap-1 rounded-box bg-base-100 p-2 shadow-md">
-                  <li>
-                    <Button class="text-error" onclick={() => removeMember(pubkey)}>
-                      <Icon icon={MinusCircle} />
-                      Remove Member
-                    </Button>
-                  </li>
-                </ul>
-              </Popover>
-            {/if}
+    <ModalHeader>
+      <ModalTitle>Members</ModalTitle>
+      <ModalSubtitle>
+        of <RoomName {url} {h} class="text-primary" />
+      </ModalSubtitle>
+    </ModalHeader>
+    <div class="flex flex-col gap-2">
+      {#each $members as pubkey (pubkey)}
+        <div class="card2 bg-alt relative">
+          <div class="flex items-center justify-between gap-2">
+            <div class="min-w-0 flex-1">
+              <Profile {pubkey} {url} />
+            </div>
+            <div class="relative">
+              <Button class="btn btn-circle btn-ghost btn-sm" onclick={() => toggleMenu(pubkey)}>
+                <Icon icon={MenuDots} />
+              </Button>
+              {#if menuPubkey === pubkey}
+                <Popover hideOnClick onClose={closeMenu}>
+                  <ul
+                    transition:fly
+                    class="menu absolute right-0 z-popover mt-2 w-48 gap-1 rounded-box bg-base-100 p-2 shadow-md">
+                    <li>
+                      <Button class="text-error" onclick={() => removeMember(pubkey)}>
+                        <Icon icon={MinusCircle} />
+                        Remove Member
+                      </Button>
+                    </li>
+                  </ul>
+                </Popover>
+              {/if}
+            </div>
           </div>
         </div>
-      </div>
-    {/each}
+      {/each}
+    </div>
   </ModalBody>
   <ModalFooter>
     <Button class="btn btn-link" onclick={back}>
       <Icon icon={AltArrowLeft} />
       Go back
     </Button>
+    {#if $userIsAdmin}
+      <Button class="btn btn-primary" onclick={addMember}>
+        <Icon icon={AddCircle} />
+        Add members
+      </Button>
+    {/if}
   </ModalFooter>
 </Modal>

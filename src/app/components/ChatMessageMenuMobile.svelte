@@ -49,21 +49,23 @@
 
 <Modal>
   <ModalBody>
-    <Button class="btn btn-neutral" onclick={showInfo}>
-      <Icon size={4} icon={Code2} />
-      Message Info
-    </Button>
-    <Button class="btn btn-neutral w-full" onclick={copyText}>
-      <Icon size={4} icon={Copy} />
-      Copy Text
-    </Button>
-    <Button class="btn btn-neutral w-full" onclick={sendReply}>
-      <Icon size={4} icon={Reply} />
-      Send Reply
-    </Button>
-    <Button class="btn btn-primary w-full" onclick={showEmojiPicker}>
-      <Icon size={4} icon={SmileCircle} />
-      Send Reaction
-    </Button>
+    <div class="flex flex-col gap-2">
+      <Button class="btn btn-neutral" onclick={showInfo}>
+        <Icon size={4} icon={Code2} />
+        Message Info
+      </Button>
+      <Button class="btn btn-neutral w-full" onclick={copyText}>
+        <Icon size={4} icon={Copy} />
+        Copy Text
+      </Button>
+      <Button class="btn btn-neutral w-full" onclick={sendReply}>
+        <Icon size={4} icon={Reply} />
+        Send Reply
+      </Button>
+      <Button class="btn btn-primary w-full" onclick={showEmojiPicker}>
+        <Icon size={4} icon={SmileCircle} />
+        Send Reaction
+      </Button>
+    </div>
   </ModalBody>
 </Modal>

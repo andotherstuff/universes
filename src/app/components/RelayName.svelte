@@ -3,11 +3,14 @@
 
   type Props = {
     url: string
+    class?: string
   }
 
-  const {url}: Props = $props()
+  const {url, ...props}: Props = $props()
 
   const display = $derived(deriveRelayDisplay(url))
 </script>
 
-{$display}
+<span class={props.class}>
+  {$display}
+</span>

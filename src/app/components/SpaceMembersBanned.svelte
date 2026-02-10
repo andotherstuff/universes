@@ -59,34 +59,36 @@
       <ModalTitle>Banned users</ModalTitle>
       <ModalSubtitle>on {displayRelayUrl(url)}</ModalSubtitle>
     </ModalHeader>
-    {#each $bans as { pubkey, reason } (pubkey)}
-      <div class="card2 bg-alt relative">
-        <div class="flex items-center justify-between gap-2">
-          <div class="min-w-0 flex-1">
-            <Profile {pubkey} {url} />
-          </div>
-          <div class="relative">
-            <Button class="btn btn-circle btn-ghost btn-sm" onclick={() => toggleMenu(pubkey)}>
-              <Icon icon={MenuDots} />
-            </Button>
-            {#if menuPubkey === pubkey}
-              <Popover hideOnClick onClose={closeMenu}>
-                <ul
-                  transition:fly
-                  class="menu absolute right-0 z-popover mt-2 w-48 gap-1 rounded-box bg-base-100 p-2 shadow-md">
-                  <li>
-                    <Button onclick={() => restoreMember(pubkey)}>
-                      <Icon icon={Restart} />
-                      Restore User
-                    </Button>
-                  </li>
-                </ul>
-              </Popover>
-            {/if}
+    <div class="flex flex-col gap-2">
+      {#each $bans as { pubkey, reason } (pubkey)}
+        <div class="card2 bg-alt relative">
+          <div class="flex items-center justify-between gap-2">
+            <div class="min-w-0 flex-1">
+              <Profile {pubkey} {url} />
+            </div>
+            <div class="relative">
+              <Button class="btn btn-circle btn-ghost btn-sm" onclick={() => toggleMenu(pubkey)}>
+                <Icon icon={MenuDots} />
+              </Button>
+              {#if menuPubkey === pubkey}
+                <Popover hideOnClick onClose={closeMenu}>
+                  <ul
+                    transition:fly
+                    class="menu absolute right-0 z-popover mt-2 w-48 gap-1 rounded-box bg-base-100 p-2 shadow-md">
+                    <li>
+                      <Button onclick={() => restoreMember(pubkey)}>
+                        <Icon icon={Restart} />
+                        Restore User
+                      </Button>
+                    </li>
+                  </ul>
+                </Popover>
+              {/if}
+            </div>
           </div>
         </div>
-      </div>
-    {/each}
+      {/each}
+    </div>
   </ModalBody>
   <ModalFooter>
     <Button class="btn btn-link" onclick={back}>

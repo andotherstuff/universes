@@ -7,6 +7,7 @@
   import Pen from "@assets/icons/pen.svg?dataurl"
   import TrashBin2 from "@assets/icons/trash-bin-2.svg?dataurl"
   import Login3 from "@assets/icons/login-3.svg?dataurl"
+  import MenuDots from "@assets/icons/menu-dots.svg?dataurl"
   import ClockCircle from "@assets/icons/clock-circle.svg?dataurl"
   import AltArrowLeft from "@assets/icons/alt-arrow-left.svg?dataurl"
   import EyeClosed from "@assets/icons/eye-closed.svg?dataurl"
@@ -15,8 +16,10 @@
   import Microphone from "@assets/icons/microphone.svg?dataurl"
   import Bookmark from "@assets/icons/bookmark.svg?dataurl"
   import VolumeLoud from "@assets/icons/volume-loud.svg?dataurl"
+  import {fly} from "@lib/transition"
   import Icon from "@lib/components/Icon.svelte"
   import Button from "@lib/components/Button.svelte"
+  import Popover from "@lib/components/Popover.svelte"
   import Confirm from "@lib/components/Confirm.svelte"
   import Modal from "@lib/components/Modal.svelte"
   import ModalBody from "@lib/components/ModalBody.svelte"
@@ -61,6 +64,14 @@
   const shouldNotify = deriveShouldNotify(url, h)
 
   const back = () => history.back()
+
+  const toggleMenu = () => {
+    showMenu = !showMenu
+  }
+
+  const closeMenu = () => {
+    showMenu = false
+  }
 
   const startEdit = () => pushModal(RoomEdit, {url, h})
 
@@ -115,6 +126,7 @@
     })
 
   let loading = $state(false)
+  let showMenu = $state(false)
 </script>
 
 <Modal>
@@ -129,33 +141,99 @@
           <span class="text-primary">{displayRelayUrl(url)}</span>
         </div>
       </div>
-      <div class="grid grid-cols-2 gap-2">
+      <div class="relative">
+        <Button class="btn btn-circle btn-ghost btn-sm" onclick={toggleMenu}>
+          <Icon icon={MenuDots} />
+        </Button>
+        {#if showMenu}
+          <Popover hideOnClick onClose={closeMenu}>
+            <ul
+              transition:fly
+              class="bg-alt menu absolute right-0 z-popover w-48 gap-1 rounded-box p-2 shadow-md">
+              {#if $userIsAdmin}
+                <li>
+                  <Button class="text-error" onclick={startDelete}>
+                    <Icon icon={TrashBin2} />
+                    Delete Room
+                  </Button>
+                </li>
+                <li>
+                  <Button onclick={startEdit}>
+                    <Icon icon={Pen} />
+                    Edit Room
+                  </Button>
+                </li>
+              {:else if $membershipStatus === MembershipStatus.Initial}
+                <li>
+                  <Button disabled={loading} onclick={join}>
+                    {#if loading}
+                      <span class="loading loading-spinner loading-sm"></span>
+                    {:else}
+                      <Icon icon={Login3} />
+                    {/if}
+                    Join member list
+                  </Button>
+                </li>
+              {:else if $membershipStatus === MembershipStatus.Pending}
+                <li>
+                  <Button>
+                    <Icon icon={ClockCircle} />
+                    Membership pending
+                  </Button>
+                </li>
+              {:else}
+                <li>
+                  <Button disabled={loading} onclick={leave}>
+                    {#if loading}
+                      <span class="loading loading-spinner loading-sm"></span>
+                    {:else}
+                      <Icon icon={Login3} />
+                    {/if}
+                    Leave member list
+                  </Button>
+                </li>
+              {/if}
+            </ul>
+          </Popover>
+        {/if}
+      </div>
+    </div>
+    <div class="flex flex-col gap-2 card2 card2-sm bg-alt">
+      <strong class="text-lg">Room Permissions</strong>
+      <div class="flex gap-2 flex-wrap">
         {#if $room?.isRestricted}
           <Button
-            class="btn btn-neutral btn-sm tooltip tooltip-left"
+            class="btn btn-neutral btn-xs rounded-full tooltip flex gap-2 items-center"
             data-tip="Only members can send messages.">
-            <Icon size={4} icon={Microphone} />
+            <Icon size={4} icon={Microphone} /> Restricted
           </Button>
         {/if}
         {#if $room?.isPrivate}
           <Button
-            class="btn btn-neutral btn-sm tooltip tooltip-left"
+            class="btn btn-neutral btn-xs rounded-full tooltip flex gap-2 items-center"
             data-tip="Only members can view messages.">
-            <Icon size={4} icon={Lock} />
+            <Icon size={4} icon={Lock} /> Private
           </Button>
         {/if}
         {#if $room?.isHidden}
           <Button
-            class="btn btn-neutral btn-sm tooltip tooltip-left"
+            class="btn btn-neutral btn-xs rounded-full tooltip flex gap-2 items-center"
             data-tip="This room is not visible to non-members.">
-            <Icon size={4} icon={EyeClosed} />
+            <Icon size={4} icon={EyeClosed} /> Hidden
           </Button>
         {/if}
         {#if $room?.isClosed}
           <Button
-            class="btn btn-neutral btn-sm tooltip tooltip-left"
+            class="btn btn-neutral btn-xs rounded-full tooltip flex gap-2 items-center"
             data-tip="Requests to join this room will be ignored.">
-            <Icon size={4} icon={MinusCircle} />
+            <Icon size={4} icon={MinusCircle} /> Closed
+          </Button>
+        {/if}
+        {#if !$room?.isRestricted && !$room?.isPrivate && !$room?.isHidden && !$room?.isClosed}
+          <Button
+            class="btn btn-neutral btn-xs rounded-full tooltip flex gap-2 items-center"
+            data-tip="This room has no additional access controls.">
+            <Icon size={4} icon={MinusCircle} /> Public
           </Button>
         {/if}
       </div>
@@ -203,40 +281,5 @@
       <Icon icon={AltArrowLeft} />
       Go back
     </Button>
-    <div class="flex gap-2">
-      {#if $userIsAdmin}
-        <Button class="btn btn-outline btn-error" onclick={startDelete}>
-          <Icon icon={TrashBin2} />
-          <span class="hidden md:inline">Delete Room</span>
-        </Button>
-        <Button class="btn btn-primary" onclick={startEdit}>
-          <Icon icon={Pen} />
-          Edit Room
-        </Button>
-      {:else if $membershipStatus === MembershipStatus.Initial}
-        <Button class="btn btn-neutral" disabled={loading} onclick={join}>
-          {#if loading}
-            <span class="loading loading-spinner loading-sm"></span>
-          {:else}
-            <Icon icon={Login3} />
-          {/if}
-          Join member list
-        </Button>
-      {:else if $membershipStatus === MembershipStatus.Pending}
-        <Button class="btn btn-neutral">
-          <Icon icon={ClockCircle} />
-          Membership pending
-        </Button>
-      {:else}
-        <Button class="btn btn-neutral" disabled={loading} onclick={leave}>
-          {#if loading}
-            <span class="loading loading-spinner loading-sm"></span>
-          {:else}
-            <Icon icon={Login3} />
-          {/if}
-          Leave member list
-        </Button>
-      {/if}
-    </div>
   </ModalFooter>
 </Modal>

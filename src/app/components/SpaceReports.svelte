@@ -1,12 +1,16 @@
 <script lang="ts">
-  import {REPORT, displayRelayUrl} from "@welshman/util"
+  import {REPORT} from "@welshman/util"
   import AltArrowLeft from "@assets/icons/alt-arrow-left.svg?dataurl"
   import Button from "@lib/components/Button.svelte"
   import Icon from "@lib/components/Icon.svelte"
   import Modal from "@lib/components/Modal.svelte"
   import ModalBody from "@lib/components/ModalBody.svelte"
+  import ModalHeader from "@lib/components/ModalHeader.svelte"
+  import ModalTitle from "@lib/components/ModalTitle.svelte"
+  import ModalSubtitle from "@lib/components/ModalSubtitle.svelte"
   import ModalFooter from "@lib/components/ModalFooter.svelte"
   import ReportItem from "@app/components/ReportItem.svelte"
+  import RelayName from "@app/components/RelayName.svelte"
   import {deriveEventsForUrl} from "@app/core/state"
 
   interface Props {
@@ -22,13 +26,17 @@
 
 <Modal>
   <ModalBody>
-    <div class="flex min-w-0 flex-col gap-1">
-      <h1 class="ellipsize whitespace-nowrap text-2xl font-bold">Reports</h1>
-      <p class="ellipsize text-sm opacity-75">on {displayRelayUrl(url)}</p>
+    <ModalHeader>
+      <ModalTitle>Reports</ModalTitle>
+      <ModalSubtitle>on <RelayName {url} class="text-primary" /></ModalSubtitle>
+    </ModalHeader>
+    <div class="flex flex-col gap-2">
+      {#each $reports as event (event.id)}
+        <ReportItem {url} {event} />
+      {:else}
+        <p class="py-12 text-center">No reports found.</p>
+      {/each}
     </div>
-    {#each $reports as event (event.id)}
-      <ReportItem {url} {event} />
-    {/each}
   </ModalBody>
   <ModalFooter>
     <Button class="btn btn-link" onclick={back}>

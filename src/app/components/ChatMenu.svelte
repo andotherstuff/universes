@@ -27,24 +27,26 @@
 
 <Modal>
   <ModalBody>
-    <Button class="btn btn-primary" onclick={startChat}>
-      <Icon size={5} icon={ChatSquare} />
-      Start chat
-    </Button>
-    <Button class="btn btn-neutral" onclick={markAsRead}>
-      <Icon size={5} icon={Check} />
-      Mark all read
-    </Button>
-    {#if $notificationSettings.messages}
-      <Button class="btn btn-neutral" onclick={disableAlerts}>
-        <Icon size={4} icon={BellOff} />
-        Disable alerts
+    <div class="flex flex-col gap-2">
+      <Button class="btn btn-primary" onclick={startChat}>
+        <Icon size={5} icon={ChatSquare} />
+        Start chat
       </Button>
-    {:else}
-      <Button class="btn btn-neutral" onclick={enableAlerts}>
-        <Icon size={4} icon={Bell} />
-        Enable alerts
+      <Button class="btn btn-neutral" onclick={markAsRead}>
+        <Icon size={5} icon={Check} />
+        Mark all read
       </Button>
-    {/if}
+      {#if $notificationSettings.messages}
+        <Button class="btn btn-neutral" onclick={disableAlerts}>
+          <Icon size={4} icon={BellOff} />
+          Disable alerts
+        </Button>
+      {:else}
+        <Button class="btn btn-neutral" onclick={enableAlerts}>
+          <Icon size={4} icon={Bell} />
+          Enable alerts
+        </Button>
+      {/if}
+    </div>
   </ModalBody>
 </Modal>

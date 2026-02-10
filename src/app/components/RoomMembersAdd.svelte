@@ -114,7 +114,7 @@
   <ModalBody>
     <ModalHeader>
       <ModalTitle>Add Members</ModalTitle>
-      <ModalSubtitle>to <RoomName {url} {h} /></ModalSubtitle>
+      <ModalSubtitle>to <RoomName {url} {h} class="text-primary" /></ModalSubtitle>
     </ModalHeader>
     <Field>
       {#snippet label()}
