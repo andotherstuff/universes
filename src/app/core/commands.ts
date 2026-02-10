@@ -99,16 +99,16 @@ export const getPubkeyHints = (pubkey: string) => {
   return hints
 }
 
-export const prependParent = (parent: TrustedEvent | undefined, {content, tags}: EventContent) => {
+export const prependParent = (
+  parent: TrustedEvent | undefined,
+  {content, tags}: EventContent,
+  url?: string,
+) => {
   if (parent) {
-    const nevent = nip19.neventEncode({
-      id: parent.id,
-      kind: parent.kind,
-      author: parent.pubkey,
-      relays: Router.get().Event(parent).limit(3).getUrls(),
-    })
+    const relays = url ? [url] : Router.get().Event(parent).limit(3).getUrls()
+    const nevent = nip19.neventEncode({...parent, relays})
 
-    tags = [...tags, tagEventForQuote(parent), tagPubkey(parent.pubkey)]
+    tags = [...tags, tagEventForQuote(parent, url), tagPubkey(parent.pubkey)]
     content = toNostrURI(nevent) + "\n\n" + content
   }
 
@@ -303,11 +303,18 @@ export type ReactionParams = {
   protect: boolean
   event: TrustedEvent
   content: string
+  url?: string
   tags?: string[][]
 }
 
-export const makeReaction = ({protect, content, event, tags: paramTags = []}: ReactionParams) => {
-  const tags = [...paramTags, ...tagEventForReaction(event)]
+export const makeReaction = ({
+  url,
+  protect,
+  content,
+  event,
+  tags: paramTags = [],
+}: ReactionParams) => {
+  const tags = [...paramTags, ...tagEventForReaction(event, url)]
   const groupTag = getTag("h", event.tags)
 
   if (groupTag) {
@@ -321,8 +328,9 @@ export const makeReaction = ({protect, content, event, tags: paramTags = []}: Re
   return makeEvent(REACTION, {content, tags})
 }
 
-export const publishReaction = ({relays, ...params}: ReactionParams & {relays: string[]}) =>
-  publishThunk({event: makeReaction(params), relays})
+export const publishReaction = ({relays, ...params}: ReactionParams & {relays: string[]}) => {
+  publishThunk({event: makeReaction({url: relays[0], ...params}), relays})
+}
 
 // Comments
 
@@ -330,13 +338,14 @@ export type CommentParams = {
   event: TrustedEvent
   content: string
   tags?: string[][]
+  url?: string
 }
 
-export const makeComment = ({event, content, tags = []}: CommentParams) =>
-  makeEvent(COMMENT, {content, tags: [...tags, ...tagEventForComment(event)]})
+export const makeComment = ({url, event, content, tags = []}: CommentParams) =>
+  makeEvent(COMMENT, {content, tags: [...tags, ...tagEventForComment(event, url)]})
 
 export const publishComment = ({relays, ...params}: CommentParams & {relays: string[]}) =>
-  publishThunk({event: makeComment(params), relays})
+  publishThunk({event: makeComment({url: relays[0], ...params}), relays})
 
 // Settings
 

@@ -67,11 +67,11 @@
     }
 
     if (share) {
-      template = prependParent(share, template)
+      template = prependParent(share, template, url)
     }
 
     if (parent) {
-      template = prependParent(parent, template)
+      template = prependParent(parent, template, url)
     }
 
     const thunk = publishThunk({
