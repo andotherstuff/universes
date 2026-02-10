@@ -365,7 +365,7 @@
 /* tippy popover */
 
 .tippy-box {
-  @apply shadow-xl;
+  @apply rounded-box shadow-xl;
 }
 
 /* emoji picker */

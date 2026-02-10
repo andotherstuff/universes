@@ -181,7 +181,7 @@ export const allNotifications = derived(
 )
 
 export const notifications = derived([page, allNotifications], ([$page, $allNotifications]) => {
-  return new Set([...$allNotifications].filter(p => $page.url.pathname.startsWith(p)))
+  return new Set([...$allNotifications].filter(p => !$page.url.pathname.startsWith(p)))
 })
 
 export const onNotification = call(() => {

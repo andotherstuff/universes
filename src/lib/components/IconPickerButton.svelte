@@ -51,7 +51,7 @@
   bind:popover
   component={IconPickerDialog}
   props={{onSelect: onClick}}
-  params={{trigger: "manual", interactive: true}}>
+  params={{trigger: "manual", interactive: true, placement: "top-end"}}>
   <Button onclick={open} class={props.class}>
     {@render props.children?.()}
   </Button>
