@@ -1,6 +1,5 @@
 <script lang="ts">
   import type {Snippet} from "svelte"
-  import {page} from "$app/stores"
   import {goto} from "$app/navigation"
   import {splitAt} from "@welshman/lib"
   import {userProfile, shouldUnwrap} from "@welshman/app"
@@ -21,7 +20,6 @@
   import PrimaryNavItemSpace from "@app/components/PrimaryNavItemSpace.svelte"
   import {userSpaceUrls, PLATFORM_RELAYS, PLATFORM_LOGO} from "@app/core/state"
   import {pushModal} from "@app/util/modal"
-  import {makeSpacePath} from "@app/util/routes"
   import {notifications} from "@app/util/notifications"
 
   type Props = {
@@ -36,20 +34,14 @@
 
   const openChat = () => ($shouldUnwrap ? goto("/chat") : pushModal(ChatEnable, {next: "/chat"}))
 
-  const hasNotification = (url: string) => {
-    const path = makeSpacePath(url)
-
-    return !$page.url.pathname.startsWith(path) && $notifications.has(path)
-  }
-
   let windowHeight = $state(0)
 
   const itemHeight = 56
   const navPadding = 8 * itemHeight
   const itemLimit = $derived((windowHeight - navPadding) / itemHeight)
   const [primarySpaceUrls, secondarySpaceUrls] = $derived(splitAt(itemLimit, $userSpaceUrls))
-  const anySpaceNotifications = $derived($userSpaceUrls.some(hasNotification))
-  const otherSpaceNotifications = $derived(secondarySpaceUrls.some(hasNotification))
+  const anySpaceNotifications = $derived($userSpaceUrls.some(p => $notifications.has(p)))
+  const otherSpaceNotifications = $derived(secondarySpaceUrls.some(p => $notifications.has(p)))
 </script>
 
 <svelte:window bind:innerHeight={windowHeight} />
