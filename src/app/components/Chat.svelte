@@ -48,7 +48,7 @@
   import ChatCompose from "@app/components/ChatCompose.svelte"
   import ChatComposeParent from "@app/components/ChatComposeParent.svelte"
   import ThunkToast from "@app/components/ThunkToast.svelte"
-  import {INDEXER_RELAYS, userSettingsValues, PLATFORM_NAME, deriveChat} from "@app/core/state"
+  import {userSettingsValues, PLATFORM_NAME, deriveChat} from "@app/core/state"
   import {pushModal} from "@app/util/modal"
   import {prependParent} from "@app/core/commands"
   import {pushToast} from "@app/util/toast"
@@ -121,12 +121,14 @@
 
     // Split the message into multiple pieces so that we can use kind 15 to send images per nip 17
     // Sleep 1 second between each one to make sure timestamps are distinct
-    const thunks = Array.from(enumerate(templates)).map(([i, event]) =>
-      sendWrapped({
-        event,
-        recipients: pubkeys,
-        delay: $userSettingsValues.send_delay + ms(i),
-      }),
+    const thunks = await Promise.all(
+      Array.from(enumerate(templates)).map(([i, event]) =>
+        sendWrapped({
+          event,
+          recipients: pubkeys,
+          delay: $userSettingsValues.send_delay + ms(i),
+        }),
+      ),
     )
 
     pushToast({
@@ -178,7 +180,7 @@
 
   onMount(() => {
     for (const pubkey of others) {
-      loadMessagingRelayList(pubkey, INDEXER_RELAYS, true)
+      loadMessagingRelayList(pubkey)
     }
 
     const observer = new ResizeObserver(() => {
