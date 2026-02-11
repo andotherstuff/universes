@@ -345,14 +345,12 @@ class CapacitorNotifications implements IPushAdapter {
     String(hash(relay + key + device.get()))
 
   _getPushUrl = async (url: string) => {
-    let relay = await loadRelay(url)
+    for (const candidate of [url, PUSH_BRIDGE]) {
+      const relay = await loadRelay(candidate)
 
-    if (!relay?.self || !relay?.supported_nips?.map(String)?.includes("9a")) {
-      relay = await loadRelay(PUSH_BRIDGE)
-    }
-
-    if (relay?.self) {
-      return relay.url
+      if (relay?.supported_nips?.map(String)?.includes("9a")) {
+        return candidate
+      }
     }
   }
 
