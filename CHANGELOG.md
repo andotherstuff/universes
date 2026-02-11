@@ -1,9 +1,29 @@
 # Changelog
 
-# Current
+# 1.6.4
 
+* Clean up modal design
+* Fix overflowing popovers
+* Use space urls for relay hints
+* Re-work notification badges
+* Add push notification support via NIP 9a
+* Optimistically load messaging relays to avoid unnecessary warning
+* Recover from indexeddb not being available
+* Fix safe area inset support
+* Show space URL in top bar on mobile
+* Fix calendar detail page
+* Improve relay synchronization, especially for pyramid and relay29
+* Improve invite code error handling
+* Add wallet receive flow
+* Fix safari image uploads
+* Re-work recent activity page
+* Add classified listing content type
+* Use address for page param for replaceable events
+* Refine discover page to avoid slowness
+* Upgrade som dependencies
 * Tag event author when tagging parent event
 * Disable macos build
+* Add room muting
 
 # 1.6.3
 
