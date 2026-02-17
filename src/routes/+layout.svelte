@@ -7,6 +7,7 @@
   import {App, type URLOpenListenerEvent} from "@capacitor/app"
   import {dev} from "$app/environment"
   import {goto} from "$app/navigation"
+  import {page} from "$app/stores"
   import {sync, throttled} from "@welshman/store"
   import {call} from "@welshman/lib"
   import {defaultSocketPolicies} from "@welshman/net"
@@ -42,9 +43,14 @@
   import * as notifications from "@app/util/notifications"
   import * as storage from "@app/util/storage"
   import {syncKeyboard} from "@app/util/keyboard"
+  import {getPageTitle} from "@app/util/title"
   import NewNotificationSound from "@src/app/components/NewNotificationSound.svelte"
 
   const {children} = $props()
+
+  const pageTitle = $derived.by(() => {
+    return getPageTitle({page: $page, pubkey: $pubkey})
+  })
 
   const policies = [authPolicy, blockPolicy, trustPolicy, mostlyRestrictedPolicy]
 
@@ -198,6 +204,12 @@
   import.meta.hot?.dispose(() => {
     App.removeAllListeners()
     unsubscribe.then(call)
+  })
+
+  $effect(() => {
+    if (typeof document !== "undefined") {
+      document.title = pageTitle
+    }
   })
 </script>
 
