@@ -1,4 +1,4 @@
-# Flotilla
+# Universes
 
 A discord-like nostr client based on the idea of "relays as groups".
 
