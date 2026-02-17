@@ -1,7 +1,6 @@
 <script lang="ts">
-  import {nwc} from "@getalby/sdk"
   import {LOCALE} from "@welshman/lib"
-  import {displayRelayUrl, isNWCWallet, fromMsats} from "@welshman/util"
+  import {displayRelayUrl, isNWCWallet} from "@welshman/util"
   import {session, pubkey, profilesByPubkey} from "@welshman/app"
   import DownloadMinimalistic from "@assets/icons/download-minimalistic.svg?dataurl"
   import UploadMinimalistic from "@assets/icons/upload-minimalistic.svg?dataurl"
@@ -13,7 +12,7 @@
   import WalletDisconnect from "@app/components/WalletDisconnect.svelte"
   import WalletUpdateReceivingAddress from "@app/components/WalletUpdateReceivingAddress.svelte"
   import {pushModal} from "@app/util/modal"
-  import {getWebLn} from "@app/core/commands"
+  import {getWalletBalance} from "@app/core/commands"
   import Wallet2 from "@assets/icons/wallet.svg?dataurl"
   import CheckCircle from "@assets/icons/check-circle.svg?dataurl"
   import AddCircle from "@assets/icons/add-circle.svg?dataurl"
@@ -72,12 +71,10 @@
             </p>
             <p class="flex gap-2 whitespace-nowrap">
               Balance:
-              {#await getWebLn()
-                ?.enable()
-                .then(() => getWebLn().getBalance())}
+              {#await getWalletBalance()}
                 <span class="loading loading-spinner loading-sm"></span>
-              {:then res}
-                {new Intl.NumberFormat(LOCALE).format(res?.balance || 0)}
+              {:then balance}
+                {new Intl.NumberFormat(LOCALE).format(balance)}
               {:catch}
                 [unknown]
               {/await}
@@ -85,17 +82,17 @@
             </p>
           </div>
         {:else if $session.wallet.type === "nwc"}
-          {@const {lud16, relayUrl, nostrWalletConnectUrl} = $session.wallet.info}
+          {@const {lud16, relayUrl} = $session.wallet.info}
           <div class="flex flex-col justify-between gap-2 lg:flex-row">
             <p>
               Connected to <strong>{lud16}</strong> via <strong>{displayRelayUrl(relayUrl)}</strong>
             </p>
             <p class="flex gap-2 whitespace-nowrap">
               Balance:
-              {#await new nwc.NWCClient({nostrWalletConnectUrl}).getBalance()}
+              {#await getWalletBalance()}
                 <span class="loading loading-spinner loading-sm"></span>
-              {:then res}
-                {new Intl.NumberFormat(LOCALE).format(fromMsats(res?.balance || 0))}
+              {:then balance}
+                {new Intl.NumberFormat(LOCALE).format(balance)}
               {:catch}
                 [unknown]
               {/await}

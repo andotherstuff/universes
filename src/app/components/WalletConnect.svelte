@@ -1,6 +1,6 @@
 <script lang="ts">
   import {debounce} from "throttle-debounce"
-  import {nwc} from "@getalby/sdk"
+  import {nwc} from "@lib/lightning"
   import {sleep, assoc} from "@welshman/lib"
   import type {NWCInfo} from "@welshman/util"
   import {pubkey, userProfile, updateSession} from "@welshman/app"
@@ -33,8 +33,14 @@
     loading = true
 
     try {
-      await Promise.all([sleep(800), getWebLn().enable()])
-      const info = await getWebLn().getInfo()
+      const webLn = getWebLn()
+
+      if (!webLn) {
+        throw new Error("WebLN not available")
+      }
+
+      await Promise.all([sleep(800), webLn.enable()])
+      const info = (await webLn.getInfo?.()) || {}
 
       if (!info?.supports?.includes("lightning")) {
         pushToast({

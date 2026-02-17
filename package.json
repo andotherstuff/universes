@@ -11,6 +11,7 @@
     "lint": "prettier --check src && eslint src",
     "format": "git diff head --name-only --diff-filter d | grep -E '(js|ts|svelte|css)$' | xargs -r prettier --write",
     "format:all": "prettier --write src",
+    "test": "vitest run",
     "prepare": "husky"
   },
   "devDependencies": {
@@ -25,6 +26,7 @@
     "eslint-config-prettier": "^9.1.2",
     "eslint-plugin-svelte": "^2.46.1",
     "globals": "^15.15.0",
+    "jsdom": "^24.0.0",
     "postcss": "^8.5.6",
     "prettier": "^3.8.1",
     "prettier-plugin-svelte": "^3.4.1",
@@ -33,7 +35,8 @@
     "tailwindcss": "^3.4.19",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.53.1",
-    "vite": "^5.4.21"
+    "vite": "^5.4.21",
+    "vitest": "^1.6.0"
   },
   "type": "module",
   "dependencies": {
@@ -49,9 +52,8 @@
     "@capacitor/push-notifications": "^8.0.0",
     "@capawesome/capacitor-android-dark-mode-support": "^8.0.0",
     "@capawesome/capacitor-badge": "^8.0.0",
-    "@getalby/lightning-tools": "^6.1.0",
-    "@getalby/sdk": "^5.1.2",
     "@noble/curves": "^1.9.7",
+    "@noble/hashes": "^2.0.1",
     "@pomade/core": "^0.0.12",
     "@poppanator/sveltekit-svg": "^4.2.1",
     "@sveltejs/adapter-static": "^3.0.10",
