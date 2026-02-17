@@ -1,12 +1,12 @@
 import {describe, expect, it} from "vitest"
+import {getPubkey, makeSecret, normalizeRelayUrl} from "@welshman/util"
 import {NWCClient} from "./NWCClient"
-import {derivePublicKey, generateSecret} from "./transport"
 
 describe("NWCClient", () => {
   it("builds and accepts wallet connect urls", () => {
-    const secret = generateSecret()
-    const walletSecret = generateSecret()
-    const walletPubkey = derivePublicKey(walletSecret)
+    const secret = makeSecret()
+    const walletSecret = makeSecret()
+    const walletPubkey = getPubkey(walletSecret)
     const relayUrls = ["wss://relay.one", "wss://relay.two"]
 
     const client = new NWCClient({
@@ -21,20 +21,20 @@ describe("NWCClient", () => {
     expect(url).toContain(`nostr+walletconnect://${walletPubkey}?`)
     expect(url).toContain(`relay=${relayUrls[0]}`)
     expect(url).toContain(`relay=${relayUrls[1]}`)
-    expect(url).toContain(`pubkey=${derivePublicKey(secret)}`)
+    expect(url).toContain(`pubkey=${getPubkey(secret)}`)
     expect(url).toContain(`secret=${secret}`)
 
     const parsedClient = new NWCClient({nostrWalletConnectUrl: url})
 
     expect(parsedClient.walletPubkey).toBe(walletPubkey)
-    expect(parsedClient.relayUrls).toEqual(relayUrls)
+    expect(parsedClient.relayUrls).toEqual(relayUrls.map(normalizeRelayUrl))
     expect(parsedClient.options.secret).toBe(secret)
   })
 
   it("accepts a single relay url", () => {
-    const secret = generateSecret()
-    const walletSecret = generateSecret()
-    const walletPubkey = derivePublicKey(walletSecret)
+    const secret = makeSecret()
+    const walletSecret = makeSecret()
+    const walletPubkey = getPubkey(walletSecret)
 
     const client = new NWCClient({
       relayUrl: "wss://relay.single",
@@ -42,6 +42,26 @@ describe("NWCClient", () => {
       secret,
     })
 
-    expect(client.relayUrls).toEqual(["wss://relay.single"])
+    expect(client.relayUrls).toEqual([normalizeRelayUrl("wss://relay.single")])
+  })
+
+  it("requires hex keys", () => {
+    expect(
+      () =>
+        new NWCClient({
+          relayUrl: "wss://relay.single",
+          walletPubkey: "npub1nothex",
+          secret: makeSecret(),
+        }),
+    ).toThrow("Invalid wallet pubkey")
+
+    expect(
+      () =>
+        new NWCClient({
+          relayUrl: "wss://relay.single",
+          walletPubkey: getPubkey(makeSecret()),
+          secret: "nsec1nothex",
+        }),
+    ).toThrow("Invalid secret key")
   })
 })

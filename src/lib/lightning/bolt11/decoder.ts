@@ -1,4 +1,4 @@
-import {bytesToHex, bytesToUtf8} from "../core"
+import {bytesToHex, textDecoder} from "@welshman/lib"
 import {bech32Decode, convertBits} from "./bech32"
 import {parseHrpAmount} from "./amount"
 
@@ -28,7 +28,7 @@ const decodeTagData = (tag: string, words: number[]) => {
   }
   if (tag === "d") {
     const bytes = Uint8Array.from(convertBits(words, 5, 8, false))
-    return {description: bytesToUtf8(bytes)}
+    return {description: textDecoder.decode(bytes)}
   }
   if (tag === "x") {
     return {expiry: wordsToNumber(words)}

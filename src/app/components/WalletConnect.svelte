@@ -33,8 +33,14 @@
     loading = true
 
     try {
-      await Promise.all([sleep(800), getWebLn().enable()])
-      const info = await getWebLn().getInfo()
+      const webLn = getWebLn()
+
+      if (!webLn) {
+        throw new Error("WebLN not available")
+      }
+
+      await Promise.all([sleep(800), webLn.enable()])
+      const info = (await webLn.getInfo?.()) || {}
 
       if (!info?.supports?.includes("lightning")) {
         pushToast({

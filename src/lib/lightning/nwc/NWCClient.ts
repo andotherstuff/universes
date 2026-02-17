@@ -1,4 +1,13 @@
-import {SimplePool, type Event, type EventTemplate} from "nostr-tools"
+import {uniq} from "@welshman/lib"
+import {PublishStatus, publish, request} from "@welshman/net"
+import {Nip01Signer, decrypt} from "@welshman/signer"
+import {
+  getPubkey,
+  makeEvent,
+  normalizeRelayUrl,
+  type SignedEvent,
+  type TrustedEvent,
+} from "@welshman/util"
 import type {
   Nip47EncryptionType,
   Nip47GetBalanceResponse,
@@ -20,15 +29,43 @@ import {
   Nip47UnsupportedEncryptionError,
   Nip47WalletError,
 } from "./types"
-import {
-  decryptContent,
-  derivePublicKey,
-  encryptContent,
-  normalizePubkey,
-  normalizeSecretKey,
-  selectPreferredEncryption,
-  signEvent as signNostrEvent,
-} from "./transport"
+
+const NIP47_INFO_KIND = 13194
+const NIP47_REQUEST_KIND = 23194
+const NIP47_RESPONSE_KIND = 23195
+const NIP47_VERSION = "1.0"
+const OUTBOUND_ENCRYPTION: Nip47EncryptionType = "nip44_v2"
+
+const hexKeyPattern = /^[0-9a-f]{64}$/i
+
+const normalizeHexKey = (key: string, label: string) => {
+  const normalized = key.trim()
+
+  if (!hexKeyPattern.test(normalized)) {
+    throw new Error(`Invalid ${label}`)
+  }
+
+  return normalized.toLowerCase()
+}
+
+type Nip47Response<T> = {
+  result?: T
+  error?: {
+    message?: string
+    code?: string
+  }
+}
+
+const withTimeout = async <T>(timeoutMs: number, f: (signal: AbortSignal) => Promise<T>) => {
+  const controller = new AbortController()
+  const timeoutId = setTimeout(() => controller.abort(), timeoutMs)
+
+  try {
+    return await f(controller.signal)
+  } finally {
+    clearTimeout(timeoutId)
+  }
+}
 
 export type NWCOptions = {
   relayUrls: string[]
@@ -83,13 +120,13 @@ const parseWalletConnectUrl = (walletConnectUrl: string): NewNWCClientOptions =>
 }
 
 export class NWCClient {
-  pool: SimplePool
+  signer: Nip01Signer
   relayUrls: string[]
   walletPubkey: string
   secret: string
   lud16: string | undefined
   options: NWCOptions
-  private encryptionType: Nip47EncryptionType | undefined
+  private encryptionReady = false
 
   constructor(options: NewNWCClientOptions = {}) {
     if (options.nostrWalletConnectUrl) {
@@ -109,33 +146,26 @@ export class NWCClient {
       throw new Error("Missing wallet pubkey")
     }
 
-    const secret = normalizeSecretKey(options.secret)
-    if (!secret) {
+    if (!options.secret) {
       throw new Error("Missing secret key")
     }
 
-    this.pool = new SimplePool()
-    this.relayUrls = relayUrls
-    this.secret = secret
+    this.relayUrls = uniq(relayUrls.map(normalizeRelayUrl))
+    this.secret = normalizeHexKey(options.secret, "secret key")
     this.lud16 = options.lud16
-    this.walletPubkey = normalizePubkey(options.walletPubkey)
+    this.walletPubkey = normalizeHexKey(options.walletPubkey, "wallet pubkey")
+    this.signer = Nip01Signer.fromSecret(this.secret)
 
     const nostrWalletConnectUrl =
       options.nostrWalletConnectUrl || this.buildNostrWalletConnectUrl(true)
 
     this.options = {
-      relayUrls,
-      relayUrl: relayUrls[0],
+      relayUrls: this.relayUrls,
+      relayUrl: this.relayUrls[0],
       walletPubkey: this.walletPubkey,
       secret: this.secret,
       lud16: this.lud16,
       nostrWalletConnectUrl,
-    }
-
-    if (globalThis.WebSocket === undefined) {
-      console.error(
-        "WebSocket is undefined. Make sure to `import websocket-polyfill` for nodejs environments",
-      )
     }
   }
 
@@ -176,7 +206,8 @@ export class NWCClient {
   }
 
   close() {
-    return this.pool.close(this.relayUrls)
+    // No-op. The welshman network layer manages relay socket lifecycle.
+    return undefined
   }
 
   private buildNostrWalletConnectUrl(includeSecret = true) {
@@ -196,53 +227,7 @@ export class NWCClient {
   }
 
   private get publicKey() {
-    return derivePublicKey(this.secret)
-  }
-
-  private signEvent(event: EventTemplate): Event {
-    return signNostrEvent(event, this.secret)
-  }
-
-  private async encrypt(pubkey: string, content: string) {
-    return await encryptContent(this.secret, pubkey, content, this.requireEncryption())
-  }
-
-  private async decrypt(pubkey: string, content: string) {
-    return await decryptContent(this.secret, pubkey, content, this.requireEncryption())
-  }
-
-  private requireEncryption(): Nip47EncryptionType {
-    if (!this.encryptionType) {
-      throw new Error("Missing encryption or version")
-    }
-    return this.encryptionType
-  }
-
-  private async getWalletServiceInfo(): Promise<{encryptions: Nip47EncryptionType[]}> {
-    await this.ensureConnected()
-
-    const event = await this.pool.get(this.relayUrls, {
-      kinds: [13194],
-      limit: 1,
-      authors: [this.walletPubkey],
-    })
-
-    if (!event) {
-      throw new Error("no info event (kind 13194) returned from relay")
-    }
-
-    const versionsTag = event.tags.find(tag => tag[0] === "v")
-    const encryptionTag = event.tags.find(tag => tag[0] === "encryption")
-
-    let encryptions: Nip47EncryptionType[] = ["nip04"]
-    if (versionsTag && versionsTag[1]?.includes("1.0")) {
-      encryptions.push("nip44_v2")
-    }
-    if (encryptionTag) {
-      encryptions = encryptionTag[1].split(" ") as Nip47EncryptionType[]
-    }
-
-    return {encryptions}
+    return getPubkey(this.secret)
   }
 
   private async executeNip47Request<T>(
@@ -251,129 +236,145 @@ export class NWCClient {
     resultValidator: (result: T) => boolean,
     timeoutValues?: Nip47TimeoutValues,
   ): Promise<T> {
-    await this.ensureConnected()
-    await this.selectEncryptionType()
+    await this.assertWalletSupportsNip44()
 
-    return new Promise<T>((resolve, reject) => {
-      const command = {
-        method: nip47Method,
-        params,
-      }
-
-      ;(async () => {
-        const encryptedCommand = await this.encrypt(this.walletPubkey, JSON.stringify(command))
-        const eventTemplate: EventTemplate = {
-          kind: 23194,
-          created_at: Math.floor(Date.now() / 1000),
-          tags: [
-            ["p", this.walletPubkey],
-            ["v", this.requireEncryption() === "nip44_v2" ? "1.0" : "0.0"],
-            ["encryption", this.requireEncryption()],
-          ],
-          content: encryptedCommand,
-        }
-
-        const event = this.signEvent(eventTemplate)
-        const sub = this.pool.subscribe(
-          this.relayUrls,
-          {
-            kinds: [23195],
-            authors: [this.walletPubkey],
-            "#e": [event.id],
-          },
-          {
-            onevent: async responseEvent => {
-              clearTimeout(replyTimeoutCheck)
-              sub.close()
-
-              let response
-              try {
-                const decryptedContent = await this.decrypt(
-                  this.walletPubkey,
-                  responseEvent.content,
-                )
-                response = JSON.parse(decryptedContent)
-              } catch {
-                reject(new Nip47ResponseDecodingError("failed to deserialize response", "INTERNAL"))
-                return
-              }
-
-              if (response.result) {
-                if (resultValidator(response.result)) {
-                  resolve(response.result)
-                } else {
-                  reject(
-                    new Nip47ResponseValidationError(
-                      "response from NWC failed validation: " + JSON.stringify(response.result),
-                      "INTERNAL",
-                    ),
-                  )
-                }
-              } else {
-                reject(
-                  new Nip47WalletError(
-                    response.error?.message || "unknown Error",
-                    response.error?.code || "INTERNAL",
-                  ),
-                )
-              }
-            },
-          },
-        )
-
-        const replyTimeoutCheck = setTimeout(() => {
-          sub.close()
-          reject(new Nip47ReplyTimeoutError(`reply timeout: event ${event.id}`, "INTERNAL"))
-        }, timeoutValues?.replyTimeout || 60000)
-
-        const publishTimeoutCheck = setTimeout(() => {
-          sub.close()
-          reject(new Nip47PublishTimeoutError(`publish timeout: ${event.id}`, "INTERNAL"))
-        }, timeoutValues?.publishTimeout || 5000)
-
-        try {
-          await Promise.any(this.pool.publish(this.relayUrls, event))
-          clearTimeout(publishTimeoutCheck)
-        } catch (error) {
-          clearTimeout(publishTimeoutCheck)
-          reject(new Nip47PublishError(`failed to publish: ${error}`, "INTERNAL"))
-        }
-      })().catch(error => reject(error as Error))
+    const command = {method: nip47Method, params}
+    const encryptedCommand = await this.signer.nip44.encrypt(
+      this.walletPubkey,
+      JSON.stringify(command),
+    )
+    const template = makeEvent(NIP47_REQUEST_KIND, {
+      tags: [
+        ["p", this.walletPubkey],
+        ["v", NIP47_VERSION],
+        ["encryption", OUTBOUND_ENCRYPTION],
+      ],
+      content: encryptedCommand,
     })
-  }
-
-  private async ensureConnected() {
-    if (!this.relayUrls.length) {
-      throw new Error("Missing relay url")
-    }
+    const event = await this.signer.sign(template)
+    const replyTimeout = timeoutValues?.replyTimeout || 60_000
+    const publishTimeout = timeoutValues?.publishTimeout || 5_000
+    const responseListener = this.listenForResponse(event.id, replyTimeout)
 
     try {
-      await Promise.any(this.relayUrls.map(relayUrl => this.pool.ensureRelay(relayUrl)))
+      await this.publishRequest(event, publishTimeout)
     } catch (error) {
-      console.error("failed to connect to any relay", error)
-      throw new Nip47NetworkError("Failed to connect to " + this.relayUrls.join(","), "OTHER")
+      responseListener.cancel()
+      throw error
+    }
+
+    const responseEvent = await responseListener.promise
+    let response: Nip47Response<T>
+
+    try {
+      const decryptedContent = await decrypt(this.signer, this.walletPubkey, responseEvent.content)
+      response = JSON.parse(decryptedContent) as Nip47Response<T>
+    } catch {
+      throw new Nip47ResponseDecodingError("failed to deserialize response", "INTERNAL")
+    }
+
+    if (response.result) {
+      if (resultValidator(response.result)) {
+        return response.result
+      }
+
+      throw new Nip47ResponseValidationError(
+        "response from NWC failed validation: " + JSON.stringify(response.result),
+        "INTERNAL",
+      )
+    }
+
+    throw new Nip47WalletError(
+      response.error?.message || "unknown Error",
+      response.error?.code || "INTERNAL",
+    )
+  }
+
+  private listenForResponse(eventId: string, timeoutMs: number) {
+    const controller = new AbortController()
+    const timeoutId = setTimeout(() => controller.abort(), timeoutMs)
+    let responseEvent: TrustedEvent | undefined
+
+    const promise = request({
+      relays: this.relayUrls,
+      filters: [{kinds: [NIP47_RESPONSE_KIND], authors: [this.walletPubkey], "#e": [eventId]}],
+      signal: controller.signal,
+      onEvent: (event: TrustedEvent) => {
+        if (!responseEvent) {
+          responseEvent = event
+          controller.abort()
+        }
+      },
+    })
+      .then(() => {
+        if (!responseEvent) {
+          throw new Nip47ReplyTimeoutError(`reply timeout: event ${eventId}`, "INTERNAL")
+        }
+
+        return responseEvent
+      })
+      .finally(() => clearTimeout(timeoutId))
+
+    return {
+      promise,
+      cancel: () => controller.abort(),
     }
   }
 
-  private async selectEncryptionType() {
-    if (!this.encryptionType) {
-      const walletServiceInfo = await this.getWalletServiceInfo()
-      const encryptionType = selectPreferredEncryption(walletServiceInfo.encryptions)
+  private async publishRequest(event: SignedEvent, timeout: number) {
+    const resultsByRelay = await publish({
+      relays: this.relayUrls,
+      event,
+      timeout,
+    })
+    const results = Object.values(resultsByRelay)
 
-      if (!encryptionType) {
-        throw new Nip47UnsupportedEncryptionError(
-          "no compatible encryption or version found between wallet and client",
-          "UNSUPPORTED_ENCRYPTION",
-        )
-      }
-
-      if (encryptionType === "nip04") {
-        console.warn(
-          "NIP-04 encryption is about to be deprecated. Please upgrade your wallet service to use NIP-44 instead.",
-        )
-      }
-
-      this.encryptionType = encryptionType
+    if (results.some(result => result.status === PublishStatus.Success)) {
+      return
     }
+
+    if (results.every(result => result.status === PublishStatus.Timeout)) {
+      throw new Nip47PublishTimeoutError(`publish timeout: ${event.id}`, "INTERNAL")
+    }
+
+    throw new Nip47PublishError(
+      "failed to publish: " + results.map(result => `${result.relay}:${result.status}`).join(", "),
+      "INTERNAL",
+    )
+  }
+
+  private async assertWalletSupportsNip44() {
+    if (this.encryptionReady) {
+      return
+    }
+
+    const infoEvents = await withTimeout(5_000, signal =>
+      request({
+        relays: this.relayUrls,
+        filters: [{kinds: [NIP47_INFO_KIND], authors: [this.walletPubkey], limit: 1}],
+        signal,
+      }),
+    )
+    const info = infoEvents[0]
+
+    if (!info) {
+      throw new Nip47NetworkError("no info event (kind 13194) returned from relay", "OTHER")
+    }
+
+    const encryptionTag = info.tags.find(tag => tag[0] === "encryption")
+    const supportedEncryptions = (encryptionTag?.[1] || "").split(" ").filter(Boolean)
+    const isNip44Supported =
+      supportedEncryptions.length > 0
+        ? supportedEncryptions.includes(OUTBOUND_ENCRYPTION)
+        : info.tags.some(tag => tag[0] === "v" && tag[1]?.includes(NIP47_VERSION))
+
+    if (!isNip44Supported) {
+      throw new Nip47UnsupportedEncryptionError(
+        "wallet does not support required nip44_v2 encryption",
+        "UNSUPPORTED_ENCRYPTION",
+      )
+    }
+
+    this.encryptionReady = true
   }
 }

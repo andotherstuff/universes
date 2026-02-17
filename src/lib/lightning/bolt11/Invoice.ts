@@ -1,4 +1,5 @@
-import {sha256Bytes, bytesToHex, hexToBytes} from "../core"
+import {sha256} from "@noble/hashes/sha2.js"
+import {bytesToHex, hexToBytes} from "@welshman/lib"
 import {decodeInvoice} from "./decoder"
 import type {InvoiceArgs, SuccessAction} from "./types"
 
@@ -48,7 +49,7 @@ export class Invoice {
     if (!preimage || !this.paymentHash) return false
 
     try {
-      const preimageHash = bytesToHex(sha256Bytes(hexToBytes(preimage)))
+      const preimageHash = bytesToHex(sha256(hexToBytes(preimage)))
       return this.paymentHash === preimageHash
     } catch {
       return false

@@ -1,4 +1,4 @@
-export type Nip47EncryptionType = "nip04" | "nip44_v2"
+export type Nip47EncryptionType = "nip44_v2"
 
 export type Nip47Method =
   | "get_info"
